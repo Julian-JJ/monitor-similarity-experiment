@@ -1,19 +1,15 @@
-"""Sequential agent execution, resumable state checkpoints, and follow-up branches."""
+"""Sequential agent execution, completed-rollout caching, and follow-up branches."""
 
-import ast
 import copy
-import fcntl
 import importlib.metadata
 import json
 import platform
-import random
 import time
-from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
 from . import __version__
-from .artifacts import digest, read_json, write_json
+from .artifacts import digest, lock, read_json, write_json
 from .environments import Environment, ROOT, provenance
 
 FOLLOWUP = (ROOT / "prompts/generic_followup.txt").read_text().strip()
@@ -28,20 +24,6 @@ def versions():
             ("pydantic", "pandas", "PyYAML", "docstring-parser", "typing-extensions")}
 
 
-@contextmanager
-def lock(path):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a") as stream:
-        try:
-            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            raise RuntimeError(f"Another worker owns {path}") from None
-        try:
-            yield
-        finally:
-            fcntl.flock(stream, fcntl.LOCK_UN)
-
-
 def add_message(messages, message):
     messages.append({"id": f"m{len(messages):05d}", **message})
 
@@ -49,55 +31,40 @@ def add_message(messages, message):
 def validate_completion(message, require_reasoning):
     if message["finish_reason"] not in ("stop", "tool_calls"):
         raise ValueError(f"Incomplete generation: finish_reason={message['finish_reason']!r}")
-    if require_reasoning and not message.get("reasoning"):
+    if require_reasoning and message.get("reasoning") is None:
         raise ValueError("No reasoning returned; use Qwen thinking mode and --reasoning-parser qwen3")
 
 
 def run_actor(client, path, identity, settings, environment_factory=Environment):
-    """Resume after the last committed turn, including simulated state and RNG."""
-    task, variant, seed = (identity[k] for k in ("task", "variant", "seed"))
-    environment = environment_factory(task, variant, seed)
+    """Reuse completed artifacts; overwrite every incomplete attempt from scratch."""
     if path.exists():
-        artifact = read_json(path)
-        if artifact["identity"] != identity:
+        previous = read_json(path)
+        if previous["identity"] != identity:
             raise ValueError("Cache identity mismatch")
-        if artifact["status"] == "complete":
-            return artifact
-        environment.restore(artifact["final_state"])
-        random.setstate(ast.literal_eval(artifact["random_state"]))
-    else:
+        if previous["status"] == "complete":
+            return previous
+    task, variant, seed = (identity[k] for k in ("task", "variant", "seed"))
+    record = {"schema_version": 2, "artifact_type": "actor_rollout",
+              "rollout_id": digest(identity), "identity": identity,
+              "created_at": now(), "status": "running"}
+    # Only a status record is durable until the entire trajectory and grading
+    # succeed. An exception or hard kill cannot publish a partial tool turn.
+    write_json(path, record)
+    started = time.monotonic()
+    pending_raw = None
+    try:
+        environment = environment_factory(task, variant, seed)
         initial = environment.snapshot()
-        artifact = {"schema_version": 1, "artifact_type": "actor_rollout",
-                    "rollout_id": digest(identity), "identity": identity,
-                    "created_at": now(), "status": "running", "messages": [],
-                    "initial_state_hash": digest(initial), "initial_state": initial,
-                    "raw_responses": [], "turns": 0, "elapsed_seconds": 0.0,
-                    "actor_finished": False, "evaluation": None}
+        artifact = {**record, "messages": [], "initial_state": initial,
+                    "initial_state_hash": digest(initial), "raw_responses": [],
+                    "turns": 0, "actor_finished": False, "evaluation": None}
         for message in environment.prompts():
             add_message(artifact["messages"], message)
-
-    def checkpoint():
-        artifact["final_state"] = environment.snapshot()
-        artifact["random_state"] = repr(random.getstate())
-        artifact["updated_at"] = now()
-        write_json(path, artifact)
-
-    checkpoint()
-    artifact.pop("error", None)
-    artifact["status"] = "running"
-    try:
         while not artifact["actor_finished"] and artifact["turns"] < settings["max_turns"]:
-            started = time.monotonic()
-            message, raw = client.complete(artifact["messages"], environment.tools(), settings,
-                                           seed + artifact["turns"])
-            # Validate before mutating environment. Failed responses are preserved
-            # separately and do not become part of a resumed conversation.
-            try:
-                validate_completion(message, settings["require_reasoning"])
-            except ValueError:
-                artifact.setdefault("failed_responses", []).append(raw)
-                raise
-            artifact["raw_responses"].append(raw)
+            message, pending_raw = client.complete(
+                artifact["messages"], environment.tools(), settings, seed + artifact["turns"])
+            validate_completion(message, settings["require_reasoning"])
+            artifact["raw_responses"].append(pending_raw)
             add_message(artifact["messages"], message)
             ended = False
             for call in message["tool_calls"]:
@@ -117,27 +84,30 @@ def run_actor(client, path, identity, settings, environment_factory=Environment)
                 add_message(artifact["messages"], {
                     "role": "tool", "tool_call_id": call["id"], "name": name,
                     "content": error if error else (result if isinstance(result, str)
-                               else json.dumps(result, ensure_ascii=False, default=str)),
+                               else json.dumps(result, ensure_ascii=False, allow_nan=False)),
                     "error": error})
             artifact["turns"] += 1
-            artifact["elapsed_seconds"] += time.monotonic() - started
             artifact["actor_finished"] = ended or not message["tool_calls"]
             if artifact["actor_finished"]:
                 artifact["termination"] = "end_task" if ended else "final_answer"
-            checkpoint()
+            pending_raw = None
         if not artifact["actor_finished"]:
             artifact["termination"] = "max_turns"
         artifact["evaluation"] = environment.evaluate()
+        artifact["final_state"] = environment.snapshot()
         artifact["status"] = "complete"
-        checkpoint()
+        artifact["elapsed_seconds"] = time.monotonic() - started
+        artifact["updated_at"] = now()
+        write_json(path, artifact)
         return artifact
     except Exception as exception:
-        raw = getattr(exception, "raw_response", None)
+        raw = getattr(exception, "raw_response", None) or pending_raw
         if raw is not None:
-            artifact.setdefault("failed_responses", []).append(raw)
-        artifact["status"] = "error"
-        artifact["error"] = {"type": type(exception).__name__, "message": str(exception)}
-        checkpoint()
+            record["failed_responses"] = [raw]
+        record.update(status="error", updated_at=now(),
+                      elapsed_seconds=time.monotonic() - started,
+                      error={"type": type(exception).__name__, "message": str(exception)})
+        write_json(path, record)
         raise
 
 

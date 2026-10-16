@@ -40,10 +40,19 @@ Requested seeds and complete metadata aid reproducibility; do not promise bitwis
 
 ## Cache behavior
 
-Use content-derived identities incorporating all inputs that affect the artifact. Write artifacts atomically and resume unfinished work without regenerating completed trajectories. Separate execution, grading, and follow-up identities so changes to one stage do not unnecessarily invalidate the others.
+Use content-derived identities incorporating all inputs that affect the artifact.
+Write completed artifacts atomically and reuse completed trajectories. Incomplete
+actors are overwritten and generated again from the initial environment; do not
+save partial conversations or environment checkpoints. A grading failure also
+requires a fresh actor attempt. Follow-ups have separate identities and can be
+retried without regenerating a completed actor. Independent regrading is future
+work, not implemented in the current runner.
 
 Frozen rollout manifests define the exact samples used in comparisons. Changing a judge or evaluator creates a new label version rather than overwriting the old one. Keep labels and privileged state available to the evaluator but outside monitor observation rendering.
 
 ## Validation milestone
 
-Verify environment reset, reference-solution evaluation, interrupted-run resume, cache invalidation, message ordering, and follow-up isolation. Start with one programmatic environment before generating the full dataset.
+Verify environment reset, reference-solution evaluation, interrupted-run restart,
+absence of partial checkpoints, cache invalidation, message ordering, and
+follow-up isolation. Start with one programmatic environment before generating
+the full dataset.

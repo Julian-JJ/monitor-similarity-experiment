@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from monitor_experiment.artifacts import write_json
+from monitor_experiment.artifacts import lock, write_json
 
 
 def main():
@@ -28,18 +28,20 @@ def main():
     revision = HfApi().model_info(model, revision=args.revision).sha
     print(f"Downloading {model}@{revision} to {output}", flush=True)
     output.mkdir(parents=True, exist_ok=True)
-    (output / ".download-incomplete").write_text(revision + "\n")
-    snapshot_download(repo_id=model, revision=revision, local_dir=output,
-                      max_workers=args.workers,
-                      allow_patterns=["*.json", "*.safetensors", "*.jinja", "*.txt", "*.model", "*.md", "LICENSE*"])
-    # Published only after the entire snapshot has been downloaded successfully.
-    write_json(output / "download-manifest.json", {
-        "schema_version": 1, "model_id": model, "revision": revision,
-        "huggingface_hub_version": version("huggingface-hub"),
-        "files": {str(p.relative_to(output)): p.stat().st_size for p in sorted(output.rglob("*"))
-                  if p.is_file() and ".cache" not in p.relative_to(output).parts
-                  and p.name not in ("download-manifest.json", "serving-manifest.json", ".download-incomplete")}})
-    (output / ".download-incomplete").unlink()
+    with lock(output / ".model.lock"):
+        (output / ".download-incomplete").write_text(revision + "\n")
+        snapshot_download(repo_id=model, revision=revision, local_dir=output,
+                          max_workers=args.workers,
+                          allow_patterns=["*.json", "*.safetensors", "*.jinja", "*.txt", "*.model", "*.md", "LICENSE*"])
+        # Published only after the entire snapshot has been downloaded successfully.
+        write_json(output / "download-manifest.json", {
+            "schema_version": 1, "model_id": model, "revision": revision,
+            "huggingface_hub_version": version("huggingface-hub"),
+            "files": {str(p.relative_to(output)): p.stat().st_size for p in sorted(output.rglob("*"))
+                      if p.is_file() and ".cache" not in p.relative_to(output).parts
+                      and p.name not in ("download-manifest.json", "serving-manifest.json",
+                                         ".download-incomplete", ".model.lock")}})
+        (output / ".download-incomplete").unlink()
     print("Download complete. Immutable revision recorded in download-manifest.json.")
 
 

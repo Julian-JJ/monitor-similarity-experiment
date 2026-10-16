@@ -16,17 +16,25 @@ class ProtocolError(RuntimeError):
 def normalize(response):
     choice = response["choices"][0]
     original = choice["message"]
-    content = original.get("content") or ""
+    content = original.get("content")
+    if content is None:
+        content = ""
+    if not isinstance(content, str):
+        raise ProtocolError("Expected assistant content to be a string or null")
     reasoning = original.get("reasoning_content")
     if reasoning is None:
         reasoning = original.get("reasoning")
-    # Support servers returning raw Qwen <think> delimiters instead of a field.
-    if "</think>" in content:
-        before, content = content.split("</think>", 1)
-        reasoning = reasoning or before.removeprefix("<think>").strip()
-        content = content.lstrip()
-    elif "<think>" in content:
-        raise ProtocolError("Unclosed reasoning block; likely truncated generation")
+    if reasoning is not None and not isinstance(reasoning, str):
+        raise ProtocolError("Expected assistant reasoning to be a string or null")
+    # Parsed reasoning, including an empty string, is authoritative. Only
+    # interpret raw delimiters when no parsed field exists and content starts
+    # with an explicit reasoning block. Inline or closing-only tags are text.
+    if reasoning is None and content.lstrip().startswith("<think>"):
+        block = content.lstrip()[len("<think>"):]
+        if "</think>" not in block:
+            raise ProtocolError("Unclosed reasoning block; likely truncated generation")
+        reasoning, content = block.split("</think>", 1)
+        reasoning = reasoning.strip()
     calls = copy.deepcopy(original.get("tool_calls") or [])
     for i, call in enumerate(calls):
         call.setdefault("id", f"call_{response.get('id', 'response')}_{i}")
@@ -62,8 +70,8 @@ class Client:
 
     def check(self):
         names = [item["id"] for item in self.request("/models")["data"]]
-        if self.model not in names:
-            raise ValueError(f"Model {self.model!r} not served; endpoint offers {names}")
+        if names != [self.model]:
+            raise ValueError(f"Expected exactly the recorded model {self.model!r}; endpoint offers {names}")
         return {"base_url": self.base_url, "served_model": self.model}
 
     def complete(self, messages, tools, settings, seed):
@@ -81,6 +89,8 @@ class Client:
             body.update(tools=tools, tool_choice="auto", parallel_tool_calls=False)
         response = self.request("/chat/completions", body)
         try:
+            if response.get("model") != self.model:
+                raise ProtocolError("Response model does not match the recorded serving configuration")
             return normalize(response), response
         except (KeyError, TypeError, IndexError, ProtocolError) as error:
             raise ProtocolError(str(error), response) from error

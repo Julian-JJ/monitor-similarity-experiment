@@ -1,9 +1,11 @@
 """Deterministic artifact identities and atomic JSON writes."""
 
+import fcntl
 import hashlib
 import json
 import os
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 
@@ -30,3 +32,18 @@ def write_json(path, value):
 
 def read_json(path):
     return json.loads(Path(path).read_text())
+
+
+@contextmanager
+def lock(path):
+    """Hold a nonblocking process lock; optionally pass its descriptor to a child."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a") as stream:
+        try:
+            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise RuntimeError(f"Another worker or server owns {path}") from None
+        # Closing releases our reference. Do not explicitly unlock: a child
+        # inheriting this descriptor must retain the lock if its parent exits.
+        yield stream.fileno()

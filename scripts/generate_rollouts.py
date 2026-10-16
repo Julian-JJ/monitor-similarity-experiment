@@ -13,6 +13,7 @@ from monitor_experiment.artifacts import read_json
 from monitor_experiment.environments import Environment, TASKS
 from monitor_experiment.inference import Client
 from monitor_experiment.rollouts import generate
+from monitor_experiment.serving import validate_manifest
 
 
 def resolve(value):
@@ -58,12 +59,16 @@ def main():
     config["model"]["revision"] = manifest["revision"]
     config["model"]["download_manifest"] = manifest
     serving = read_json(resolve(config["model"]["serving_manifest"]))
-    if (serving["revision"], serving["model_id"]) != (manifest["revision"], manifest["model_id"]):
-        parser.error("Serving manifest and downloaded model revision disagree")
+    try:
+        served_model = validate_manifest(serving, manifest)
+    except (KeyError, TypeError, ValueError) as error:
+        parser.error(f"Invalid serving provenance: {error}")
     config["model"]["serving"] = serving
+    config["model"]["manifest"] = str(resolve(config["model"]["manifest"]).resolve())
+    config["model"]["serving_manifest"] = str(resolve(config["model"]["serving_manifest"]).resolve())
     if args.base_url:
         config["model"]["base_url"] = args.base_url
-    client = Client(config["model"]["base_url"], config["model"]["id"],
+    client = Client(config["model"]["base_url"], served_model,
                     config["generation"]["timeout"], config["model"]["api_key_env"])
     print("Endpoint:", client.check())
     generate(config, client, resolve(args.cache_dir or config["cache"]["directory"]),

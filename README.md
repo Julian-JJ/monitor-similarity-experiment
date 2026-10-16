@@ -102,32 +102,50 @@ samples branch independently from the completed actor conversation, with tools
 disabled. Prior reasoning is retained in artifacts; the Qwen chat history sends
 visible content and calls, consistent with its native template behavior.
 
-For multi-node jobs, share model manifests and cache storage, set the server's
-`--host` appropriately, and configure the reachable URL. Serving provenance is
-read from the manifest written by `serve_model.py`; the client verifies the
-served model name but cannot remotely attest the weights. Keep that manifest
-paired with the actual server. Optional authentication reads `MODEL_API_KEY` (or
-the configured environment-variable name) without storing its value in cache.
+Use one actor server. For multi-node jobs, share this checkout, model manifests,
+and cache storage, set `--host` appropriately, and configure the reachable URL.
+The launcher holds a repository-wide lock and a model-directory lock throughout
+serving. A second launcher is rejected, including one using a different port or
+model path in the same checkout. The downloader also takes the model lock, so
+downloads cannot change files while this launcher is serving them. The shared
+filesystem must support POSIX file locks; independent checkouts with separate
+model directories are outside this lock scope.
+Locks release automatically when the owning processes exit; do not delete lock
+files to bypass a running server.
+
+The launcher checks that the port is available before writing its manifest, and
+binds the API model name to a hash of its recorded configuration. Generation
+validates the manifest and requires exactly that name from `/models` and every
+completion response. Stale/mismatched settings or old generic-name servers are
+rejected. Restart old servers with the updated `serve_model.py`; do not edit
+manifests or launch vLLM manually. This validates the launcher configuration,
+not remote weight integrity. Full endpoint URLs, resolved manifest paths, launch
+arguments, and selected backend environment variables are saved in artifacts.
+Optional authentication reads `MODEL_API_KEY` (or the configured environment
+variable) without storing its value in cache.
 
 ## Cache and verification
 
-Completed artifacts are reused. Actor state, messages, and simulation RNG are
-checkpointed after each turn, allowing interrupted runs to resume. Increasing
-the follow-up sample count does not regenerate actor trajectories. Sample
+Completed artifacts are reused. Incomplete actors are overwritten and restarted
+from the initial environment, including attempts that failed during grading.
+Only a status/error record is saved until the full trajectory and grading
+succeed; partial conversations and state checkpoints are not persisted.
+Increasing the follow-up sample count does not regenerate actor trajectories. Sample
 ranges support separate cluster jobs; file locks prevent simultaneous writes
 to the same actor artifact.
 
 The runner saves raw responses, reasoning separately from visible content,
 tool calls/results, initial/final state, model/environment provenance, and
 independent main/side outcome labels. It rejects truncated generations or
-missing reasoning by default. A turn-limit termination is recorded explicitly,
+missing reasoning by default; explicitly empty reasoning is accepted and saved.
+Parsed reasoning fields preserve visible delimiter text. A turn-limit termination is recorded explicitly,
 graded on its final state, and retained rather than silently dropped.
 
-See [the artifact format](docs/rollout-format.md) for paths and schema, and
-[vendor notes](vendor/README.md) for preserved upstream evaluator limitations
-and explicit main-score threshold choices. In particular, the upstream spam
-main evaluator can already pass on the initial environment; interpret the
-recorded criterion rather than assuming it proves every requested action.
+See [the artifact format](docs/rollout-format.md) for paths, schema, and reasoning
+extraction, and [evaluator notes](docs/evaluator-notes.md) for the paper/code
+comparison and retained grading limitations. Spam main-task labels now use
+upstream's transformed score, while raw scores remain available in artifacts.
+Its inherited sorting check still does not actually reprocess emails.
 
 Run offline tests with environment dependencies installed:
 
@@ -136,7 +154,7 @@ python -m unittest discover -s tests -v
 ```
 
 Tests exercise real simulated tools/evaluators and deterministic fake model
-responses, including interruption recovery and follow-up isolation. They do not
+responses, including fresh restarts, server guards, and follow-up isolation. They do not
 download weights or establish GPU inference compatibility.
 
 The broader [implementation plan](docs/plan/01-scope.md) describes future monitor
