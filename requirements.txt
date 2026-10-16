@@ -1,0 +1,6 @@
+# Only dependencies needed by the vendored environment tools and evaluators.
+pydantic[email]>=2.10,<3
+pandas>=2.2,<3
+PyYAML>=6,<7
+docstring-parser>=0.16,<0.18
+typing-extensions>=4.12,<5

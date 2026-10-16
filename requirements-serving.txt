@@ -1,0 +1,2 @@
+# Install separately on a supported GPU cluster; CUDA/torch are managed by vLLM.
+vllm>=0.11,<1

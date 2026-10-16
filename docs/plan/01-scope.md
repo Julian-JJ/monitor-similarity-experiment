@@ -1,6 +1,9 @@
 # Scope and research decisions
 
-Status: implementation plan; no framework code has been implemented.
+Status: the initial model-download and programmatic-task rollout slice is
+implemented; see [the repository README](../../README.md). Monitor evaluation
+and hierarchical aggregation remain planned work. The documents below describe
+the broader intended framework.
 
 Build a lightweight framework to measure how the monitor affects monitorability. Generate Qwen3-14B trajectories once, freeze their outcome labels, and reuse identical trajectories across monitor conditions.
 
