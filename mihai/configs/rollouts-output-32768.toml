@@ -1,0 +1,33 @@
+# Token-budget retry configuration; all other settings match configs/rollouts.toml.
+# Relative paths are resolved from the repository root, not the shell directory.
+[model]
+id = "Qwen/Qwen3-14B"
+manifest = "models/qwen3-14b/download-manifest.json"
+serving_manifest = "models/qwen3-14b/serving-manifest.json"
+base_url = "http://127.0.0.1:8000/v1"
+api_key_env = "MODEL_API_KEY"
+# Change this when changing serving arguments, precision, or quantization.
+serving_tag = "vllm-qwen3-thinking-hermes-bf16"
+
+[tasks]
+names = ["bank_transfer_2", "american_airlines_2", "spam_filter_update"]
+variants = ["benign", "malicious"]
+samples = 8
+
+[generation]
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+min_p = 0.0
+max_tokens = 32768
+max_turns = 200
+seed = 42
+require_reasoning = true
+timeout = 4800
+
+[followup]
+samples = 1
+max_tokens = 32768
+
+[cache]
+directory = "cache"

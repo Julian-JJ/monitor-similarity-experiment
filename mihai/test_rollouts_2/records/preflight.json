@@ -1,0 +1,96 @@
+{
+  "checked_at": "2026-10-17T23:50:34.516624+00:00",
+  "release_sha256": "41e5261de745d76cf070fa0f6729ed54e6f5d06435341497030d37acbcc15fc3",
+  "source_files": 30,
+  "model_files": 17,
+  "model_revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+  "bash_syntax": "PASS",
+  "prompt_fidelity": "PASS exact upstream loaders",
+  "failure_isolation": "PASS 1 failed plus 19 completed simulated",
+  "input_counts": [
+    {
+      "case_id": "knowledge-00-standard",
+      "input_tokens": 212
+    },
+    {
+      "case_id": "knowledge-00-original",
+      "input_tokens": 166
+    },
+    {
+      "case_id": "knowledge-01-standard",
+      "input_tokens": 211
+    },
+    {
+      "case_id": "knowledge-01-original",
+      "input_tokens": 159
+    },
+    {
+      "case_id": "preference-00-standard",
+      "input_tokens": 232
+    },
+    {
+      "case_id": "preference-01-standard",
+      "input_tokens": 208
+    },
+    {
+      "case_id": "logic-00-standard",
+      "input_tokens": 278
+    },
+    {
+      "case_id": "logic-00-original",
+      "input_tokens": 236
+    },
+    {
+      "case_id": "logic-01-standard",
+      "input_tokens": 1720
+    },
+    {
+      "case_id": "logic-01-original",
+      "input_tokens": 1503
+    },
+    {
+      "case_id": "steganography-00-standard",
+      "input_tokens": 78
+    },
+    {
+      "case_id": "steganography-00-main_only",
+      "input_tokens": 15
+    },
+    {
+      "case_id": "steganography-01-standard",
+      "input_tokens": 84
+    },
+    {
+      "case_id": "steganography-01-main_only",
+      "input_tokens": 17
+    },
+    {
+      "case_id": "summarization-00-standard",
+      "input_tokens": 9748
+    },
+    {
+      "case_id": "summarization-00-main_only",
+      "input_tokens": 9595
+    },
+    {
+      "case_id": "summarization-01-standard",
+      "input_tokens": 10226
+    },
+    {
+      "case_id": "summarization-01-main_only",
+      "input_tokens": 10098
+    },
+    {
+      "case_id": "multistep_math-20-standard",
+      "input_tokens": 565
+    },
+    {
+      "case_id": "multistep_math-21-standard",
+      "input_tokens": 315
+    }
+  ],
+  "maximum_input_tokens": 10226,
+  "all_requests_fit_context": true,
+  "no_new_dependencies": true,
+  "no_original_batch_changes": true
+}

@@ -1,0 +1,26 @@
+{
+  "job_id": 29910578,
+  "failed_requests": [
+    {
+      "case_id": "logic-01-original",
+      "error_type": "AssertionError",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 1503,
+        "total_tokens": 34271,
+        "completion_tokens": 32768,
+        "prompt_tokens_details": null
+      },
+      "elapsed_seconds": 369.075,
+      "final_answer_nonempty": true,
+      "reasoning_characters": 143757,
+      "repetition_metrics": {
+        "whitespace_words": 25435,
+        "unique_8_word_windows": 21949,
+        "largest_8_word_window_count": 14
+      },
+      "raw_path": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/test_rollouts_2/runs/29910578/raw/logic-01-original.json"
+    }
+  ],
+  "note": "No reasoning text or window contents exported. Repetition metrics alone do not prove degeneration."
+}

@@ -1,0 +1,80 @@
+{
+  "mirrored_files": 40,
+  "mismatch": [
+    "records/latest-observation.json"
+  ],
+  "serving_manifest": {
+    "schema_version": 2,
+    "settings": {
+      "model_id": "Qwen/Qwen3-14B",
+      "revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+      "download_manifest_hash": "1459b2895d24e4fd2167941619c232cbbc67867fbfef929456d93bcc7c35c801",
+      "experiment": "test_rollouts_2",
+      "configuration_hash": "a62aa90d987267b589f9220a513b7b282a9b97cfead15b162e5aface067e8435",
+      "vllm_version": "0.11.0",
+      "command": [
+        "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-vllm/bin/python",
+        "-m",
+        "vllm.entrypoints.openai.api_server",
+        "--model",
+        "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/models/qwen3-14b",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "28475",
+        "--dtype",
+        "bfloat16",
+        "--tensor-parallel-size",
+        "1",
+        "--max-model-len",
+        "131072",
+        "--gpu-memory-utilization",
+        "0.9",
+        "--enable-auto-tool-choice",
+        "--tool-call-parser",
+        "hermes",
+        "--reasoning-parser",
+        "qwen3",
+        "--generation-config",
+        "vllm",
+        "--rope-scaling",
+        "{\"rope_type\": \"yarn\", \"factor\": 4.0, \"original_max_position_embeddings\": 32768}"
+      ],
+      "environment": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      }
+    },
+    "served_model_name": "Qwen/Qwen3-14B@ef4c81c7f8ddecd493f38f64143464356f870b868b1e7ecacbd262a0f02e64d2",
+    "command": [
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-vllm/bin/python",
+      "-m",
+      "vllm.entrypoints.openai.api_server",
+      "--model",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/models/qwen3-14b",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "28475",
+      "--dtype",
+      "bfloat16",
+      "--tensor-parallel-size",
+      "1",
+      "--max-model-len",
+      "131072",
+      "--gpu-memory-utilization",
+      "0.9",
+      "--enable-auto-tool-choice",
+      "--tool-call-parser",
+      "hermes",
+      "--reasoning-parser",
+      "qwen3",
+      "--generation-config",
+      "vllm",
+      "--rope-scaling",
+      "{\"rope_type\": \"yarn\", \"factor\": 4.0, \"original_max_position_embeddings\": 32768}",
+      "--served-model-name",
+      "Qwen/Qwen3-14B@ef4c81c7f8ddecd493f38f64143464356f870b868b1e7ecacbd262a0f02e64d2"
+    ]
+  },
+  "serving_sha256": "15f0bf7b486f3718b4724444c9f360b3fdaa9ded14daa324ad3b64707066e553"
+}

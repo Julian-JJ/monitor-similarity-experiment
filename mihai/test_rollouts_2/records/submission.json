@@ -1,0 +1,53 @@
+{
+  "experiment": "test_rollouts_2",
+  "intent_id": "d531bdf6-705e-4cfb-8bff-dc0c3bac7d40",
+  "state": "submitted",
+  "attempted_at": "2026-10-17T23:50:44.857757+00:00",
+  "release": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/test_rollouts_2/releases/41e5261de745d76c",
+  "release_manifest_sha256": "41e5261de745d76cf070fa0f6729ed54e6f5d06435341497030d37acbcc15fc3",
+  "configuration_sha256": "6407658ff8cb440b4e6f981618e8de169c4de333fd2c1573a26e367f37ccb969",
+  "selection_sha256": "6bcda74e45be036dfe221ac8f71ec829ccd1b8c8539df900bca9dbf8674086a9",
+  "sbatch_command": [
+    "sbatch",
+    "--parsable",
+    "--account=cpsc4880",
+    "--partition=gpu_h200",
+    "--nodes=1",
+    "--ntasks=1",
+    "--gpus=h200:1",
+    "--cpus-per-task=8",
+    "--mem=96G",
+    "--time=03:00:00",
+    "--no-requeue",
+    "--job-name=mihai-qwen-test-rollouts-2",
+    "--comment=test-rollouts-2:d531bdf6-705e-4cfb-8bff-dc0c3bac7d40",
+    "--chdir=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/test_rollouts_2/releases/41e5261de745d76c",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/test_rollouts_2/logs/slurm-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/test_rollouts_2/releases/41e5261de745d76c/run.sbatch",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/test_rollouts_2/releases/41e5261de745d76c",
+    "41e5261de745d76cf070fa0f6729ed54e6f5d06435341497030d37acbcc15fc3"
+  ],
+  "expected_requests": 20,
+  "distinct_problems": 12,
+  "queue_before_submission": "",
+  "accounting_before_submission": "29768262|interactive|COMPLETED|0:0|\n29774458|mihai-env-check|CANCELLED by 35062|0:0|\n29777185|mihai-qwen-download|COMPLETED|0:0|\n29777614|mihai-review-e645|COMPLETED|0:0|\n29777884|mihai-parallel-check|COMPLETED|0:0|\n29777904|mihai-qwen-parallel|FAILED|1:0|\n29799521|mihai-qwen-40960|FAILED|1:0|\n29828195|mihai-qwen-c65536-o8192|FAILED|1:0|\n29860690|mihai-qwen-c131072-o32768|TIMEOUT|0:0|\n29894244|mihai-qwen-h200-remaining|FAILED|1:0|",
+  "prior_receipts": {
+    "qwen-c131072-o32768-y4.submission.json": {
+      "job_id": "29860690",
+      "intent_id": "06cfd222-7101-4d2a-9257-da2c3ad5b882"
+    },
+    "qwen-c65536-o8192-y2.submission.json": {
+      "job_id": "29828195",
+      "intent_id": "fbd23cc5-c82e-4013-90dc-5821e5060356"
+    },
+    "qwen-h200-remaining-06ba293a07d3ec8d.submission.json": {
+      "job_id": "29894244",
+      "intent_id": "7abc5432-28a6-48bb-9543-06b61c3c35d1"
+    }
+  },
+  "authorization": "User requested separate test_rollouts_2 screening, two problems per candidate task type; no automatic retries.",
+  "job_id": 29910578,
+  "submitted_at": "2026-10-17T23:50:47.336325+00:00",
+  "sbatch_stdout": "29910578",
+  "sbatch_stderr": ""
+}

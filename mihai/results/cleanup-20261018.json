@@ -1,0 +1,32 @@
+{
+  "cleaned_at": "2026-10-18T05:17:36.911486+00:00",
+  "archive": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/archives/cleanup-20261018",
+  "local_backup_verified_files": 243,
+  "failed_files_archived": 31,
+  "old_log_files_archived": 64,
+  "archived_file_bytes": 5373301,
+  "archive_sha256": "ff3606601161bec83ddc4e59fa255047efc28713be096249cb67d47113ce6788",
+  "second_experiment": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/test_rollouts_2",
+  "legacy_alias": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/test_rollouts_2",
+  "second_experiment_files_verified": 82,
+  "original_history_records_archived": 164,
+  "original_clean_files_unchanged": 84,
+  "original_clean_path": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/rollouts_original_clean",
+  "submission_receipts_and_locks_preserved": true,
+  "models_environments_and_frozen_sources_unchanged": true,
+  "local_files_removed_after_archiving": 171,
+  "local_generated_cache_directories_removed": 13,
+  "git_commit_created": false,
+  "git_push_performed": false,
+  "validation": {
+    "unit_tests_passed": 29,
+    "unit_tests_failed": 0,
+    "simulated_environments_passed": 3,
+    "second_experiment_selection_verified": true,
+    "second_experiment_failure_isolation_passed": true,
+    "second_experiment_release_files_verified": 30,
+    "pinned_upstream_files_verified": 17,
+    "raw_artifacts_or_credentials_in_git_file_set": false,
+    "full_validation_log": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/archives/cleanup-20261018/validation.txt"
+  }
+}

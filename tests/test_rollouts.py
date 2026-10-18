@@ -85,6 +85,66 @@ class EnvironmentTests(unittest.TestCase):
     def test_source_manifest(self):
         self.assertFalse(provenance()["modified"])
 
+    def test_spreadsheet_snapshot_preserves_values_without_mutating_environment(self):
+        import pandas as pd
+        env = Environment("american_airlines_2", "benign", 42)
+        self.assertEqual(env.snapshot(), env.state.model_dump(mode="json"))
+        before = env.evaluate()
+        result, error = env.execute("create_sheet", {"name": "attendees"})
+        self.assertIsNone(error)
+        self.assertIsInstance(result, str)
+        empty = env.snapshot()["excel"]["sheets"]["attendees"]["df"]
+        self.assertEqual((empty["columns"], empty["index"], empty["data"]), ([], [], []))
+        for tool, args in [
+            ("add_column", {"sheet_name": "attendees", "column_name": "flight"}),
+            ("set_cell_value", {"sheet_name": "attendees", "column_name": "flight",
+                                "row_number": 0, "value": "EXAMPLE123"}),
+            ("add_column", {"sheet_name": "attendees", "column_name": "meal"}),
+        ]:
+            _, error = env.execute(tool, args)
+            self.assertIsNone(error)
+        frame = env.state.excel.sheets["attendees"].df
+        original = frame.copy(deep=True)
+        table = json.loads(json.dumps(env.snapshot(), allow_nan=False))["excel"]["sheets"]["attendees"]["df"]
+        self.assertEqual(table["__type__"], "pandas.DataFrame")
+        self.assertEqual(table["columns"], ["flight", "meal"])
+        self.assertEqual(table["index"], [0])
+        self.assertEqual(table["data"], [["EXAMPLE123", {"__type__": "float", "value": "nan"}]])
+        pd.testing.assert_frame_equal(frame, original)
+        self.assertEqual(env.evaluate(), before)
+        result, error = env.execute("view_sheet", {"name": "attendees"})
+        self.assertIsNone(error)
+        self.assertIn("EXAMPLE123", result)
+
+    def test_spreadsheet_snapshot_retains_labels_types_and_missing_value_kinds(self):
+        import numpy as np
+        import pandas as pd
+        env = Environment("american_airlines_2", "benign", 42)
+        sheet = env.state.excel.create_sheet("edge_cases")
+        sheet.df = pd.DataFrame([[None, pd.NA, float("nan"), float("inf"),
+                                  float("-inf"), pd.NaT, np.int64(7), np.bool_(True)]],
+                                columns=["same"] * 8, index=pd.Index(["row-a"], name="row"), dtype=object)
+        sheet.df.columns.name = "column"
+        table = json.loads(json.dumps(env.snapshot(), allow_nan=False))["excel"]["sheets"]["edge_cases"]["df"]
+        self.assertEqual(table["index"], ["row-a"])
+        self.assertEqual(table["columns"], ["same"] * 8)
+        self.assertEqual(table["index_names"], ["row"])
+        self.assertEqual(table["column_names"], ["column"])
+        self.assertEqual(table["dtypes"], ["object"] * 8)
+        self.assertEqual(table["data"], [[None, {"__type__": "pandas.NA"},
+            {"__type__": "float", "value": "nan"}, {"__type__": "float", "value": "+inf"},
+            {"__type__": "float", "value": "-inf"}, {"__type__": "pandas.NaT"}, 7, True]])
+        sheet.df = pd.DataFrame(index=["empty-row"])
+        table = env.snapshot()["excel"]["sheets"]["edge_cases"]["df"]
+        self.assertEqual(table["index"], ["empty-row"])
+        self.assertEqual(table["data"], [[]])
+        sheet.df = pd.DataFrame({"count": pd.Series([], dtype="Int64")})
+        table = env.snapshot()["excel"]["sheets"]["edge_cases"]["df"]
+        self.assertEqual(table["dtypes"], ["Int64"])
+        sheet.df = pd.DataFrame([[object()]])
+        with self.assertRaises(ValueError):
+            env.snapshot()
+
     def test_tool_list_results_are_json_records(self):
         env = Environment("bank_transfer_2", "benign", 42)
         for tool in ("list_files", "get_unread_emails"):
@@ -113,6 +173,25 @@ class EnvironmentTests(unittest.TestCase):
 
 
 class RolloutTests(unittest.TestCase):
+    def test_airline_spreadsheet_completes_actor_followup_and_cache_reuse(self):
+        config = {"model": {"id": "test", "revision": "revision"},
+                  "generation": {**SETTINGS, "seed": 42}, "followup": {"samples": 1, "max_tokens": 100}}
+        replies = [response("create_sheet", {"name": "attendees"}),
+                   response("set_cell_value", {"sheet_name": "attendees", "column_name": "flight",
+                                              "row_number": 0, "value": "EXAMPLE123"}),
+                   response("end_task"), response()]
+        with tempfile.TemporaryDirectory() as folder:
+            manifest = generate(config, FakeClient(replies), folder, ["american_airlines_2"], ["benign"], 1)
+            entry = read_json(manifest)["entries"][0]
+            actor = read_json(Path(folder) / entry["rollout"])
+            self.assertEqual(actor["status"], "complete")
+            self.assertEqual(actor["final_state"]["excel"]["sheets"]["attendees"]["df"]["data"], [["EXAMPLE123"]])
+            followup = read_json(Path(folder) / entry["followups"][0])
+            self.assertEqual(followup["status"], "complete")
+            from monitor_experiment.artifacts import digest
+            self.assertEqual(followup["identity"]["parent_hash"], digest(actor))
+            self.assertEqual(manifest, generate(config, FakeClient([]), folder, ["american_airlines_2"], ["benign"], 1))
+
     def test_empty_reasoning_is_retained_in_actor_and_followup(self):
         actor_raw = response("end_task")
         actor_raw["choices"][0]["message"]["reasoning_content"] = ""
@@ -156,10 +235,16 @@ class RolloutTests(unittest.TestCase):
                 run_actor(client, path, identity, SETTINGS)
             failed = read_json(path)
             self.assertEqual(failed["status"], "error")
+            diagnostic_path = path.parent / failed["diagnostic_path"]
+            diagnostic = read_json(diagnostic_path)
+            self.assertEqual(diagnostic["completed_turns"], 1)
+            self.assertFalse(diagnostic["resumable"])
+            self.assertEqual(diagnostic["messages"][-1]["role"], "tool")
             for field in ("messages", "final_state", "random_state", "raw_responses"):
                 self.assertNotIn(field, failed)
             retry = FakeClient([response("end_task")])
             actor = run_actor(retry, path, identity, SETTINGS)
+            self.assertEqual(read_json(diagnostic_path), diagnostic)
             self.assertFalse(actor["evaluation"]["side_success"])
             self.assertEqual(actor["turns"], 1)
             self.assertEqual(len(retry.requests), 1)
@@ -231,6 +316,11 @@ class RolloutTests(unittest.TestCase):
                 self.assertEqual(saved["status"], status)
                 self.assertNotIn("messages", saved)
                 self.assertNotIn("final_state", saved)
+                if status == "error":
+                    diagnostic = read_json(path.parent / saved["diagnostic_path"])
+                    self.assertEqual(diagnostic["completed_turns"], 0)
+                    self.assertEqual(diagnostic["messages"], [{"id": "m00000", "role": "user", "content": "Test"}])
+                    self.assertEqual(diagnostic["raw_responses"], [])
             # An old v1 checkpoint is also discarded, regardless of its contents.
             write_json(path, {"schema_version": 1, "identity": identity, "status": "running",
                               "final_state": {"value": 123}, "messages": [{"role": "tool"}]})
@@ -244,6 +334,9 @@ class RolloutTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "grading failed"):
                 run_actor(FakeClient([response()]), grade_path, identity, SETTINGS, FaultEnvironment)
             self.assertNotIn("final_state", read_json(grade_path))
+            diagnostic = read_json(grade_path.parent / read_json(grade_path)["diagnostic_path"])
+            self.assertEqual(diagnostic["completed_turns"], 1)
+            self.assertEqual(len(diagnostic["raw_responses"]), 1)
             grading_error = False
             retry = FakeClient([response()])
             actor = run_actor(retry, grade_path, identity, SETTINGS, FaultEnvironment)

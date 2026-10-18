@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+models/
+benchmarks/
+cache/
+envs/
+logs/
+*.safetensors
+*.gguf
+*.log
+# Cluster-only responses, job outputs, archives and compatibility links.
+raw/
+runs/
+releases/
+archives/
+/results/runs
+/test_rollouts_2/records/attempt.json

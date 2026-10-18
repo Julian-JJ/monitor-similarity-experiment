@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-16",
+  "status": "complete",
+  "repository": "https://github.com/Julian-JJ/monitor-similarity-experiment.git",
+  "revision": "7cee43fcf6332a10bd85bf15ee714395191c7a99",
+  "account": "cpsc4880_mae73",
+  "cluster": "bouchet.ycrc.yale.edu",
+  "project_root": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+  "requested_alias": "/home/cpsc4880_mae73/project_cpsc4880/cpsc4880_mae73",
+  "python": "3.12.8",
+  "base_python": "/apps/software/system/software/miniconda/24.11.3/bin/python",
+  "environment_manager": "uv 0.13.1",
+  "isolation": "Separate relocatable virtual environments; system site packages disabled.",
+  "research": {
+    "path": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-research",
+    "requirements": [
+      "requirements.txt",
+      "requirements-download.txt"
+    ],
+    "additional_libraries": [
+      "numpy",
+      "scipy",
+      "scikit-learn",
+      "matplotlib",
+      "seaborn",
+      "tqdm",
+      "jsonlines",
+      "uv"
+    ],
+    "package_snapshot": "research-requirements-frozen.txt"
+  },
+  "serving": {
+    "path": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-vllm",
+    "requirements": [
+      "requirements-serving.txt",
+      "requirements-download.txt"
+    ],
+    "vllm": "0.11.0",
+    "torch": "2.8.0+cu128",
+    "transformers": "4.56.2",
+    "huggingface_hub": "0.36.0",
+    "cuda_runtime": "12.8",
+    "dependency_resolution_cutoff": "2026-02-01",
+    "torch_backend": "cu128",
+    "package_snapshot": "serving-requirements-frozen.txt",
+    "rationale": "vLLM 0.11.0 accepts the existing launcher's --rope-scaling option as well as Qwen3 reasoning and Hermes tool parsing. Validate future model families separately."
+  },
+  "validation": {
+    "offline_repository_tests": {
+      "passed": 13,
+      "failed": 0
+    },
+    "environments": [
+      "bank_transfer_2",
+      "american_airlines_2",
+      "spam_filter_update"
+    ],
+    "dependency_checks": "passed",
+    "final_research_location": "passed",
+    "final_serving_location": "passed, including GPU launcher and native-kernel checks",
+    "launcher_arguments": "passed on GPU, including YaRN",
+    "qwen3_model_registry": "passed",
+    "gpu": "NVIDIA A40",
+    "gpu_driver": "580.178.04",
+    "bf16_matrix_multiplication": "passed",
+    "vllm_native_rmsnorm": "passed",
+    "full_model_inference": "not tested; no model weights loaded",
+    "analysis_library_imports": "passed",
+    "no_temporary_symlink_dependencies": "passed",
+    "teammate_acl_readback": "passed"
+  },
+  "paths": {
+    "cluster_checkout": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/monitor-similarity-experiment",
+    "models": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/models",
+    "raw_cache": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/cache",
+    "logs": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs",
+    "repository_defaults": "Cluster checkout models/, cache/, and .venv are local symlinks to project storage and the research environment; excluded from Git."
+  },
+  "recommended_job_environment": {
+    "HF_HOME": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/cache/huggingface",
+    "VLLM_CACHE_ROOT": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/cache/vllm",
+    "TORCH_HOME": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/cache/torch",
+    "XDG_CACHE_HOME": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/cache/xdg"
+  },
+  "teammate_read_access": [
+    "cpsc4880_ems264",
+    "cpsc4880_jjj49",
+    "cpsc4880_as4833"
+  ],
+  "model_weights_downloaded": false,
+  "research_rollouts_generated": false,
+  "new_project_scripts_written": false,
+  "final_repository_pull": "Already up to date at 7cee43fcf6332a10bd85bf15ee714395191c7a99"
+}

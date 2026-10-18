@@ -1,0 +1,42 @@
+{
+  "created_at": "2026-10-18T01:11:00.622815+00:00",
+  "destination": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/rollouts_original_clean",
+  "manifest_sha256": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+  "readme_sha256": "f53ca608eca7dd9a55f0a5b7005539719dbea2f704777372490422c36b013b63",
+  "counts": {
+    "original": 48,
+    "complete_pairs": 41,
+    "excluded_pairs": 7,
+    "by_task": {
+      "american_airlines_2": {
+        "benign": 6,
+        "malicious": 7
+      },
+      "bank_transfer_2": {
+        "benign": 7,
+        "malicious": 6
+      },
+      "spam_filter_update": {
+        "benign": 7,
+        "malicious": 8
+      }
+    },
+    "by_source_job": {
+      "29894244": 27,
+      "29860690": 14
+    }
+  },
+  "verified_files": 84,
+  "response_bytes": 90473077,
+  "checks": {
+    "exact_original_48_partition": true,
+    "complete_actor_followup_pairs": 41,
+    "raw_files_copied": 82,
+    "source_and_copy_sha256_match_audits": true,
+    "identities_and_parent_links_valid": true,
+    "generation_model_serving_runtime_match": true,
+    "source_archives_preserved": true,
+    "contains_test_rollouts_2": false,
+    "raw_content_rewritten": false
+  }
+}

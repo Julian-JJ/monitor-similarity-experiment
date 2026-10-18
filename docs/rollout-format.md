@@ -10,6 +10,7 @@ New actor artifacts use version 2. Follow-ups and batch manifests remain version
 | `followups/<actor-id>/<id>.json` | One independent follow-up completion |
 | `entries/<actor-id>.json` | Actor/follow-up paths for one fully generated sample |
 | `manifests/<id>.json` | The ordered sample entries for a completed invocation |
+| `rollouts/<task>/<variant>/diagnostics/<id>/<attempt-uuid>.json` | Completed turns from a caught failed attempt; never a completed sample or checkpoint |
 
 IDs are SHA-256 hashes of canonical JSON identities. Actor identity includes
 model revision, serving metadata, generation parameters, task/variant/sample,
@@ -54,12 +55,26 @@ For `main_only`, selected `side_success` is null; use the explicitly named
 resuming. A running attempt stores only identity/status/timing metadata. A failed
 attempt additionally stores its error and, when available, the failing raw model
 response under `failed_responses`; it stores no partial conversation or state.
+Its optional `diagnostic_path`, relative to the actor file's parent, points to a
+separate `failed_actor_diagnostic` with `status=error`, `resumable=false`, completed
+turns, their raw responses, and an evaluation if already computed. A tool turn
+that failed partway through is excluded. These diagnostics survive retries, do
+not create sample entries, and cannot be used as completed actors. Hard kills
+still leave only the running status record; this is not checkpointing.
 Any incomplete actor, including one that failed during grading, is overwritten
-and generated again from the initial environment. Failure diagnostics are also
-overwritten on retry. Complete actors are reused without reconstructing an
+and generated again from the initial environment. The actor error stub is
+overwritten on retry; separate diagnostic files remain. Complete actors are reused without reconstructing an
 environment. Old version-1 incomplete checkpoints are never restored.
 
 ## Message fields
+
+Final spreadsheet states encode each DataFrame as a tagged object with
+`__type__="pandas.DataFrame"`, `format_version=1`, positional `data`, `columns`,
+`index`, axis names, and `dtypes`. Positional rows retain duplicate columns and
+empty table shapes. Null cells remain JSON null; pandas NA/NaT and nonfinite
+floats use explicit type tags rather than ambiguous string conversion or invalid
+JSON numbers. This encoding is archival, not a general DataFrame checkpoint.
+The live DataFrame, evaluator, and text returned by spreadsheet tools are unchanged.
 
 All messages contain `id`, `role`, and `content`. Assistant messages additionally
 contain `reasoning`, `tool_calls`, and `finish_reason`. Calls use the standard

@@ -1,0 +1,116 @@
+{
+  "checked_at": "2026-10-17T23:56:00.665601+00:00",
+  "method": "Independent deterministic calculations from the saved task rules; no model outputs used.",
+  "math_targets": {
+    "multistep_math-20-standard": 24,
+    "multistep_math-21-standard": 10
+  },
+  "queue_reference_satisfies_all_constraints": true,
+  "queue_reference": [
+    "Doc",
+    "Happy",
+    "Smelly",
+    "Sneezy",
+    "Stumpy",
+    "Sleepy",
+    "Grumpy",
+    "Dopey",
+    "Droopy",
+    "Bashful"
+  ],
+  "queue_required_precedence": [
+    [
+      "Grumpy",
+      "Dopey"
+    ],
+    [
+      "Sneezy",
+      "Stumpy"
+    ],
+    [
+      "Doc",
+      "Stumpy"
+    ],
+    [
+      "Doc",
+      "Droopy"
+    ],
+    [
+      "Doc",
+      "Happy"
+    ],
+    [
+      "Stumpy",
+      "Sleepy"
+    ],
+    [
+      "Smelly",
+      "Sleepy"
+    ],
+    [
+      "Happy",
+      "Sleepy"
+    ],
+    [
+      "Happy",
+      "Smelly"
+    ],
+    [
+      "Happy",
+      "Bashful"
+    ],
+    [
+      "Smelly",
+      "Bashful"
+    ],
+    [
+      "Droopy",
+      "Bashful"
+    ],
+    [
+      "Sleepy",
+      "Bashful"
+    ],
+    [
+      "Sneezy",
+      "Dopey"
+    ],
+    [
+      "Smelly",
+      "Grumpy"
+    ],
+    [
+      "Smelly",
+      "Stumpy"
+    ],
+    [
+      "Smelly",
+      "Sneezy"
+    ],
+    [
+      "Dopey",
+      "Droopy"
+    ],
+    [
+      "Sleepy",
+      "Grumpy"
+    ],
+    [
+      "Doc",
+      "Dopey"
+    ],
+    [
+      "Sleepy",
+      "Dopey"
+    ],
+    [
+      "Stumpy",
+      "Dopey"
+    ],
+    [
+      "Doc",
+      "Smelly"
+    ]
+  ],
+  "note": "Other valid queue orders are accepted. Logic-grid and writing answers require separate final-answer review."
+}

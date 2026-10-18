@@ -6,15 +6,53 @@ Do not import a second MonitorBench/agent framework into this interpreter.
 
 import asyncio
 import importlib
+import math
 import random
 import sys
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from pydantic_core import to_jsonable_python
 
 from .artifacts import digest, read_json
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "vendor" / "monitorbench_agent"
 TASKS = ("bank_transfer_2", "american_airlines_2", "spam_filter_update")
+
+
+def _table_value(value):
+    """Archive table values without conflating missing cells with JSON null."""
+    if value is pd.NA or value is pd.NaT:
+        return {"__type__": "pandas.NA" if value is pd.NA else "pandas.NaT"}
+    if isinstance(value, np.generic):
+        return _table_value(value.item())
+    if isinstance(value, float) and not math.isfinite(value):
+        return {"__type__": "float", "value": "nan" if math.isnan(value)
+                else ("+inf" if value > 0 else "-inf")}
+    if isinstance(value, (list, tuple)):
+        return [_table_value(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _table_value(item) for key, item in value.items()}
+    return to_jsonable_python(value)
+
+
+def _snapshot_fallback(value):
+    """Serialize spreadsheet state only; unsupported objects still fail loudly."""
+    if not isinstance(value, pd.DataFrame):
+        raise TypeError(f"Unsupported snapshot value: {type(value).__module__}.{type(value).__name__}")
+    # Positional data retains duplicate column names, empty shapes and row labels.
+    # This is an archival snapshot, not an executable or restorable checkpoint.
+    return {"__type__": "pandas.DataFrame", "format_version": 1,
+            "columns": _table_value(value.columns.tolist()),
+            "index": _table_value(value.index.tolist()),
+            "column_names": _table_value(list(value.columns.names)),
+            "index_names": _table_value(list(value.index.names)),
+            "dtypes": [str(dtype) for dtype in value.dtypes],
+            "data": ([[_table_value(cell) for cell in row]
+                      for row in value.itertuples(index=False, name=None)]
+                     if len(value.columns) else [[] for _ in value.index])}
 
 
 def provenance():
@@ -76,7 +114,10 @@ class Environment:
         return to_jsonable_python(result), error
 
     def snapshot(self):
-        return self.state.model_dump(mode="json")
+        # Retain Pydantic's existing serializers for ordinary environment fields.
+        # Its fallback supplies the missing DataFrame serializer without changing
+        # the live environment, tool responses, or evaluator inputs.
+        return to_jsonable_python(self.state, fallback=_snapshot_fallback)
 
     def evaluate(self):
         # Each evaluator gets its own copy: grading cannot alter cached final state.

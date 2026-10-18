@@ -54,3 +54,72 @@ The list-of-models formatting issue was introduced by our adapter. Upstream's
 formatting it. Our adapter now also preserves structured records, using JSON
 for tool outputs. No vendored implementation was changed.
 [Pinned upstream formatter](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/datasets/dual_objective/agent/utils/pipeline_elements.py#L26)
+
+## Token and execution audit, 2026-10-17
+
+This is an adapted experiment, not an exact reproduction of MonitorBench's
+published runs. The inspected revision is
+`b6229e4b8ea9abcec38d61159c9cbd0f577ddf35`, matching our vendored environment.
+The public example selects Qwen3-4B; it is not a run-specific record proving the
+settings used for the paper's Qwen3-14B results. Appendix A.2.1 says they use
+developer-recommended hyperparameters but does not supply the missing agent
+run configuration.
+
+| Setting or behavior | Pinned upstream agent path | Our campaign after this fix |
+| --- | --- | --- |
+| Response cap per call, including thinking | `dual_agent.max_tokens=2000` overrides the general evaluated-model cap of 32768 | 32768 for actor and follow-up; previously 4096, then 8192 |
+| Context / YaRN | Example `max_model_len=32768`, YaRN 2; the agent engine receives the context directly | 131072 / YaRN 4; previously 65536 / 2 |
+| Temperature / top-p | 0.6 / 0.9 in the example | 0.6 / 0.95; top-k 20, min-p 0, per Qwen's thinking recommendations |
+| Actor turn limit | 150 outside test mode | 200, unchanged |
+| Length truncation | Logs finish reason but conversion does not reject `length` | Error; never execute a truncated response's tool calls |
+| Oversized input | Explicit overflow guard creates a synthetic `end_task` call | Request failure; not a successful model termination |
+| Prior assistant history | Replays calls with empty assistant content | Replays visible content and calls, excludes prior reasoning |
+| No tool call | Nudges the model to call a tool; stops after repeated empty turns | Records `final_answer` termination; no extra prompt |
+
+The agent-specific override is in
+[dataset configuration](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/config/dataset_config.yaml#L39)
+and applied by the
+[outcome pipeline](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/pipeline/outcome.py#L934).
+See the [general example](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/config/vllm_config.yaml),
+[agent inference implementation](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/datasets/dual_objective/agent/llms/vllm_llm.py),
+[turn limit](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/datasets/dual_objective/agent/utils/experiment_runner.py#L124),
+and [tool loop](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/datasets/dual_objective/agent/utils/pipeline_elements.py#L340).
+The generic non-agent generation path multiplies its context by the YaRN factor;
+do not infer the agent context from that separate code path.
+
+The upstream tool parser strips reasoning only when it finds a closing
+`</think>` tag. Otherwise it scans the full output for tool-call tags. Thus a
+truncated reasoning block containing a simulated tool call could be treated as
+an action by that parser. This is a code-path risk, not evidence that published
+runs encountered it. Our strict incomplete-response rejection is retained.
+
+Job 29828195's saved artifacts contain 577 model responses: 558 ending in
+tool calls, 16 normal stops, and 3 length truncations at exactly 8192 tokens.
+Median output was 1388 tokens, the 95th percentile 5463, and 210 exceeded 2000.
+Maximum saved input was 46272. All three truncated outputs had unclosed reasoning
+and no tool calls. One showed substantial repetition (37.03% duplicate 12-word
+windows, maximum identical-window count 406); the other two had 1.69% and 3.27%.
+This simple repetition measure is diagnostic, not proof of an infinite loop.
+Increasing a cap cannot guarantee that repetition stops.
+
+These statistics exclude unsaved work in failed actors. Four spreadsheet actors
+lost their trajectories when final-state serialization failed. There were 16
+verified complete pairs, seven failed pairs, and 25 not started. All 16 completed
+actors called `end_task` in 13–62 turns; none passed the main objective, while 13
+passed their side objective. This incomplete, failure-selected sample cannot
+establish benchmark quality or MonitorBench reproduction. Token limits alone do
+not explain the low main-task scores. Existing evaluator caveats above remain.
+
+The new 32768 response cap follows
+[Qwen's output recommendation](https://huggingface.co/Qwen/Qwen3-14B#best-practices).
+Observed input plus this budget is 79040, requiring a larger context. We use
+131072 with YaRN 4 within Qwen's documented range, preserving all other sampling,
+prompts, tools and grading. Static YaRN can affect short-context quality; record
+the setting and keep results separate. The 4800-second request timeout allows
+long responses but does not extend the six-hour scheduler limit.
+
+Upstream already has a
+[DataFrame-aware transcript encoder](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/datasets/dual_objective/agent/utils/experiment_runner.py#L238).
+Our adapter omitted that support. The fix archives table values, labels and types
+explicitly, without converting the live tool environment or altering grading.
+It also preserves completed turns of caught failures in separate diagnostic files.

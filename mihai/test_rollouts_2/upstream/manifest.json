@@ -1,0 +1,74 @@
+{
+  "repository": "https://github.com/ASTRAL-Group/MonitorBench",
+  "revision": "b6229e4b8ea9abcec38d61159c9cbd0f577ddf35",
+  "files": {
+    "LICENSE": {
+      "sha256": "cde76533e941191a287ddba36f216dde931addd143cd68846f1c5214326dd090",
+      "bytes": 1076
+    },
+    "config/dataset_config.yaml": {
+      "sha256": "c6fda101341ce384ceedb47c912e7a365d49da5c4394ea3eb1f7a18c94cd4b0c",
+      "bytes": 2009
+    },
+    "config/vllm_config.yaml": {
+      "sha256": "a87c14603a0accbd1a27ae15fa3e96a8882d08a8ead50386f4aa2fafa446ad5d",
+      "bytes": 950
+    },
+    "pipeline/intervention.py": {
+      "sha256": "bb1ac454e26e8e77cd2e76496c5d99098859a37f89c14b3f8f5781a11eb54627",
+      "bytes": 63283
+    },
+    "pipeline/outcome.py": {
+      "sha256": "b7c39159c4acbab4311f3f3e43cbd4ba7765b30682628d17cf24ce7fd3e74307",
+      "bytes": 54869
+    },
+    "pipeline/process.py": {
+      "sha256": "1ab6857a9464738d21dfb4097b262dc053e4d92f4a222b7ccb71b51418e33197",
+      "bytes": 7376
+    },
+    "pipeline/generation/run.py": {
+      "sha256": "92fbb57e1ce0d82af97be0323c13784a72e4ff364db842249e73fece8475aa63",
+      "bytes": 9906
+    },
+    "pipeline/base.py": {
+      "sha256": "08b254e06694c776ac1cbeb2b47b6cd27b7aed4f26ee1a8a22ecf8626adfed30",
+      "bytes": 22823
+    },
+    "utils.py": {
+      "sha256": "9f274c3d0858bbeb65190a160ae9b63ad448e08aff01e0668cde40f55897684f",
+      "bytes": 6732
+    },
+    "datasets/cue_condition/knowledge/knowledge.json": {
+      "sha256": "34e58de54de36d8cef176d1b0459b3dc954b3713e1eb8ec5c380aa3a47de601e",
+      "bytes": 140376
+    },
+    "datasets/cue_condition/preference/Preference.json": {
+      "sha256": "be2ccfce2c864f5a191157f2d66d4c3d6f6b919d40794dbf1053c3c41046a61b",
+      "bytes": 151859
+    },
+    "datasets/cue_condition/Judgment/Judgment.json": {
+      "sha256": "8f41e93bdafe0aa5cc553b44fa1a7b9710ecc7f618e7d1076ae6044c2f604a94",
+      "bytes": 204690
+    },
+    "datasets/cue_answer/brute_logic/brute_logic.json": {
+      "sha256": "8091b84ed7dcfc067e6fe7f2968b33430de84f24ea557461468c038edcc7d98c",
+      "bytes": 177569
+    },
+    "datasets/cue_answer/brute_math/brute_math.json": {
+      "sha256": "71ebf984406bbabea25350e5ea0ea820a6e60d404ee0a55988bbc7371616c493",
+      "bytes": 34420
+    },
+    "datasets/dual_objective/databricks_dolly/task_writing_steganography.json": {
+      "sha256": "492f0d3c3dd1a60ae9c8ad8355719719890dee857c99f4d5df721c7e7b66c93b",
+      "bytes": 23100
+    },
+    "datasets/dual_objective/summary/task_writing_summarization.json": {
+      "sha256": "e4c35bc3af0d0d66768d9f7cd54d3ff685d3586f6652719ca549a96802c923c7",
+      "bytes": 2917659
+    },
+    "datasets/necessary_steps/lore/lore.csv": {
+      "sha256": "ae691b085d342281aca08141768cae0492701c7c6f5c8632be252eabc807f36f",
+      "bytes": 267210
+    }
+  }
+}

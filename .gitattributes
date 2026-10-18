@@ -1,0 +1,4 @@
+# The screening release is hash-pinned: preserve its original bytes on checkout.
+mihai/test_rollouts_2/** -text
+# Vendored upstream formatting is intentionally unchanged from the source hashes.
+mihai/test_rollouts_2/upstream/** -whitespace

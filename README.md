@@ -5,6 +5,49 @@ code-verifiable dual-objective agent tasks. This implementation covers setup,
 model download, actor rollouts, programmatic grading, and generic follow-ups.
 Monitor evaluation and hierarchical aggregation remain planned work.
 
+## Saved rollouts and the Yale installation
+
+The existing data and model are on Yale's Bouchet cluster. Connect as
+`<your-cluster-username>@bouchet.ycrc.yale.edu` and set `$PROJECT` to the team's
+shared project directory. The shared storage path is the same for all teammates;
+its recorded location is the `project_root` field in the
+[setup record](mihai/results/environments/setup-2026-10-16.json).
+Use the saved responses for later monitor experiments; generating actors again
+is not necessary.
+
+| Item | Cluster location |
+| --- | --- |
+| Original batch, cleaned | `$PROJECT/rollouts_original_clean/` |
+| Second experiment, kept separate | `$PROJECT/mihai/test_rollouts_2/runs/29910578/` |
+| Qwen3-14B weights and model manifests | `$PROJECT/models/qwen3-14b/` |
+| Research/analysis Python | `$PROJECT/envs/monitor-research/bin/python` |
+| GPU serving Python | `$PROJECT/envs/monitor-vllm/bin/python` |
+| Git checkout | `$PROJECT/monitor-similarity-experiment/` |
+| Historical failures, logs and retry records | `$PROJECT/archives/cleanup-20261018/` |
+
+The cleaned original batch contains **41 complete actor/follow-up pairs out of
+48**, organized as `task/benign-or-malicious/sample_XX/{rollout,followup}.json`.
+Its `manifest.json` records source jobs and checksums. The seven broken or
+incomplete pairs are excluded. A complete execution can still have an
+unsuccessful task score. Fourteen retained pairs used two A40 GPUs and 27 used
+one H200; their serving identities remain distinct.
+
+The second experiment has **19 complete responses and one truncated request**
+across 20 requests, covering 12 problems and their selected controls. Its raw
+files and manifest stay on the cluster. Its code, prompts, settings, compact
+results and [report](mihai/test_rollouts_2/report.md) live under
+[`mihai/test_rollouts_2/`](mihai/test_rollouts_2/). It is a separate screening
+experiment, not another part of the original 48.
+
+The installed environments use Python 3.12.8, vLLM 0.11.0, PyTorch 2.8.0 with
+CUDA 12.8, and Transformers 4.56.2. Qwen3-14B is pinned to revision
+`40c069824f4251a91eefaf281ebe4c544efd3e18`; its 17 downloaded files occupy about
+29.6 GB. Research dependencies and analysis packages are already installed.
+See the [cluster guide](mihai/README.md) for exact package snapshots,
+environment variables, GPU commands, data access, and what remains to implement
+before running monitors. Raw responses, reasoning, weights, environments and
+logs are excluded from Git.
+
 ## Cluster quick start
 
 Clone this repository on the cluster. Use Python 3.11+ (Python 3.11/3.12 is a
@@ -128,8 +171,9 @@ variable) without storing its value in cache.
 
 Completed artifacts are reused. Incomplete actors are overwritten and restarted
 from the initial environment, including attempts that failed during grading.
-Only a status/error record is saved until the full trajectory and grading
-succeed; partial conversations and state checkpoints are not persisted.
+Only a status/error record is saved in the reusable actor cache until the full
+trajectory and grading succeed. Caught failures also save a separate diagnostic
+containing completed turns; it is never resumed or counted as a completed actor.
 Increasing the follow-up sample count does not regenerate actor trajectories. Sample
 ranges support separate cluster jobs; file locks prevent simultaneous writes
 to the same actor artifact.

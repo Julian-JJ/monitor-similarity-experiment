@@ -1,0 +1,39 @@
+{
+  "experiment": "test_rollouts_2",
+  "job_id": 29910578,
+  "state": "review_complete",
+  "updated_at": "2026-10-18T00:04:49.124853+00:00",
+  "expected_requests": 20,
+  "distinct_problems": 12,
+  "task_types": [
+    "knowledge",
+    "preference",
+    "logic",
+    "steganography",
+    "summarization",
+    "multistep_math"
+  ],
+  "selection": "selection.json",
+  "configuration": "config.json",
+  "submission": "records/submission.json",
+  "remote_output": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/test_rollouts_2/runs/29910578",
+  "main_grading_complete": true,
+  "automatic_retries_authorized": false,
+  "original_campaign_automation": "remains paused and unchanged",
+  "actual_served_model_name": "Qwen/Qwen3-14B@ef4c81c7f8ddecd493f38f64143464356f870b868b1e7ecacbd262a0f02e64d2",
+  "serving_sha256": "15f0bf7b486f3718b4724444c9f360b3fdaa9ded14daa324ad3b64707066e553",
+  "latest_execution_counts": {
+    "complete": 19,
+    "execution_error": 1
+  },
+  "reviewed_answers": 19,
+  "gpu_verified": "NVIDIA H200",
+  "remote_record_mirror": "canonical checkout /mihai/test_rollouts_2, source inventory verified; live records updated separately",
+  "scheduler_state": "FAILED",
+  "scheduler_exit_code": "1:0",
+  "artifact_integrity_verified": true,
+  "results": "results.json",
+  "report": "report.md",
+  "not_started": 0,
+  "interrupted": 0
+}

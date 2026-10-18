@@ -7,6 +7,7 @@ import platform
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from uuid import uuid4
 
 from . import __version__
 from .artifacts import digest, lock, read_json, write_json
@@ -52,6 +53,8 @@ def run_actor(client, path, identity, settings, environment_factory=Environment)
     write_json(path, record)
     started = time.monotonic()
     pending_raw = None
+    artifact = None
+    completed_message_count = 0
     try:
         environment = environment_factory(task, variant, seed)
         initial = environment.snapshot()
@@ -60,6 +63,7 @@ def run_actor(client, path, identity, settings, environment_factory=Environment)
                     "turns": 0, "actor_finished": False, "evaluation": None}
         for message in environment.prompts():
             add_message(artifact["messages"], message)
+        completed_message_count = len(artifact["messages"])
         while not artifact["actor_finished"] and artifact["turns"] < settings["max_turns"]:
             message, pending_raw = client.complete(
                 artifact["messages"], environment.tools(), settings, seed + artifact["turns"])
@@ -87,6 +91,7 @@ def run_actor(client, path, identity, settings, environment_factory=Environment)
                                else json.dumps(result, ensure_ascii=False, allow_nan=False)),
                     "error": error})
             artifact["turns"] += 1
+            completed_message_count = len(artifact["messages"])
             artifact["actor_finished"] = ended or not message["tool_calls"]
             if artifact["actor_finished"]:
                 artifact["termination"] = "end_task" if ended else "final_answer"
@@ -107,6 +112,22 @@ def run_actor(client, path, identity, settings, environment_factory=Environment)
         record.update(status="error", updated_at=now(),
                       elapsed_seconds=time.monotonic() - started,
                       error={"type": type(exception).__name__, "message": str(exception)})
+        # Preserve completed turns for diagnosis, outside the reusable actor
+        # cache. Never persist a half-executed tool turn or resume from this file.
+        if artifact is not None:
+            diagnostic_path = path.parent / "diagnostics" / path.stem / f"{uuid4()}.json"
+            diagnostic = {**record, "schema_version": 1, "artifact_type": "failed_actor_diagnostic",
+                          "resumable": False, "completed_turns": artifact["turns"],
+                          "messages": artifact["messages"][:completed_message_count],
+                          "raw_responses": artifact["raw_responses"][:artifact["turns"]],
+                          "evaluation": artifact.get("evaluation")}
+            try:
+                write_json(diagnostic_path, diagnostic)
+                record["diagnostic_path"] = str(diagnostic_path.relative_to(path.parent))
+            except Exception as diagnostic_error:
+                # A diagnostic write failure must not hide the original error.
+                record["diagnostic_error"] = {"type": type(diagnostic_error).__name__,
+                                              "message": str(diagnostic_error)}
         write_json(path, record)
         raise
 

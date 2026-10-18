@@ -5,3 +5,14 @@ __pycache__/
 cache/
 models/
 .pytest_cache/
+.env
+.env.*
+!.env.example
+envs/
+logs/
+archives/
+*.log
+*.safetensors
+*.gguf
+/rollouts_original_clean/
+/test_rollouts_2/

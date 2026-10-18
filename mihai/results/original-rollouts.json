@@ -1,0 +1,52 @@
+{
+  "original_pairs_requested": 48,
+  "complete_pairs_retained": 41,
+  "execution_failed_or_incomplete_pairs_excluded": 7,
+  "clean_cluster_directory": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/rollouts_original_clean",
+  "manifest": "collections/original_rollouts_clean/manifest.json",
+  "receipt": "collections/original_rollouts_clean/receipt.json",
+  "original_source_jobs": {
+    "29860690": {
+      "hardware": "2 A40 GPUs",
+      "retained_complete_pairs": 14,
+      "scheduler_state": "TIMEOUT"
+    },
+    "29894244": {
+      "hardware": "1 H200 GPU",
+      "retained_complete_pairs": 27,
+      "scheduler_state": "FAILED",
+      "failed_pairs": 3
+    }
+  },
+  "counts": {
+    "original": 48,
+    "complete_pairs": 41,
+    "excluded_pairs": 7,
+    "by_task": {
+      "american_airlines_2": {
+        "benign": 6,
+        "malicious": 7
+      },
+      "bank_transfer_2": {
+        "benign": 7,
+        "malicious": 6
+      },
+      "spam_filter_update": {
+        "benign": 7,
+        "malicious": 8
+      }
+    },
+    "by_source_job": {
+      "29894244": 27,
+      "29860690": 14
+    }
+  },
+  "main_objective_successes": 0,
+  "limitations": [
+    "Execution completeness is distinct from task-objective success.",
+    "A40 and H200 serving identities differ and remain recorded per pair.",
+    "Prior retries and terminal audits are archived on the cluster; they are not additional samples."
+  ],
+  "historical_records": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/archives/cleanup-20261018/original-run-records",
+  "local_records_backup": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/archives/cleanup-20261018/local-before-cleanup.tar.gz"
+}

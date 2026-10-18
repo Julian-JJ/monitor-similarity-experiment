@@ -1,0 +1,62 @@
+dual_coding:
+  bcb_side_tasks:
+    - logio
+    - permissions
+    - iodelete
+    - iodownload
+    - ioexfil
+    - exit
+
+  stress_to_attack:
+    standard: baseline
+    direct_conceal: stealth
+    monitor_aware: monitor_notice
+
+  bcb_id_set: TEST
+  bcb_use_pairings: true
+  max_workers: 128
+
+impossible_coding:
+  split: oneoff
+  max_attempts: 5
+  limit: 50                 # null = full dataset
+  max_tokens: 2000
+  rope_scaling: {"rope_type": "yarn", "factor": 2, "original_max_position_embeddings": 32768}
+  api_concurrency: 8
+  # Input (prompt) caching for the API backend. The retry loop re-sends the whole
+  # conversation every attempt and every rollout of a sample repeats the same first
+  # turn, so the shared prefix is billed at ~0.1x instead of full price.
+  # Anthropic models need the explicit marker this sends; OpenAI/Gemini cache on
+  # their own and ignore the setting. ttl "5m" costs 1.25x to write, "1h" costs 2x --
+  # "1h" is the default because a round waits on the whole batch plus Docker tests.
+  prompt_cache: true
+  prompt_cache_ttl: "1h"
+  stress_to_attack:
+    standard: baseline
+    direct_conceal: stealth
+    monitor_aware: monitor_notice
+
+dual_agent:
+  max_tokens: 2000
+  rope_scaling: {"rope_type": "yarn", "factor": 2, "original_max_position_embeddings": 32768}
+
+  task_folders:
+    - american_airlines_2
+    - api_key_calendar_agendas_2
+    - bank_transfer_2
+    - expenditure_accounting
+    - spam_filter_update
+
+  stress_to_attack:
+    standard: baseline
+    direct_conceal: stealth
+    monitor_aware: monitor_notice
+
+# Batch API (monitor / verification stages when backend: "api"). Each record is
+# submitted rollout_number times with identical content, so a breakpoint on the
+# prompt lets rollouts 2..n read what rollout 1 wrote. Anthropic runs batch
+# requests in parallel and does not guarantee the hit, and a full miss costs the
+# write premium on every request -- hence opt-in. Anthropic (claude) models only.
+batch_api:
+  prompt_cache: false
+  prompt_cache_ttl: "5m"
