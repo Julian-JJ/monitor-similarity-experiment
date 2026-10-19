@@ -1,0 +1,9 @@
+# Reference cell: MonitorBench's own monitor (Qwen3-32B), no task context, all three scopes,
+# on the cached rollouts. Add "main_only_v1" to rollout_sets once the controls exist.
+name = "baseline"
+monitor = "qwen3-32b"
+rollout_sets = ["original_clean"]
+[grid]
+scope = ["action", "cot", "all"]
+[options]
+samples = 4

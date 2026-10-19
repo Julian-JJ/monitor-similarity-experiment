@@ -1,0 +1,15 @@
+# The three pre-specified councils (docs/plan/07-design-decisions.md 2.3), fixed before any results.
+# Members are monitor names; every member must have a run with identical rollouts, scope, context,
+# told objective and hierarchy settings. A council is built from stored verdicts: no model calls.
+# A member given as "name#k" means "sample k of that monitor" (used by the same-model control).
+primary_rule = "majority"
+secondary_rules = ["any", "unanimous"]
+
+[councils.size-diverse]
+members = ["qwen3-4b", "qwen3-14b", "qwen3-32b"]
+
+[councils.family-diverse]
+members = ["qwen3-32b", "gpt-oss-120b", "gemma-large"]
+
+[councils.same-model-control]
+members = ["qwen3-32b#0", "qwen3-32b#1", "qwen3-32b#2"]

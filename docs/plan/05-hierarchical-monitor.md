@@ -7,8 +7,10 @@ Related: [scope](01-scope.md) · [monitor evaluation](04-monitor-evaluation.md) 
 
 Status (2026-10-19): the design below is implemented as a library
 ([`monitor_experiment/hierarchy.py`](../../monitor_experiment/hierarchy.py)) with
-offline tests and two dry-run scripts. **No monitor model has been run.** The
-command that executes monitors (`scripts/run_monitors.py`) is still unwritten.
+offline tests, and is run by the experiment runner (`scripts/run_experiment.py`; see
+[the system documentation](../system/README.md)). **No monitor model has been run.** Since the first version the
+library gained an objective override (for judging a rollout under the other objective and for control rollouts), the
+optional reference-plan block, a partial-CoT hook, and latency and token accounting; its tests grew from 30 to 38.
 
 ## Why a hierarchical monitor is needed
 
@@ -255,7 +257,7 @@ Where this differs from upstream's code, or where the paper may differ from this
 
 ## Validation
 
-Done (offline, no model): `tests/test_hierarchy.py`, 30 tests. They check
+Done (offline, no model): `tests/test_hierarchy.py`, 38 tests. They check
 rendering per scope, lossless splitting, full coverage of every word of every turn
 once and in order, single-chunk prompts being byte-identical to upstream's,
 exactly one part notice, tree shape against the call-count formula, neutralized

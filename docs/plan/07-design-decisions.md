@@ -183,8 +183,10 @@ Each call may also generate up to 16,768 tokens (thinking plus answer), so outpu
 comparable to or larger than input; its real size is unmeasured and is a pilot output. The
 plan context adds one plan block (at most about 1,000 tokens) to each prompt, roughly 10% more
 input. Planned monitors: Qwen3-4B, 14B, 32B, 30B-A3B, GPT-OSS-120B and one Gemma model, each in
-two contexts (none, plan): about 12 cells, about 100,000 calls and 960 M input tokens. Wall time
-is not estimated until the pilot measures throughput.
+two contexts (none, plan): 36 cells with the three scopes. The dry run of the full grid on the 41 cached rollouts
+(`mihai/results/dryrun-preregistered-grid-20261019.json`) gives **100,128 model calls, about 1.00 billion input tokens
+(estimated) and 54 plan calls** (the control rollouts, once they exist, add roughly 70%). Wall time is not estimated until the pilot
+measures throughput.
 
 **Run order, with gates.** (1) a format-only pilot (section 2.8); (2) Qwen3-32B, no context, three
 scopes, which is MonitorBench's own monitor and sets the reference; gate: at least 90% of
@@ -344,6 +346,10 @@ exploratory condition, with the single follow-up each rollout has.
 - **Effort (an assumption, not a measurement):** the double-annotated sample is about 20 pairs with
   perhaps 5 to 15 candidate spans each at 1 to 2 minutes a span, roughly 2 to 5 hours per
   annotator; the remaining pairs and the spot check roughly 3 to 6 hours for one annotator.
+  **Update after running the rules on the real rollouts:** they propose 446 spans over the 39 positive
+  pairs (mean 11.4, at most 15 per pair), so the double-annotated 20 pairs are about 230 spans per annotator,
+  roughly 4 to 8 hours each, and the remaining 19 pairs about 200 spans (see
+  [presence labels](../system/presence-labels.md)).
 
 ### 2.11 Control rollouts
 

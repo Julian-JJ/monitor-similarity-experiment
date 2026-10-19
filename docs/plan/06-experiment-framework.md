@@ -242,7 +242,7 @@ list. A run is reproducible from `manifest.json` plus the frozen rollouts.
 
 | Existing | Becomes |
 | --- | --- |
-| `monitor_experiment/hierarchy.py` (rendering, chunking, tree, verdicts, 30 tests) | the `hier_ad` strategy |
+| `monitor_experiment/hierarchy.py` (rendering, chunking, tree, verdicts, 38 tests) | the `hier_ad` strategy (built) |
 | `scripts/plan_hierarchy.py`, `scripts/count_transcript_tokens.py` | the basis of `--dry-run` |
 | `monitor_experiment/artifacts.py` (digest, atomic writes, locks) | cell and node IDs, resumable caching |
 | `monitor_experiment/inference.py` (`Client`) | extended into the monitor client |
@@ -251,7 +251,25 @@ list. A run is reproducible from `manifest.json` plus the frozen rollouts.
 
 ## Plan, in order
 
-**Phase A: local, no GPU.** Each ends with passing tests and updated docs.
+**Phase A: local, no GPU.** Each ends with passing tests and updated docs. **Built on 2026-10-19; status below, details in
+[the system documentation](../system/README.md).**
+
+| Item | Status |
+| --- | --- |
+| A1 data layer and registries | done: `data.py`, `registry.py` |
+| A2 spec, grid, cell IDs, overrides | done: `spec.py` |
+| A3 metrics, bootstrap, councils | done: `metrics.py`, `council.py` |
+| A4 runner, resume, dry run | done: `runner.py` |
+| A5 report | done: `report.py` (Markdown only) |
+| A6 monitor client | done: `monitor_client.py` (tested against a local fake server only) |
+| A7 descriptors | done: in the registry |
+| A8 plan context, partial CoT, councils | done; `execute`, `plan_compare`, follow-up visibility and `interrogate` are not |
+| A9 cost and latency | done: `costs.py` (no dollar cost: not applicable) |
+| A10 presence labels | tooling done; human annotation and frozen rules are not |
+| plan prompts, freeze lock | done; lock is `draft` |
+| comparisons P1 to P5 | done: `compare.py` |
+
+The step list that follows is the original plan, kept for the record.
 
 1. **A1. Registries and data layer.** `data.py`, `registry.py`; load the 41 rollouts
    with hash verification; observable/privileged separation. Test: labels unreachable from

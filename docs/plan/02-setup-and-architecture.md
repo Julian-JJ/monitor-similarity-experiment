@@ -12,7 +12,7 @@ Expose three entry points:
 | --- | --- |
 | `scripts/setup.sh` | Install selected dependencies, fetch environments, and check readiness |
 | `scripts/generate_rollouts.py` | Execute and label actor trajectories; cache follow-ups |
-| `scripts/run_monitors.py` | Evaluate cached trajectories and produce reports (**not yet written**) |
+| `scripts/run_experiment.py` | Run or price a monitor experiment on cached trajectories (**built**, offline-tested; replaces the proposed `run_monitors.py`); with `score_run.py`, `compare_cells.py`, `make_report.py` ([system docs](../system/cli.md)) |
 
 Offline helpers that already exist: `scripts/count_transcript_tokens.py` (which
 single-pass monitor prompts fit a context window) and `scripts/plan_hierarchy.py`

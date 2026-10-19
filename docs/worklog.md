@@ -5,7 +5,7 @@ user declined. Newest session last. Times are omitted except where a file's own
 timestamp matters. "Local" means the Mac at `/Users/arushsrivastava/Desktop/VS Workspace`;
 "cluster" means Yale's Bouchet (`bouchet.ycrc.yale.edu`).
 
-## Session 2026-10-19
+## Session 2026-10-19, part 1: research, planning, hierarchical monitor
 
 ### A. Cluster access
 
@@ -101,7 +101,7 @@ timestamp matters. "Local" means the Mac at `/Users/arushsrivastava/Desktop/VS W
 19. **Created `.venv/`** (Python 3.14.7, ignored) and installed `tokenizers 0.23.3`,
     `huggingface_hub`, and `PyYAML` with their dependencies. The existing test suite
     needs the cluster packages (pydantic, pandas, …) and was not run locally; see
-    [Verification](#verification).
+    [Verification](#verification-end-of-part-1).
 
 ### F. Hierarchical monitor
 
@@ -130,7 +130,7 @@ timestamp matters. "Local" means the Mac at `/Users/arushsrivastava/Desktop/VS W
     were found unsupported when checked against the data (which task the over-limit
     `action` rollouts belong to; a "8 to 100 times" ratio) and were corrected.
 25. **Edited existing documents** so they match the new state: see
-    [Documents changed](#documents-changed).
+    [Documents changed](#documents-changed-part-1).
 
 ### G. Plan revised into a reusable framework (later the same day)
 
@@ -221,7 +221,7 @@ timestamp matters. "Local" means the Mac at `/Users/arushsrivastava/Desktop/VS W
     The framework plan, research notes, README and index were updated. No control was generated; nothing
     ran on the cluster.
 
-### Verification
+### Verification (end of part 1)
 
 - `tests/test_hierarchy.py`: 30 tests, all pass locally (`.venv/bin/python -B -m unittest tests.test_hierarchy`).
   They include a check that every one of the 41 saved rollouts yields a clean hidden
@@ -231,7 +231,7 @@ timestamp matters. "Local" means the Mac at `/Users/arushsrivastava/Desktop/VS W
 - No monitor model was run, on the cluster or locally. Nothing in this log is a
   monitorability result.
 
-### Files created
+### Files created (part 1)
 
 | Path | Purpose |
 | --- | --- |
@@ -252,14 +252,118 @@ timestamp matters. "Local" means the Mac at `/Users/arushsrivastava/Desktop/VS W
 
 Local-only, git-ignored: `rollouts_original_clean/`, `cache/tokenizer/`, `.venv/`.
 
-### Documents changed
+### Documents changed (part 1)
 
 See the "Changed in the repository" list in [`docs/README.md`](README.md) for the
 edits to existing files and why.
 
-### Not done
+### Not done (end of part 1)
 
 - No monitor was run; `scripts/run_monitors.py` does not exist.
 - No `main_only` rollouts were generated.
 - No commit was made. All changes are uncommitted in the local clone.
 - The cluster checkout was not updated with any of the above.
+
+## Session 2026-10-19, part 2: commit, then Phase A
+
+### H. Commit of the documentation
+
+33. The user asked to commit the docs. The repository was on `main` (the default branch), so a branch `monitor-framework` was created first.
+    Only `docs/`, `README.md`, `mihai/README.md` and `vendor/README.md` were staged (14 files, 1,906 insertions, 11 deletions) and committed as
+    **`392288e`**, with the co-author trailer. Nothing was pushed. The code, prompts, configs and results those documents describe were
+    **not** in that commit, so the committed documents link to files that exist only in the working tree; the commit message says so. The commit
+    dates the pre-registration in [07](plan/07-design-decisions.md).
+
+### I. Phase A, in the order it was done
+
+Each step ended with tests passing before the next began. Mistakes are recorded where they happened.
+
+34. **Facts checked before coding** (read-only): the manifest's `actor_sha256` is the SHA-256 of the file bytes (verified on the first pair);
+    the system-message layout (so the hidden objective can be cut out between fixed markers); the six objective texts; and how the environments
+    declare tools (`end_task` is added by the base class, the rest by an `add_tools([...])` call).
+35. **`hierarchy.py` extended** (objective override, reference-plan block, partial-CoT hook, latency and token accounting, a prompt hash on every node,
+    `estimate_tree_tokens` moved in from the script). The plan text is passed to `format` as an argument so braces in a plan cannot break a prompt
+    (tested). 8 new tests (38 in all). `scripts/plan_hierarchy.py` was changed to use the shared estimate and reproduced its earlier output exactly.
+36. **Prompts**: `prompts/monitor_plan.txt` and `prompts/monitor_plan_section.txt`, the drafts from [07 section 2.8](plan/07-design-decisions.md#28-prompts).
+37. **Data layer** (`data.py`), the objective table (`configs/objectives.json`, six texts, built by `scripts/build_objective_table.py`), 17 tests, including
+    against the real 41 rollouts. *Mistake:* a macOS `sed -i` call failed, which skipped the commands chained after it, so the shared test helper was not created
+    and the first test run could not import it; fixed by making the rename in Python and creating the file with the editor.
+38. **Registries** (`registry.py`, `configs/monitors.toml`, `configs/rollout_sets.toml`). *Caught by the strict validation:* `[monitors.qwen3-1.7b]` is read by TOML as nested
+    tables because of the dot; the key is now quoted.
+39. **Spec and grid** (`spec.py`), the experiment files `pilot-format-only.toml`, `baseline.toml`, `preregistered-grid.toml`, and `configs/councils.toml`. 15 tests
+    (registry and spec together).
+40. **Metrics and councils** (`metrics.py`, `council.py`): 23 tests, with the expected values worked out by hand in the tests.
+41. **Monitor client** (`monitor_client.py`): 10 tests against a real local HTTP server. Python reported `ResourceWarning`s from the *existing* inference code, which does
+    not close HTTP error bodies; harmless here and left unchanged.
+42. **Tool lists** (`toollists.py`, `scripts/build_tool_lists.py`, `configs/tool_lists.json`) read with `ast`: 71, 73 and 41 tools. A cross-check against the tools the
+    actor actually called found one name not in the list, `search_contacts_zelle`; inspection showed the actor invented it and the environment answered
+    `ToolNotFoundError`. The extraction was right; the test encodes that exception explicitly.
+43. **Freeze, strategies, costs, runner** (`freeze.py`, `strategies.py`, `costs.py`, `runner.py`, `scripts/freeze.py`, `scripts/run_experiment.py`, `scripts/score_run.py`) and a draft
+    `prompts/prompts.lock.json`. 20 runner tests, later 24. *Two test bugs, not code bugs:* an assertion looked for the string `main_only` in prompts while my own synthetic
+    reasoning contained a tag with that name; and one test edited a rollout without updating the manifest checksum, so verification (correctly) fired first.
+44. **Comparisons** (`compare.py`, `configs/comparisons.toml`, `metrics.collapse_majority`): 9 tests. *Mistake:* my fake "oracle" monitor failed at the combining level because
+    combining prompts contain only the chunk analyses, not the transcript, so it could not recognize a rollout there; the fake now carries a chunk-level detection upward, as a
+    real monitor would. I also rewrote my first selector logic, which was ambiguous when several cells matched.
+45. **Report** (`report.py`, `scripts/make_report.py`, `scripts/compare_cells.py`): 6 tests.
+46. **Presence labels** (`presence.py`, `configs/presence_rules.json`, `scripts/presence_labels.py`): 23 tests. *The first draft of the rules (v0.1) failed an objective check*: the
+    evaluator says the objectives were achieved, so the action rules had to fire, but they fired for none of 7 American Airlines malicious and none of 7 benign bank pairs
+    (`\bAA\b` does not match flight numbers like `AA2847`; payments name IBANs, not people), and the rules proposed thousands of spans per rollout. Version 0.2 narrows the
+    patterns, adds a structural `repeat_recipient` rule, and proposes only the earliest three matching turns per rule. Result: 446 spans over 39 positive pairs (at most 15 per pair),
+    and the action rules fire for all 39.
+47. **Safeguards found on review**: `--base-url` with several monitors would have pointed them all at one server, silently comparing one model with itself; the tool now refuses it,
+    gained `--monitor NAME`, and warns if the served model's name does not match. That in turn showed that separate invocations would overwrite the manifest's cell list, so manifests now
+    accumulate cells and sessions (2 tests).
+48. **Accidental change, undone.** `chmod +x scripts/*.py` changed the file mode of three original scripts (`download_model.py`, `generate_rollouts.py`, `serve_model.py`), which git showed
+    as modified. They were restored to mode 644; `git diff` on `scripts/` now shows no tracked differences. The new scripts remain executable.
+49. **Dry runs on the real data.** `baseline.toml`: 984 units, 8,336 calls, 79.9 M input tokens, identical to the earlier independent calculation. The full pre-registered grid on the cached
+    rollouts only: 36 cells, 11,808 units, **100,128 calls, about 1.004 billion input tokens (estimated)**, 54 plan calls. In the `action` scope 2 rollout-objective pairs (8 of 328 units)
+    are single-pass without a plan but chunked with one. Results saved in `mihai/results/`.
+50. **The pre-existing tests.** `requirements.txt` was installed into the local `.venv` (pydantic 2.14.1, pandas 2.3.3) and the repository's own discovery
+    (`python -m unittest discover -s tests`) was run: **218 tests pass** (189 for this system, 29 original; two more runner tests were added after this entry for the `item_ids` fix, see entry 53).
+51. **Documentation**: `docs/system/` (16 files) describing the built system, and corrections elsewhere, including `docs/plan/04`, which still proposed a `run_monitors.py --config
+    configs/monitors.toml` whose config path is now the monitor registry. Two statements written in this part were wrong and were corrected before this entry: that plan and no-plan
+    cells chunk identically (not when a transcript fits one pass only without the plan), and the annotation effort estimate (4 to 8 hours per annotator, not 2 to 5).
+52. **A deviation from the session guidance:** one throwaway smoke-test directory was created under `/tmp` instead of the scratchpad; it was deleted at once. Nothing else used `/tmp`.
+
+53. **Review fixes after the suite first passed.** (a) With `item_limit`, `score_run` expected units for *all* rollouts, so a complete pilot would have been reported
+    incomplete; the manifest now records `item_ids` and scoring uses them (2 tests). (b) The report header counted the rollouts a set holds rather than those the run used; fixed
+    by tagging each item with its set. (c) An end-to-end check: the real pilot experiment file was run through the real command line and the real client over HTTP against a
+    throwaway fake model server (outside the repository) on the real rollouts and configs: 9 plans, 48 units in 4 cells, scored and reported, `complete` for every cell, manifest
+    recording the served model, GPU record and `draft` prompts; the run directory and the server were then removed. The fake server answers by simple rules, so the numbers it produced mean nothing; the check was of plumbing.
+
+### Verification (part 2)
+
+* `python -m unittest discover -s tests`: 218 tests, all pass. Per module: hierarchy 38, data 17, registry and spec 15, metrics and councils 23, monitor client 10, tool lists 5, strategies 14,
+  runner 24, comparisons 9, report 6, presence 23, freeze 5, original rollouts 23 and model scripts 6.
+* Tests that need the real rollouts run against the 41 and skip themselves if they are absent.
+* **What is verified:** the logic, against fake monitors of known behavior and hand-worked numbers; the client against a real local HTTP server; the command line's dry run on real data.
+* **What is not:** nothing has talked to a real monitor model. The `reasoning_effort` request field for GPT-OSS is unverified. The plan and judge prompts have never been run on a model, so their
+  wording is untested; the lock is `draft`. The objective texts have not been compared with the vendored task definitions' own text. The control rollouts do not exist.
+
+### Files created (part 2)
+
+| Path | Purpose |
+| --- | --- |
+| `monitor_experiment/{data,registry,spec,strategies,monitor_client,runner,metrics,council,compare,costs,report,presence,freeze,toollists}.py` | the system; each described under [`system/`](system/README.md) |
+| `scripts/{run_experiment,score_run,compare_cells,make_report,freeze,presence_labels,build_objective_table,build_tool_lists}.py` | command-line tools |
+| `configs/{monitors,rollout_sets,councils,comparisons}.toml`, `configs/experiments/*.toml` | registries and experiment files |
+| `configs/{objectives,tool_lists,presence_rules}.json` | the objective table, the agent's tool lists, the draft presence rules |
+| `prompts/{monitor_plan,monitor_plan_section}.txt`, `prompts/prompts.lock.json` | plan prompts and the (draft) freeze lock |
+| `tests/{support,test_data,test_registry_spec,test_metrics,test_monitor_client,test_toollists,test_strategies,test_runner,test_compare,test_report,test_presence,test_freeze}.py`, `tests/__init__.py` | 189 tests |
+| `docs/system/*.md` | the system documentation |
+| `mihai/results/dryrun-*-20261019.json` | priced experiment files |
+
+Local-only, git-ignored: `rollouts_original_clean/`, `cache/tokenizer/`, `.venv/`, and now `runs/`, `presence/`, `rollouts_main_only_clean/`.
+
+### Documents changed (part 2)
+
+See the table in [`docs/README.md`](README.md).
+
+### Not done (end of part 2)
+
+* No monitor model was run, anywhere. No pilot. The prompts are not frozen.
+* The `main_only` control rollouts were not generated, and there is no script yet to build their manifest.
+* Nothing from part 2 is committed; only the part 1 documentation is (`392288e`). Nothing was pushed.
+* The cluster checkout was not updated; the SSH connection was not used in this part.
+* Human annotation of presence labels has not started and needs two annotators.
+* `execute`, `plan_compare`, follow-up visibility, the `structured` prompt, interrogation and HTML or figures are not implemented.

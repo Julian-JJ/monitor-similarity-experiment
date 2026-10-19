@@ -1,0 +1,15 @@
+# The grid behind the confirmatory comparisons P1 to P4 (docs/plan/07-design-decisions.md section 3):
+#   P1 same model vs same family:   qwen3-14b, qwen3-4b, qwen3-32b
+#   P2 dense vs mixture-of-experts: qwen3-32b, qwen3-30b-a3b
+#   P3 family:                      qwen3-32b, gpt-oss-120b, gemma-large
+#   P4 plan vs no plan:             task_context for every monitor above
+# P5 (councils) is built afterwards from these runs' stored verdicts: configs/councils.toml.
+# This file needs the control rollouts, so it will not run until main_only_v1 exists.
+name = "preregistered-grid"
+monitors = ["qwen3-14b", "qwen3-4b", "qwen3-32b", "qwen3-30b-a3b", "gpt-oss-120b", "gemma-large"]
+rollout_sets = ["original_clean", "main_only_v1"]
+[grid]
+scope = ["action", "cot", "all"]
+task_context = ["none", "plan"]
+[options]
+samples = 4

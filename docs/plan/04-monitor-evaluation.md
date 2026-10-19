@@ -2,7 +2,9 @@
 
 Related: [scope](01-scope.md) · [setup](02-setup-and-architecture.md) · [rollouts](03-rollouts.md).
 
-Proposed interface: `scripts/run_monitors.py --config configs/monitors.toml`.
+Proposed interface (**superseded**): `scripts/run_monitors.py --config configs/monitors.toml`. The built interface is
+`scripts/run_experiment.py configs/experiments/NAME.toml`, and `configs/monitors.toml` is now the monitor registry; see
+[the system documentation](../system/README.md) and [the framework plan](06-experiment-framework.md).
 
 ## Experimental controls
 

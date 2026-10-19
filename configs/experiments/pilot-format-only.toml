@@ -1,0 +1,12 @@
+# Format-only pilot (docs/plan/07-design-decisions.md 2.8): does a monitor's reply parse, how long is it,
+# does the plan fit? The pilot reports validity, length and finish reasons only and never reads labels,
+# so prompt wording cannot be tuned to detection performance.
+name = "pilot-format-only"
+monitor = "qwen3-14b"
+rollout_sets = ["original_clean"]
+[grid]
+scope = ["action", "cot"]
+task_context = ["none", "plan"]
+[options]
+samples = 1
+item_limit = 1          # the first rollout of each task and variant: six rollouts in all

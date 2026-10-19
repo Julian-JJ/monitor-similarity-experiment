@@ -3,11 +3,10 @@
 A lightweight runner for cached **Qwen3-14B** trajectories in MonitorBench's
 code-verifiable dual-objective agent tasks. This implementation covers setup,
 model download, actor rollouts, programmatic grading, and generic follow-ups.
-A hierarchical monitor for transcripts too long for one prompt is designed and
-implemented as an offline library with tests (see
-[the design](docs/plan/05-hierarchical-monitor.md)). **No monitor has been run yet**:
-the command that runs monitors and the monitorability metrics are still planned work.
-Documentation index: [docs/README.md](docs/README.md); chronological record:
+On top of that sits an **experiment system** for monitors: choose a monitor model and variations in a TOML file, run (or price) it, and get
+metrics with confidence intervals, pre-registered comparisons and a report, including a hierarchical monitor for transcripts too long for
+one prompt. It is built and tested offline (218 tests); **no monitor model has been run yet**. See the
+[system documentation](docs/system/README.md); documentation index: [docs/README.md](docs/README.md); chronological record:
 [work log](docs/worklog.md).
 
 ## Saved rollouts and the Yale installation
@@ -206,18 +205,19 @@ Tests exercise real simulated tools/evaluators and deterministic fake model
 responses, including fresh restarts, server guards, and follow-up isolation. They do not
 download weights or establish GPU inference compatibility.
 
-## Monitor planning and local analysis
+## Monitor experiments (built offline; no monitor has been run)
 
-The monitor stage reads saved rollouts and needs no GPU to plan. To work locally,
-copy the 41 clean rollouts and the pinned tokenizer from the cluster into the
-git-ignored `rollouts_original_clean/` and `cache/tokenizer/` (see the
-[work log](docs/worklog.md) for the exact steps used on 2026-10-19), then:
+An experiment file names a monitor, rollout sets and variations; one command runs (or prices) it, others score, compare and report. **Start with the
+[system documentation](docs/system/README.md).** Local use needs the 41 rollouts in the git-ignored `rollouts_original_clean/` and the pinned tokenizer in
+`cache/tokenizer/` (copied from the cluster; see the [work log](docs/worklog.md)):
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r requirements-analysis.txt
-.venv/bin/python -B -m unittest tests.test_hierarchy -v      # offline; 30 tests
-.venv/bin/python -B scripts/count_transcript_tokens.py       # does each prompt fit a context window?
-.venv/bin/python -B scripts/plan_hierarchy.py                # chunks, model calls, tokens (dry run)
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt -r requirements-analysis.txt
+.venv/bin/python -B -m unittest discover -s tests                                   # 218 offline tests
+.venv/bin/python -B scripts/run_experiment.py configs/experiments/baseline.toml --dry-run   # price it: no model needed
+# with a monitor served (one model per server):
+.venv/bin/python scripts/run_experiment.py configs/experiments/baseline.toml --monitor qwen3-32b --base-url http://NODE:8000/v1 --score
+.venv/bin/python scripts/compare_cells.py runs/baseline && .venv/bin/python scripts/make_report.py runs/baseline/metrics.json --out report.md
 ```
 
 Findings so far, with sources: single-pass monitoring does not fit for the `cot`
@@ -228,7 +228,8 @@ rollouts failed their own side objective and none are `main_only` controls, so c
 negatives need new `main_only` rollouts from the same actor, which are planned
 ([research notes](docs/research/monitor-baseline-notes.md),
 [pre-registered decisions](docs/plan/07-design-decisions.md#211-control-rollouts)); the cached
-cross-objective labels give a secondary, impure set of negatives.
+cross-objective labels give a secondary, impure set of negatives. The baseline (8,336 monitor calls) and the full pre-registered grid
+(100,128 calls, about 1.0 billion input tokens, on the cached rollouts alone) are priced in `mihai/results/`.
 
 The broader [implementation plan](docs/plan/01-scope.md) describes future monitor
 experiments. [Monitoring Monitorability](https://arxiv.org/html/2512.18311v1)

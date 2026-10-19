@@ -1,0 +1,144 @@
+# Monitor models an experiment may choose by name (see docs/system/registries.md).
+#
+# Every key is required except active_b, notes and reasoning_control. `verified` is false until the
+# model has been downloaded and its revision pinned; entries marked "TBD" cannot be run until filled in.
+# Chunk sizes are counted with ONE reference tokenizer for every monitor, so all monitors see identical
+# observation chunks and only the model differs. Each call's real prompt size is read from the server.
+reference_tokenizer = "cache/tokenizer/tokenizer.json"   # Qwen3-14B's tokenizer.json, pinned revision
+
+[monitors.qwen3-14b]            # the same model as the fixed agent
+model_id = "Qwen/Qwen3-14B"
+revision = "40c069824f4251a91eefaf281ebe4c544efd3e18"
+family = "qwen3"
+size_b = 14
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+thinking = true
+verified = true
+notes = "Installed on the cluster (29.6 GB). Used as the pilot monitor."
+[monitors.qwen3-14b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+
+[monitors."qwen3-1.7b"]           # same family, smaller (exploratory)
+model_id = "Qwen/Qwen3-1.7B"
+revision = "UNPINNED"
+family = "qwen3"
+size_b = 1.7
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+thinking = true
+verified = false
+notes = "Not downloaded. Pin the revision at download time."
+[monitors."qwen3-1.7b".sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+
+[monitors.qwen3-4b]             # same family, smaller
+model_id = "Qwen/Qwen3-4B"
+revision = "UNPINNED"
+family = "qwen3"
+size_b = 4
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+thinking = true
+verified = false
+notes = "Not downloaded. Pin the revision at download time."
+[monitors.qwen3-4b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+
+[monitors.qwen3-32b]            # same family, larger; MonitorBench's own monitor
+model_id = "Qwen/Qwen3-32B"
+revision = "UNPINNED"
+family = "qwen3"
+size_b = 32
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+thinking = true
+verified = false
+notes = "Not downloaded (about 65 GB in BF16). Fits one 141 GB H200, not one 48 GB A40."
+[monitors.qwen3-32b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+
+[monitors.qwen3-30b-a3b]        # same family, mixture-of-experts
+model_id = "Qwen/Qwen3-30B-A3B"
+revision = "UNPINNED"
+family = "qwen3"
+size_b = 30
+active_b = 3
+architecture = "moe"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+thinking = true
+verified = false
+notes = "UNVERIFIED: listed from memory of the Qwen3 family. Confirm it exists and its license before use."
+[monitors.qwen3-30b-a3b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+
+[monitors.gpt-oss-120b]         # different family, mixture-of-experts
+model_id = "openai/gpt-oss-120b"
+revision = "UNPINNED"
+family = "gpt-oss"
+size_b = 120
+architecture = "moe"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+thinking = true
+verified = false
+notes = "Not downloaded. Memory use under its released quantization must be checked before serving. Reasoning effort is set through reasoning_control."
+[monitors.gpt-oss-120b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+[monitors.gpt-oss-120b.reasoning_control]
+kind = "reasoning_effort"
+default = "medium"
+
+[monitors.gemma-large]          # different family, dense
+model_id = "TBD-gemma"
+revision = "UNPINNED"
+family = "gemma"
+size_b = 30
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+thinking = true
+verified = false
+notes = "PLACEHOLDER. The exact Gemma model is fixed at download time (docs/plan/07-design-decisions.md 2.2); size_b is a stand-in."
+[monitors.gemma-large.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
