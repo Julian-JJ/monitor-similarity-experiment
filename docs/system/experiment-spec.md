@@ -60,7 +60,7 @@ existing run without invalidating the ones already done.
 
 `expand(spec, registry, fingerprints)` returns one `Cell` per combination of monitor and axes. Its `cell_id` is the SHA-256 of: the
 monitor's identity; the axis values; the resolved hierarchy parameters; the identity options above; and the **fingerprints** (hashes of the
-prompt files, tool lists, objective table, councils, presence rules, comparisons file and the reference tokenizer). Editing any prompt
+five prompt files, tool lists, objective table and the reference tokenizer; the councils, comparisons and presence rules are deliberately not part of it, see [freeze](freeze.md)). Editing any prompt
 file therefore changes every cell ID, and nothing computed under the old prompt can be mistaken for a result under the new one. Two
 cells with identical settings are an error.
 

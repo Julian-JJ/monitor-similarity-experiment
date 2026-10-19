@@ -83,6 +83,17 @@ def worker_plan(tasks, samples_per_task, block, first_sample=0):
     return plan
 
 
+def pair_list(tasks, samples_per_task, first_sample=0):
+    """Every (task, sample) to generate, interleaved across tasks so a partial run is balanced.
+
+    One pair per process is the unit of isolation: a sample that fails (the generator stops its process on the first
+    execution failure) must not take the other samples with it, as it did when whole blocks shared one process.
+    """
+    if samples_per_task < 1:
+        raise SetupError("samples_per_task must be at least 1")
+    return [(task, sample) for sample in range(first_sample, first_sample + samples_per_task) for task in tasks]
+
+
 def implementation_hash(checkout):
     """The hash the rollout runner puts in every actor identity: every ``*.py`` under ``monitor_experiment/``."""
     folder = Path(checkout) / "monitor_experiment"

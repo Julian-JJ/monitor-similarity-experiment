@@ -37,17 +37,37 @@ def scan_actors(cache, variant):
     return found
 
 
+def completed_samples(cache, variant):
+    """``{(task, sample)}`` whose actor and follow-up both completed, under any serving identity."""
+    done = set()
+    for path in sorted((Path(cache) / "entries").glob("*.json")):
+        entry = read_json(path)
+        if entry["variant"] != variant:
+            continue
+        actor = read_json(Path(cache) / entry["rollout"])
+        followups = [read_json(Path(cache) / f) for f in entry["followups"]]
+        if actor.get("status") == "complete" and followups and all(f.get("status") == "complete" for f in followups):
+            done.add((entry["task"], entry["sample"]))
+    return done
+
+
 def build_collection(cache, out, *, variant="main_only", name, expect=None, source_job=None, hardware=None,
                      config_path=None, tasks=None, builder_path=None):
     """Assemble the collection and return the manifest. ``expect`` is the number of samples requested per task."""
     cache, out = Path(cache), Path(out)
     if (out / "manifest.json").exists():
         raise CollectionError(f"{out / 'manifest.json'} already exists; build into a new directory")
-    entries = {}
+    entries, duplicates = {}, []
     for path in sorted((cache / "entries").glob("*.json")):
         entry = read_json(path)
         if entry["variant"] == variant:
-            entries[(entry["task"], entry["sample"])] = entry
+            key = (entry["task"], entry["sample"])
+            if key in entries:
+                duplicates.append(key)
+            entries[key] = entry
+    if duplicates:
+        raise CollectionError(f"More than one entry for {sorted(set(duplicates))}: the same sample was generated under two serving identities. "
+                              "Decide which to keep and remove the other entry file before building; the builder will not choose silently.")
     actors = scan_actors(cache, variant)
     wanted_tasks = tasks or sorted({t for t, _ in actors})
     pairs, excluded, identities = [], [], []

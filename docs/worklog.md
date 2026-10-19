@@ -434,3 +434,78 @@ The user asked: commit Phase A; explain what "annotators" means; do Phase B; kee
 * The Phase B preparation (this part) is **not committed**; only Phase A (`152b414`) and the part 1 documentation (`392288e`) are.
 * No monitor model has been run anywhere. No human annotation. Prompts remain `draft`.
 * To continue: the user reopens the SSH connection (passphrase and MFA), and supplies or helps find the Slurm options for an H200 job.
+
+## Session 2026-10-19, part 4: Phase B on the cluster
+
+The user reopened the connection, pointed to the YCRC job-scheduling tutorial and asked for the Phase B preparation to be committed. Everything in this part ran on Bouchet
+(`login2`) unless stated. Times are UTC as recorded in job status files.
+
+### M. Commit and Slurm facts
+
+65. **Committed the Phase B preparation** as `af32c0d` on `monitor-framework` (29 files, 1,536 insertions; audit showed nothing unexpected and no mode changes). Not pushed.
+66. **The Slurm tutorial** (<https://docs.ycrc.yale.edu/clusters-at-yale/job-scheduling/>, read through a page-summarising tool) gives the general options (`--account`, `--partition`, `--time`, `--gpus`,
+    `--cpus-per-task`, `--mem`), the commands (`sbatch`, `squeue --me`, `scancel`, `sacct`, `sbatch --test-only`) and the rule not to run heavy computation on login nodes. It does not name GPU
+    types or partitions for this cluster, so those were read from the cluster itself.
+67. **Facts established on the cluster by read-only commands:** the account is `cpsc4880` (QOS `normal` and `interactive`); `gpu_h200` allows all accounts and QOS `normal`, with no maximum time; there are also
+    `gpu_h100`, `gpu_b200`, `gpu_rtx6000`, `gpu`, `gpu_devel` partitions; storage is 4.0 TB with 3.2 TB free on `/nfs/roberts/project`; `pip install` works from the login node.
+68. **The teammate's job records are readable** (`$SHARED/logs/*.submission.json`). They give the exact flags of the successful H200 job: `--account=cpsc4880 --partition=gpu_h200 --nodes=1 --ntasks=1
+    --gpus=h200:1 --cpus-per-task=8 --mem=96G --no-requeue` (24 h limit). That job (29894244) started 20:36Z, had its server ready after 2 minutes and ended 22:51Z: **30 pairs in about 2¼ hours**,
+    much faster than my earlier assumption of 5 pairs an hour. The 2×A40 job (29860690) ran the full 6 hours and was stopped. The record's configuration hash for the cached batch's config,
+    `35988863…`, equals the hash of `mihai/configs/rollouts-output-32768.toml` on the cluster: the source config is the one that was used.
+69. **The odd start estimates are explained.** `sbatch --test-only` reported a start time of exactly one year ahead for every GPU partition. A reservation named `EmergencyMaintenance` (365 days, for admins)
+    covers a set of nodes; the estimate is that reservation's end, not a real queue time. The jobs below started within seconds. The queues are long (hundreds of jobs pending in each GPU partition) yet
+    free GPUs existed, so the real behaviour was only learned by submitting.
+
+### N. Setting up and verifying (no GPU)
+
+70. **B1: copied the branch** to `$ME/monitor-framework` with `rsync` (149 files, 1.1 MB, 3 minutes), leaving out `.git`, the environment, data, `vendor/monitorbench_agent` and the large test assets.
+71. **Setup script** (`setup_cluster.sh`, 18 minutes on the slow filesystem, exit 0). Verified by its own checks: the private model directory has all 17 files (29,552,612,206 bytes, revision `40c06982…`);
+    the data links exist; the derived config differs from the cached batch's in exactly the two intended lines (a diff confirmed this); **the pristine checkout is commit `5dc0417`, clean, with implementation hash
+    `8542b29e…`, equal to the cached batch's**; the analysis environment installed (PyYAML, tokenizers, pydantic, pandas).
+72. **Environment self-test** (`generate_rollouts.py --check-environments`, 12 s): the three environments load and register **71, 73 and 41 tools**, independently confirming the `ast`-based tool lists.
+73. **The framework on the cluster:** the freeze lock shows no differences and the tokenizer's SHA-256 equals the local file's; a dry run of the pilot file priced 48 units, 352 calls and 9 plan calls.
+
+### O. Jobs submitted
+
+74. **Control rollouts: job 30068171** (`controls-main-only`). `sbatch --parsable --account=cpsc4880 --partition=gpu_h200 --nodes=1 --ntasks=1 --gpus=h200:1 --cpus-per-task=8 --mem=96G --time=08:00:00
+    --no-requeue --output=$ME/logs/controls-%j.log --chdir=$ME/monitor-similarity-experiment mihai/cluster/run_controls.sbatch`. A receipt with the command, generating commit, config and launcher hashes was written to
+    `$ME/logs/controls-30068171.submission.json`. It started within 20 seconds on `a1122u11n01` (3 minutes after the 23:03Z start the server was ready; six workers began generating).
+    Config hash `b844b551…`. Time limit 8 hours (ends 03:03Z), reduced from the teammate's 24 because the earlier comparable job needed about 2¼ hours.
+75. **Format-only pilot: job 30068179** (`pilot-format-only`), Qwen3-14B as the monitor, `SCORE=0` so no label is read, 3-hour limit. It showed `ReqNodeNotAvail, Reserved for maintenance` for a few seconds and then
+    started on the same node (a different GPU). A receipt is in `$ME/logs/monitor-30068179.submission.json`.
+
+### P. The format-only pilot and the freeze
+
+76. **The pilot finished** (job 30068179, exit 0, 911 seconds of run time, started 23:06:55Z; server ready after 85 s). Qwen3-14B as the monitor, scopes `action` and `cot`, contexts `none` and `plan`, one rollout of each task and
+    variant, one sample: 48 units, 352 requests. Read through `scripts/pilot_summary.py` only, which cannot reach labels; the job ran with `SCORE=0` and the run directory contains no `metrics` files. **Results:**
+    0 invalid requests, 0 retried, every reply a normal stop; completion tokens per request median 997 (95th percentile 1,698, max 3,189 against a 16,768 cap); prompts up to 14,243 tokens against the 15,488 limit; 9 plans of
+    330 to 474 words (524 to 870 tokens) with no retry; chunks per unit median 6, max 23; request latency median 15 s; **405 completion tokens per second at concurrency 8**. The planning assumption of about 1,000 tokens per
+    reply was accurate.
+77. **Qualitative format check** (no labels): one plan and two replies (a chunk reply and a combining reply) were read. The plan has numbered steps with tools and checks; the replies follow the requested three-part structure
+    and quote evidence with turn numbers. Nothing refused or looked malformed.
+78. **An observation, deliberately not acted on.** Across the nine plans, all mention actions that are unneeded, unusual or to be avoided (2 to 6 phrases each) but only two give them the dedicated heading that item 3 of the
+    plan prompt asks for. The pre-registered rule permits wording changes only to fix format failures; none occurred, so the wording was left unchanged. It is recorded as a question for the user.
+79. **A design flaw in my freeze mechanism, found before freezing.** Cell IDs included the hashes of the councils file, the comparisons file and the presence rules, none of which changes what a monitor says; editing a comparison
+    or revising a presence rule would have invalidated every monitor output. Fixed before any confirmatory run exists: cell IDs now cover the five prompt files, tool lists, objective table and tokenizer; the freeze lock
+    additionally covers the councils and comparisons files; and the presence rules have a separate lock, because they must stay editable until the annotator agreement check. Recorded as **amendment A5** (no monitor result had
+    been seen). 5 new tests, including one showing an analysis-file edit changes the lock but not a single cell ID. The 258-test suite passes.
+80. **The prompts were frozen**: `freeze.py write --status frozen` (7 files, tool lists, objectives, tokenizer `aeb13307…`), and `freeze.py rules-write --status draft` for the presence rules (version 0.2). The wording
+    of every prompt is exactly what the pilot ran, except that the pilot ran under the older fingerprint scheme (cell IDs differ; the prompt files do not).
+81. **Documentation** updated with the Slurm facts, the pilot table and the corrected freeze design (`docs/system/freeze.md` rewritten, `cluster.md`, plan status tables, indexes, counts: 258 tests, 229 new).
+
+### Q. Control rollouts, as of this entry
+
+82. Job 30068171 had 3 complete samples cached after 22 minutes (6 workers). At that rate (about 8 an hour) the 36 requested samples would need about 4½ hours, inside the 8-hour limit (ends 03:03Z); the earlier
+    comparable job ran 12 an hour. Not yet complete.
+
+### R. A flaw in the control job's design, found while it ran
+
+83. **Worker 0 of job 30068171 died after one sample.** About 27 minutes in, its log ended with `ProtocolError: Unclosed reasoning block; likely truncated generation` (the model's response ran into the 32,768-token limit inside
+    its reasoning, an ordinary execution failure of the kind that cost the cached batch 7 of 48 samples). The generator **stops its whole process** at the first execution failure, and my job gave each of six processes a block of six samples,
+    so the other five samples of that block (bank, samples 1 to 5) would never have been attempted. With roughly one sample in seven failing, most blocks would have been cut short and the target of 8 retained per task missed.
+    The teammate's pipeline ran each pair as its own invocation for this reason; I had not carried that design over. The mistake was mine: the block design was written and only smoke-tested without being run.
+84. **Fix, with tests.** `scripts/run_pairs.py` runs one process per (task, sample), eight at a time, skips samples already complete in the cache under any serving identity, writes one log per pair and a `summary.json`,
+    and fails only if *every* attempt fails. The collection builder now **refuses** to choose silently if one sample has two complete entries (the same sample generated under two serving identities). 8 new tests; `run_controls.sbatch` now calls the
+    driver; the old `prepare_controls.py workers` plan is no longer used by the job. 266 tests pass.
+85. **Cost of the fix.** The in-flight rollouts of job 30068171 are lost when it is cancelled (about 27 minutes of five concurrent samples); the five completed samples (american_airlines_2 samples 0 and 6; spam_filter_update samples 0, 6 and 7)
+    stay in the cache and are skipped by the new job.

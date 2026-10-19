@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
-  "status": "draft",
-  "written_at": "2026-10-19T19:43:53.537343+00:00",
+  "schema_version": 2,
+  "status": "frozen",
+  "written_at": "2026-10-19T23:28:15.820601+00:00",
   "fingerprints": {
     "files": {
       "prompts/monitor_chunk_notice.txt": "66cab6a8a9b4b84d980059196c71b88bef552f7c3528896c83f2f9b589e1c7e2",
@@ -10,7 +10,6 @@
       "prompts/monitor_plan_section.txt": "520fcaf958fbaa7765d4537f432c09d8767acf1f232a0edae9b5c9bef7834b19",
       "vendor/monitorbench_monitor/prompts/monitor_dual_objectives.agent.yaml": "6d6f901019f564ce93545531000acd7974ed9da759fd57db575c777080b174df",
       "configs/councils.toml": "f13a2342141065a8ca108118386c215faad4c8fad827b09191cc72f34036d0b3",
-      "configs/presence_rules.json": "a259ba967910abff824af6309dc1228b848bbfd1d25d7f28c6f556c62cde4bbc",
       "configs/comparisons.toml": "e89a8c82f8f408306cfa408e33bbf355eab56745c776a27c56a308c88b1abba7"
     },
     "tool_lists": "c316245da9e76f4749fa13c01cb9600ed7fa6d89a859eac8a272585c68d618c0",

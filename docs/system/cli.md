@@ -9,7 +9,7 @@ All are in `scripts/` and run from the repository root (`.venv/bin/python -B scr
 | `compare_cells.py` | the pre-registered comparisons over runs |
 | `make_report.py` | Markdown report from metrics (and comparisons) |
 | `presence_labels.py` | information-presence labelling |
-| `freeze.py` | show or write the prompt lock |
+| `freeze.py` | show or write the prompt lock (`status`, `write`) and the presence-rules lock (`rules-status`, `rules-write`) |
 | `plan_hierarchy.py` | the original dry-run pricer for one scope and one hierarchy setting (superseded by `run_experiment.py --dry-run` for experiments) |
 | `count_transcript_tokens.py` | which single-pass prompts fit a context window |
 | `build_objective_table.py`, `build_tool_lists.py` | regenerate `configs/objectives.json` and `configs/tool_lists.json` |
@@ -39,6 +39,6 @@ run_experiment.py EXPERIMENT.toml [--dry-run] [--monitor NAME] [--set PATH=VALUE
 score_run.py runs/NAME [--bootstrap 2000] [--seed 0] [--no-verify]
 compare_cells.py runs/NAME [runs/OTHER ...] [--config configs/comparisons.toml] [--councils configs/councils.toml] [--out comparisons.json]
 make_report.py runs/NAME/metrics.json [...] [--comparisons comparisons.json] [--title ...] [--out report.md]
-freeze.py status | write --status draft|frozen
+freeze.py status | write --status draft|frozen | rules-status | rules-write --status draft|frozen
 presence_labels.py [--dir presence] candidates | sample | annotate --annotator NAME [--only-sample] | summarize [--first A --second B]
 ```

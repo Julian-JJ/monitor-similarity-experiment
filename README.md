@@ -5,7 +5,7 @@ code-verifiable dual-objective agent tasks. This implementation covers setup,
 model download, actor rollouts, programmatic grading, and generic follow-ups.
 On top of that sits an **experiment system** for monitors: choose a monitor model and variations in a TOML file, run (or price) it, and get
 metrics with confidence intervals, pre-registered comparisons and a report, including a hierarchical monitor for transcripts too long for
-one prompt. It is built and tested offline (253 tests); **no monitor model has been run yet**. See the
+one prompt. It is built and tested offline (258 tests); **no monitor model has been run yet**. See the
 [system documentation](docs/system/README.md); documentation index: [docs/README.md](docs/README.md); chronological record:
 [work log](docs/worklog.md).
 
@@ -213,7 +213,7 @@ An experiment file names a monitor, rollout sets and variations; one command run
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt -r requirements-analysis.txt
-.venv/bin/python -B -m unittest discover -s tests                                   # 253 offline tests
+.venv/bin/python -B -m unittest discover -s tests                                   # 258 offline tests
 .venv/bin/python -B scripts/run_experiment.py configs/experiments/baseline.toml --dry-run   # price it: no model needed
 # with a monitor served (one model per server):
 .venv/bin/python scripts/run_experiment.py configs/experiments/baseline.toml --monitor qwen3-32b --base-url http://NODE:8000/v1 --score

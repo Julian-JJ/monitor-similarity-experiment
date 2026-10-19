@@ -271,15 +271,15 @@ list. A run is reproducible from `manifest.json` plus the frozen rollouts.
 
 The step list that follows is the original plan, kept for the record.
 
-**Phase B status (2026-10-19):** the local preparation is done and tested; nothing has run on the cluster.
+**Phase B status (2026-10-19, updated later the same day):** B1 to B3 are done; the controls are generating; the other monitors and the baseline are not started.
 
 | Item | Status |
 | --- | --- |
-| B1 sync code to the cluster | command and layout written ([cluster runbook](../system/cluster.md)); not run (connection expired) |
-| B2 control rollouts | job script, private model directory, derived config, checkout-identity check, worker plan and collection builder written and tested; the identity check was confirmed locally against the cached manifest; **not run** |
-| B3 pilot | label-free summary written and tested; job script supports `SCORE=0`; **not run** |
-| B4 download and serve another monitor | generic serving command written and tested; no download script for monitors yet; **not run** |
-| B5 baseline | job script written; **not run** |
+| B1 sync code to the cluster | **done** (149 files, 3 minutes); setup verified the code identity on the cluster |
+| B2 control rollouts | **running**: job 30068171 on one H200 (started 23:03Z); then `build_collection.py`, which has not yet run on real output |
+| B3 pilot | **done** (job 30068179): no format failure; prompts **frozen** |
+| B4 download and serve another monitor | the serving path was exercised for Qwen3-14B; no download script for other monitors yet; **not started** |
+| B5 baseline | job script exercised by the pilot; Qwen3-32B not downloaded; **not started** |
 
 1. **A1. Registries and data layer.** `data.py`, `registry.py`; load the 41 rollouts
    with hash verification; observable/privileged separation. Test: labels unreachable from

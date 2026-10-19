@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Generate the main_only control rollouts: serve Qwen3-14B on ONE GPU, run the cached batch's actor settings, no side objective.
 # Derived from run_qwen.sbatch. Differences: every path is a variable; all writes go under $ME; the teammate's directory is read-only;
-# the variant is main_only; samples are split across workers by scripts/prepare_controls.py. See docs/system/cluster.md.
+# the variant is main_only; each (task, sample) runs in its own process (scripts/run_pairs.py). See docs/system/cluster.md.
 #
 # Submit (partition/account/time are cluster specifics, not set here):
 #   sbatch --gres=gpu:h200:1 --cpus-per-task=8 --mem=96G --time=06:00:00 [--partition=... --account=...] \
 #          mihai/cluster/run_controls.sbatch
-# Environment (all optional): FIRST_SAMPLE (default 0), SAMPLES_PER_TASK (12), BLOCK (6), PORT (28473).
+# Environment (all optional): FIRST_SAMPLE (default 0), SAMPLES_PER_TASK (12), PARALLEL (8), PORT (28473).
 set -euo pipefail
 
 ME="${ME:-/nfs/roberts/project/cpsc4880/cpsc4880_as4833}"
@@ -16,7 +16,7 @@ FRAMEWORK="${FRAMEWORK:-$ME/monitor-framework}"
 EXPECTED_COMMIT="${EXPECTED_COMMIT:-5dc0417}"
 FIRST_SAMPLE="${FIRST_SAMPLE:-0}"
 SAMPLES_PER_TASK="${SAMPLES_PER_TASK:-12}"
-BLOCK="${BLOCK:-6}"
+PARALLEL="${PARALLEL:-8}"
 PORT="${PORT:-28473}"
 MAX_MODEL_LEN=131072   # the cached batch's serving: 131,072 tokens with YaRN factor 4, one GPU
 YARN_FACTOR=4
@@ -26,7 +26,6 @@ CONFIG="$ME/configs/rollouts-main-only.toml"
 JOB="${SLURM_JOB_ID:-local}"
 STATUS="$ME/logs/controls-$JOB.status"
 server_pid=
-worker_pids=()
 
 export PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=4
 export HF_HOME="$ME/cache/huggingface" VLLM_CACHE_ROOT="$ME/cache/vllm" TORCH_HOME="$ME/cache/torch"
@@ -36,7 +35,6 @@ mkdir -p "$ME/logs" "$HF_HOME" "$VLLM_CACHE_ROOT" "$TORCH_HOME" "$XDG_CACHE_HOME
 cleanup() {
     local code=$?
     trap - EXIT
-    for pid in "${worker_pids[@]}"; do [[ -n "$pid" ]] && kill -TERM "$pid" 2>/dev/null || true; done
     [[ -n "$server_pid" ]] && kill -TERM -- "-$server_pid" 2>/dev/null || true
     printf 'exit_code=%s finished_at=%s\n' "$code" "$(date -u +%FT%TZ)" >> "$STATUS"
     exit "$code"
@@ -71,19 +69,10 @@ done
 [[ "$ready" == 1 ]] || { tail -n 100 "$server_log" >&2; echo "Server startup timed out" >&2; exit 1; }
 printf 'server_ready_at=%s\n' "$(date -u +%FT%TZ)" >> "$STATUS"
 
-# 4. Workers: contiguous sample blocks per task (see prepare_controls.py workers). Finished samples are cached and reused on rerun.
-while read -r worker task start count; do
-    "$RESEARCH_PY" scripts/generate_rollouts.py --config "$CONFIG" --base-url "http://127.0.0.1:$PORT/v1" --cache-dir "$ME/cache" \
-        --tasks "$task" --variants main_only --start-sample "$start" --samples "$count" > "$ME/logs/controls-worker-$JOB-$worker.log" 2>&1 &
-    worker_pids+=("$!")
-    printf 'worker=%s task=%s start_sample=%s samples=%s\n' "$worker" "$task" "$start" "$count" | tee -a "$STATUS"
-done < <("$RESEARCH_PY" "$FRAMEWORK/scripts/prepare_controls.py" workers --samples "$SAMPLES_PER_TASK" --block "$BLOCK" --first-sample "$FIRST_SAMPLE")
-failed=0
-for i in "${!worker_pids[@]}"; do
-    if wait "${worker_pids[$i]}"; then printf 'worker index %s finished\n' "$i" | tee -a "$STATUS"
-    else printf 'worker index %s FAILED; see its log\n' "$i" | tee -a "$STATUS" >&2; failed=1; fi
-    worker_pids[$i]=''
-done
-worker_pids=()
-[[ "$failed" == 0 ]] || exit 1
+# 4. One process per (task, sample), PARALLEL at a time (the cached batch used 8 clients). The generator stops its whole process at the first execution
+#    failure, so block-sized workers lose every remaining sample of a block when one fails; a pair per process loses only the failed sample.
+#    Samples already complete in the cache (under any serving identity) are skipped. See scripts/run_pairs.py.
+"$RESEARCH_PY" "$FRAMEWORK/scripts/run_pairs.py" --checkout "$CHECKOUT" --python "$RESEARCH_PY" --config "$CONFIG" \
+    --base-url "http://127.0.0.1:$PORT/v1" --cache-dir "$ME/cache" --log-dir "$ME/logs/controls-pairs-$JOB" \
+    --samples "$SAMPLES_PER_TASK" --first-sample "$FIRST_SAMPLE" --parallel "$PARALLEL" 2>&1 | tee -a "$STATUS"
 printf 'complete_actor_entries=%s\n' "$(ls "$ME/cache/entries" | wc -l)" | tee -a "$STATUS"

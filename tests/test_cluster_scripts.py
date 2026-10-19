@@ -39,7 +39,9 @@ class ScriptTests(unittest.TestCase):
         self.assertIn("verify-checkout", text)                   # same commit, unmodified, same implementation hash
         self.assertIn('EXPECTED_COMMIT="${EXPECTED_COMMIT:-5dc0417}"', text)
         self.assertIn("flock -n 9", text)                          # one pipeline at a time
-        self.assertIn("--variants main_only", text)
+        self.assertIn("run_pairs.py", text)                        # one process per pair, so a failed sample does not end a block
+        self.assertNotIn("worker_pids", text, "block workers lose the rest of a block when one sample fails")
+        self.assertIn('PARALLEL="${PARALLEL:-8}"', text)
         self.assertIn("--max-model-len \"$MAX_MODEL_LEN\" --yarn-factor \"$YARN_FACTOR\"", text)
         self.assertIn("MAX_MODEL_LEN=131072", text)
         self.assertIn("--tensor-parallel-size 1", text)
