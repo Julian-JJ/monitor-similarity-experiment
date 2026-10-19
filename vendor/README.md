@@ -9,7 +9,11 @@ three task definitions, and their programmatic evaluators. Both upstream MIT
 licenses are included. The file hashes in `manifest.json` identify this extracted
 subset, including the changes below. No upstream model runner is imported.
 
-Local extraction changes:
+A second, separate subset lives in [`monitorbench_monitor/`](monitorbench_monitor/README.md):
+the unmodified agent **monitor prompt** from the same commit, with its own license
+copy and `manifest.json`. It is used by `monitor_experiment/hierarchy.py`.
+
+Local extraction changes (for `monitorbench_agent/`):
 
 - `utils/logging_utils.py` retains configuration loading, required model imports,
   and the fixed simulation clock only. Rich logging and the upstream pipeline

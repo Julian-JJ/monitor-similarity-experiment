@@ -3,7 +3,12 @@
 A lightweight runner for cached **Qwen3-14B** trajectories in MonitorBench's
 code-verifiable dual-objective agent tasks. This implementation covers setup,
 model download, actor rollouts, programmatic grading, and generic follow-ups.
-Monitor evaluation and hierarchical aggregation remain planned work.
+A hierarchical monitor for transcripts too long for one prompt is designed and
+implemented as an offline library with tests (see
+[the design](docs/plan/05-hierarchical-monitor.md)). **No monitor has been run yet**:
+the command that runs monitors and the monitorability metrics are still planned work.
+Documentation index: [docs/README.md](docs/README.md); chronological record:
+[work log](docs/worklog.md).
 
 ## Saved rollouts and the Yale installation
 
@@ -200,6 +205,30 @@ python -m unittest discover -s tests -v
 Tests exercise real simulated tools/evaluators and deterministic fake model
 responses, including fresh restarts, server guards, and follow-up isolation. They do not
 download weights or establish GPU inference compatibility.
+
+## Monitor planning and local analysis
+
+The monitor stage reads saved rollouts and needs no GPU to plan. To work locally,
+copy the 41 clean rollouts and the pinned tokenizer from the cluster into the
+git-ignored `rollouts_original_clean/` and `cache/tokenizer/` (see the
+[work log](docs/worklog.md) for the exact steps used on 2026-10-19), then:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements-analysis.txt
+.venv/bin/python -B -m unittest tests.test_hierarchy -v      # offline; 30 tests
+.venv/bin/python -B scripts/count_transcript_tokens.py       # does each prompt fit a context window?
+.venv/bin/python -B scripts/plan_hierarchy.py                # chunks, model calls, tokens (dry run)
+```
+
+Findings so far, with sources: single-pass monitoring does not fit for the `cot`
+and `all` scopes (median prompt 76k and 84k tokens against a 15.5k-token input
+limit), so a hierarchical monitor is needed
+([measurements](docs/analysis/transcript-token-counts.md)); only 3 of 41 saved
+rollouts failed their own side objective and none are `main_only` controls, so clean
+negatives need new `main_only` rollouts from the same actor, which are planned
+([research notes](docs/research/monitor-baseline-notes.md),
+[pre-registered decisions](docs/plan/07-design-decisions.md#211-control-rollouts)); the cached
+cross-objective labels give a secondary, impure set of negatives.
 
 The broader [implementation plan](docs/plan/01-scope.md) describes future monitor
 experiments. [Monitoring Monitorability](https://arxiv.org/html/2512.18311v1)

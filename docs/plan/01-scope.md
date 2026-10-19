@@ -1,18 +1,22 @@
 # Scope and research decisions
 
 Status: the initial model-download and programmatic-task rollout slice is
-implemented; see [the repository README](../../README.md). Monitor evaluation
-and hierarchical aggregation remain planned work. The documents below describe
-the broader intended framework.
+implemented; see [the repository README](../../README.md). The hierarchical
+monitor is designed and implemented as an offline library
+([05](05-hierarchical-monitor.md)); running monitors and computing metrics remain
+planned work. The documents below describe the broader intended framework.
 
 Build a lightweight framework to measure how the monitor affects monitorability. Generate Qwen3-14B trajectories once, freeze their outcome labels, and reuse identical trajectories across monitor conditions.
 
 ## Reading guide
 
-1. This document defines the experiment and its assumptions.
+1. This document defines the experiment and its assumptions. Measurements and
+   research that shaped it are in [`../analysis/`](../analysis/transcript-token-counts.md)
+   and [`../research/`](../research/monitor-baseline-notes.md).
 2. [Setup and architecture](02-setup-and-architecture.md) defines dependencies, environment reuse, and model support.
 3. [Rollout generation](03-rollouts.md) defines actor execution, follow-ups, and caching.
 4. [Monitor evaluation](04-monitor-evaluation.md) defines experimental controls, metrics, and validation.
+5. [Hierarchical monitor](05-hierarchical-monitor.md) defines how transcripts too long for one prompt are monitored.
 
 ## Task scope
 

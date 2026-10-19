@@ -160,12 +160,40 @@ historical submission arguments are archived on the cluster. They are not
 needed to read the clean collection. No automatic retry or active monitoring
 job remains from these experiments.
 
+## Local copy and planning results (added 2026-10-19)
+
+Planning the monitor stage does not need the cluster. The 41 clean pairs were
+copied to `rollouts_original_clean/` at the repository root of a local clone (87 MB,
+git-ignored) together with the pinned `tokenizer.json` in `cache/tokenizer/`. The
+copy is verbatim; it was made with `rsync` from
+`rollouts_original_clean/` in the project directory of the teammate who produced it
+(`cpsc4880_mae73`). Steps and caveats are in the [work log](../docs/worklog.md).
+
+Small results from that local work are tracked in Git under `results/`:
+
+| File | Contents |
+| --- | --- |
+| `results/transcript-token-counts-20261019.json` | prompt tokens for single-pass monitoring, per rollout, scope and tool-result cut ([analysis](../docs/analysis/transcript-token-counts.md)) |
+| `results/hierarchy-plan-32k-20261019.json` | dry-run plan: 32,768 context, 12,000-token chunks |
+| `results/hierarchy-plan-131k-chunk100k-20261019.json` | dry-run plan: 131,072 context, 100,000-token chunks |
+
+These are measurements of prompt size and planned model calls. They contain no
+monitor outputs and no raw responses or reasoning.
+
 ## What is needed to run monitors later
 
 Actor generation and follow-ups are implemented. **There is no implemented
 `scripts/run_monitors.py` yet.** The CLI in the
 [monitor evaluation plan](../docs/plan/04-monitor-evaluation.md) is proposed;
-it is not an executable command. A future monitor runner needs to:
+it is not an executable command. What exists is
+[`monitor_experiment/hierarchy.py`](../monitor_experiment/hierarchy.py), an offline
+library that renders the permitted messages for each scope, splits transcripts into
+chunks that fit a monitor's context, builds the prompts, and runs a tree of monitor
+calls through a function you supply. Its [design](../docs/plan/05-hierarchical-monitor.md)
+covers the rendering of the original transcript in item 3 and the verdict and failure
+records of item 4. It does **not** render follow-up answers or reasoning (follow-up
+visibility is unimplemented), has no monitor model client, reads no manifest, and does
+no scoring. A future monitor runner needs to:
 
 1. Read the saved manifest and verify hashes and parent links.
 2. Use identical rollout IDs across comparisons, retaining source-job/serving

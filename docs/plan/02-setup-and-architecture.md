@@ -12,9 +12,13 @@ Expose three entry points:
 | --- | --- |
 | `scripts/setup.sh` | Install selected dependencies, fetch environments, and check readiness |
 | `scripts/generate_rollouts.py` | Execute and label actor trajectories; cache follow-ups |
-| `scripts/run_monitors.py` | Evaluate cached trajectories and produce reports |
+| `scripts/run_monitors.py` | Evaluate cached trajectories and produce reports (**not yet written**) |
 
-Keep implementation in a compact Python package, with separate environment adapters, inference adapters, artifact handling, observation rendering, and metrics. Store example TOML configurations and versioned prompt assets in the repository.
+Offline helpers that already exist: `scripts/count_transcript_tokens.py` (which
+single-pass monitor prompts fit a context window) and `scripts/plan_hierarchy.py`
+(a dry run of the [hierarchical monitor](05-hierarchical-monitor.md): chunks, model
+calls, token totals). They need `requirements-analysis.txt`, not a GPU.
+Keep implementation in a compact Python package, with separate environment adapters, inference adapters, artifact handling, observation rendering, and metrics. Observation rendering, chunking and tree execution for the monitor are in `monitor_experiment/hierarchy.py`; metrics are not yet implemented. Store example TOML configurations and versioned prompt assets in the repository.
 
 ## Environment reuse
 
