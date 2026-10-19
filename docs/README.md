@@ -7,6 +7,7 @@
 | [Work log](worklog.md) | chronological record of what was done, including mistakes and declined actions |
 | [Scope](plan/01-scope.md) · [Setup](plan/02-setup-and-architecture.md) · [Rollouts](plan/03-rollouts.md) · [Monitor evaluation](plan/04-monitor-evaluation.md) | the intended framework |
 | **[System documentation](system/README.md)** | **how the built system works**: architecture, every module, file formats, metrics, commands, how to add things |
+| [Cluster runbook](system/cluster.md) · [Collections](system/collections.md) | Phase B: the scripts for the control rollouts, serving monitors and the pilot, and what is and is not verified |
 | [Experiment framework](plan/06-experiment-framework.md) | the plan behind it; Phase A is built (status table inside), Phases B and C are not |
 | [Design decisions](plan/07-design-decisions.md) | choices fixed before any results: monitor pool, councils and voting rules, plans per task, the information-presence label protocol, confirmatory comparisons, compute stance, amendment log |
 | [Hierarchical monitor](plan/05-hierarchical-monitor.md) | design of the monitor for transcripts too long for one prompt; status and open decisions |
@@ -20,12 +21,12 @@
 | Item | State |
 | --- | --- |
 | Actor rollouts and follow-ups (Qwen3-14B, 3 tasks) | done; 41 clean pairs on the cluster |
-| Hierarchical monitor library, experiment framework (data, registries, spec, runner, metrics, comparisons, report, presence tooling), prompts | done; 218 offline tests pass (189 new) |
+| Hierarchical monitor library, experiment framework (data, registries, spec, runner, metrics, comparisons, report, presence tooling), prompts | done; 253 offline tests pass (224 new) |
 | Token counts and dry-run plans over the 41 rollouts | done; results in `mihai/results/` |
 | Running any monitor model | **not done** |
 | Metrics (TPR, TNR, g-mean², bootstrap), comparisons, councils, report | done and tested against hand-worked numbers |
 | `scripts/run_experiment.py` (run and price experiments) | done; exercised only with fake monitors and a local fake server |
-| `main_only` control rollouts (clean negatives) | **planned, not generated**: spec in [07](plan/07-design-decisions.md#211-control-rollouts) (about 30, needs one H200 job) |
+| `main_only` control rollouts (clean negatives) | **planned, not generated**: spec in [07](plan/07-design-decisions.md#211-control-rollouts); the scripts, collection builder and checkout verification are written and tested locally ([cluster runbook](system/cluster.md)); needs one H200 job and your cluster login |
 | Design decisions pre-registered (monitor pool, councils, hierarchy settings, prompts' design, presence-label protocol) | done in [07](plan/07-design-decisions.md); **committed in `392288e`** on branch `monitor-framework` (not pushed), which dates it. Code written after that commit is uncommitted |
 | Prompt files for plan context, `prompts.lock.json` (status `draft`), presence rules (draft v0.2), annotation tool | written; **not frozen**: needs the format-only pilot and the annotator agreement checks |
 | Follow-up visibility in monitor input | **not implemented** |

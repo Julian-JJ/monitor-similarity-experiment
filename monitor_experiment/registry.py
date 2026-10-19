@@ -50,6 +50,7 @@ class Monitor:
     verified: bool
     active_b: float = None
     notes: str = ""
+    reasoning_parser: str = None   # vLLM --reasoning-parser name; None serves the thinking inline in the content
 
     def runnable(self):
         """Raise unless this entry names a concrete model (placeholders start with ``TBD``)."""
@@ -86,7 +87,7 @@ class SetEntry:
 
 MONITOR_REQUIRED = {"model_id", "revision", "family", "size_b", "architecture", "provider", "open_weights",
                     "base_url", "context_tokens", "output_reserve", "thinking", "verified", "sampling"}
-MONITOR_OPTIONAL = {"active_b", "notes", "reasoning_control"}
+MONITOR_OPTIONAL = {"active_b", "notes", "reasoning_control", "reasoning_parser"}
 ARCHITECTURES = ("dense", "moe")
 SET_KEYS = {"root", "manifest", "status", "description"}
 ACTOR_KEYS = {"model_id", "revision", "family", "size_b", "architecture"}

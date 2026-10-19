@@ -13,6 +13,10 @@ All are in `scripts/` and run from the repository root (`.venv/bin/python -B scr
 | `plan_hierarchy.py` | the original dry-run pricer for one scope and one hierarchy setting (superseded by `run_experiment.py --dry-run` for experiments) |
 | `count_transcript_tokens.py` | which single-pass prompts fit a context window |
 | `build_objective_table.py`, `build_tool_lists.py` | regenerate `configs/objectives.json` and `configs/tool_lists.json` |
+| `build_collection.py` | turn a rollout cache into a verified collection ([collections](collections.md)) |
+| `prepare_controls.py` | model directory, derived config, checkout verification and worker plan for the control run ([cluster](cluster.md)) |
+| `serve_monitor.py` | serve one registered monitor with vLLM ([cluster](cluster.md)) |
+| `pilot_summary.py` | label-free summary of a run for the format-only pilot |
 | `generate_rollouts.py`, `serve_model.py`, `download_model.py` | the original actor tooling (not changed) |
 
 ## `run_experiment.py`

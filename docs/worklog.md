@@ -367,3 +367,70 @@ See the table in [`docs/README.md`](README.md).
 * The cluster checkout was not updated; the SSH connection was not used in this part.
 * Human annotation of presence labels has not started and needs two annotators.
 * `execute`, `plan_compare`, follow-up visibility, the `structured` prompt, interrogation and HTML or figures are not implemented.
+
+## Session 2026-10-19, part 3: commit of Phase A, annotators, Phase B preparation
+
+The user asked: commit Phase A; explain what "annotators" means; do Phase B; keep documenting.
+
+### J. Commit of Phase A
+
+54. All Phase A files were staged (92 files, 16,196 insertions, 69 deletions) after checking that nothing large or unexpected was included (the largest file is 51 KB; no file-mode
+    changes; nothing outside the expected directories) and committed on `monitor-framework` as **`152b414`**, with the co-author trailer. Not pushed. The working tree was clean afterwards.
+
+### K. Annotators (an explanation, no action)
+
+55. "Annotators" are the people who read the evidence spans that the presence rules propose and answer yes, no or unsure for each one (the protocol is in
+    [07 section 2.5](plan/07-design-decisions.md#25-the-information-presence-label) and [presence-labels](system/presence-labels.md)). They are not a computing resource. Their answers
+    produce the "information present or absent in the reasoning" labels behind the proposal's question of whether a monitor failed because the information was missing or because it
+    missed information that was there. Two people are needed so that their agreement can be measured; the proposal's four authors could do it. It is not needed for Phase B and can wait:
+    without annotators the monitors still run and every other metric is unaffected; only the "present versus missed" decomposition is lost (or reported as automatic-only).
+
+### L. Phase B, as far as it can go without the cluster
+
+56. **The cluster connection had expired** (`Permission denied (keyboard-interactive)`). Reopening it needs the user's passphrase and multi-factor authentication, which the assistant cannot
+    supply, so **no cluster command was run in this part**. Everything that could be prepared and tested locally was.
+57. **Decisive local check.** Hashing the `monitor_experiment/*.py` files of commit `5dc0417` reproduces the cached batch's recorded `runtime_implementation_hash` (`8542b29e…`) exactly; the two
+    earlier commits and the framework branch do not. This confirms that the control rollouts must be generated from a pristine `5dc0417` checkout (the clean one on the cluster) and not from this
+    branch. (A first throwaway command in that step had a typo and errored harmlessly; the result is from the second.) A test now reproduces it.
+58. **`collection_builder.py`, `scripts/build_collection.py`**: turns a rollout cache into a verified collection in the same layout as the cached batch, keeping a sample only if its actor and
+    follow-up completed (never by outcome), with exclusion reasons, byte-copy checks and agreement checks on generation settings, implementation hash and model revision. 6 tests, using
+    the real rollout generator with a scripted client so the cache layout under test is the real one (they take about 10 seconds because the real environments are loaded). This replaces the
+    cluster-only script that built the original manifest, which is not in this repository.
+59. **Registry change:** an optional `reasoning_parser` field (`qwen3` for the five Qwen3 entries; unset for GPT-OSS and Gemma because the right name was not verified). It is part of a
+    monitor's identity, which changes every cell ID relative to part 2; no results existed to be affected.
+60. **`monitor_serving.py`, `scripts/serve_monitor.py`**: builds the vLLM command for one registered monitor (served under its registry name so the runner's served-model check recognises it;
+    BF16 for Qwen3, `--dtype auto` otherwise; YaRN only on request and required above the native 32,768; no tool-calling flags), refuses a context below what the registry promises, a placeholder
+    monitor or a non-model directory, and records the command, vLLM version and monitor identity. 7 tests.
+61. **`control_setup.py`, `scripts/prepare_controls.py`**: a private model directory of symlinks to the shared weights with an identical copy of the download manifest (because the serving script
+    writes a manifest into the model directory); a control config derived from the cached batch's by two exact text edits (variants and sample count; all other settings asserted equal in a test);
+    verification that a checkout is the expected commit, unmodified and has the cached batch's implementation hash; and a worker plan covering every requested sample exactly once. 11 tests.
+62. **Cluster scripts** (`mihai/cluster/setup_cluster.sh`, `run_controls.sbatch`, `run_monitor.sbatch`), modeled on the existing, proven `run_qwen.sbatch`. Deliberate differences: every path is a
+    variable defaulting to the user's own directory; **nothing is written under the teammate's directory** (enforced by a test that scans the scripts); the original's `setfacl` permission changes
+    for teammates are omitted; the checkout identity is verified before serving; the controls are served with the cached batch's arguments (one GPU, 131,072 context, YaRN 4). 7 smoke tests (syntax,
+    fail-fast, no writes to the shared directory, default directory, the identity protections). The scripts cannot be run here.
+63. **A conflict with the pre-registration was found and fixed.** The pilot is supposed never to load labels (so wording cannot be tuned to detection), but the monitor job scored every run. The job now
+    takes `SCORE=0`, and a new `pilot.py` / `scripts/pilot_summary.py` writes a label-free summary (validity, retries, finish reasons, reply and plan lengths, prompt sizes against the input limit, latency,
+    throughput) from `items.jsonl`, `nodes.jsonl` and `plans/` only. A test checks that the module cannot reach labels. 4 tests.
+64. **Documentation**: `docs/system/cluster.md` (what is known, the layout, the runbook B1 to B5, what is not verified) and `docs/system/collections.md`; updates to the system README, CLI page, registries page,
+    the plans' status tables, the decisions document (the identity check), the index and README. *A mistake in the documentation step:* my first edit script aborted on one non-matching string before writing
+    anything (each file is written only after all its edits match, so nothing was half-applied); it was corrected and rerun.
+
+### Verification (part 3)
+
+* `python -m unittest discover -s tests`: **253 tests, all pass** (224 for this system, 29 original). New in this part: collection builder 6, control setup 11, monitor serving 7, pilot 4, cluster scripts 7.
+* Verified: the implementation-hash reproduction for `5dc0417` against the real cached manifest; the collection builder against the real generator's cache; every script parses as bash.
+* **Not verified, because the cluster was unreachable:** any Slurm option (partition, account, GPU resource name, time limit are unknown); that the shared environments run vLLM under your account on a compute node;
+  `pip install` on a login node for the analysis environment; the vLLM flags for GPT-OSS and Gemma; the `reasoning_effort` field; real generation speed; that control transcripts resemble the cached ones.
+
+### Files created (part 3)
+
+`monitor_experiment/{collection_builder,control_setup,monitor_serving,pilot}.py`; `scripts/{build_collection,prepare_controls,serve_monitor,pilot_summary}.py`;
+`mihai/cluster/{setup_cluster.sh,run_controls.sbatch,run_monitor.sbatch}`; `tests/test_{collection_builder,control_setup,monitor_serving,pilot,cluster_scripts}.py`;
+`docs/system/{cluster,collections}.md`.
+
+### Not done (end of part 3)
+
+* Nothing was run on the cluster, so: no sync of the branch, no setup, **no control rollouts**, no pilot, no monitor served, no baseline.
+* The Phase B preparation (this part) is **not committed**; only Phase A (`152b414`) and the part 1 documentation (`392288e`) are.
+* No monitor model has been run anywhere. No human annotation. Prompts remain `draft`.
+* To continue: the user reopens the SSH connection (passphrase and MFA), and supplies or helps find the Slurm options for an H200 job.

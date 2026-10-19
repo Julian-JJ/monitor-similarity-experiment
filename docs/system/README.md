@@ -1,8 +1,8 @@
 # The monitor experiment system: how it works
 
-Status (2026-10-19): **Phase A of [the framework plan](../plan/06-experiment-framework.md) is built and tested offline.**
-No monitor model has been run. What remains is Phase B (cluster work: serving monitors, generating controls, the pilot) and
-Phase C (validation and extensions); see [What is built and what is not](#what-is-built-and-what-is-not).
+Status (2026-10-19): **Phase A of [the framework plan](../plan/06-experiment-framework.md) is built and tested offline, and the local preparation for Phase B is
+written and tested** (collection builder, control-run helper, monitor serving, job scripts, label-free pilot summary). **Nothing has been run on the cluster and no
+monitor model has been run**: the cluster connection had expired. See [What is built and what is not](#what-is-built-and-what-is-not) and the [cluster runbook](cluster.md).
 
 ## What it does
 
@@ -39,11 +39,15 @@ configs/experiments/NAME.toml ──► run_experiment.py ──► runs/NAME/{m
 | `monitor_experiment/report.py` | Markdown reports | [report](report.md) |
 | `monitor_experiment/presence.py` | information-presence labels | [presence-labels](presence-labels.md) |
 | `monitor_experiment/freeze.py` | fingerprints and the freeze lock | [freeze](freeze.md) |
+| `monitor_experiment/collection_builder.py` | turn a rollout cache into a verified collection (for the controls) | [collections](collections.md) |
+| `monitor_experiment/control_setup.py`, `monitor_serving.py` | private model directory, derived config, checkout identity; the vLLM command for a monitor | [cluster](cluster.md) |
+| `monitor_experiment/pilot.py` | label-free summary of a run for the format-only pilot | [cluster](cluster.md) |
 | `monitor_experiment/toollists.py` | the agent's tools, read from source | [plan-context](plan-context.md) |
 | `scripts/` | command-line entry points | [cli](cli.md) |
+| `mihai/cluster/` | cluster setup and job scripts (not yet run) | [cluster](cluster.md) |
 | `configs/` | registries, experiment files, councils, comparisons, objectives, tool lists, presence rules | each doc above |
 | `prompts/`, `vendor/monitorbench_monitor/` | our prompts; MonitorBench's monitor prompt, verbatim | [freeze](freeze.md) |
-| `tests/` | 218 offline tests (189 for this system, 29 from the original rollout runner) | [Testing](#testing) |
+| `tests/` | 253 offline tests (224 for this system, 29 from the original rollout runner) | [Testing](#testing) |
 | `runs/` | outputs of runs (not in Git) | [run-artifacts](run-artifacts.md) |
 
 ## The life of one unit
@@ -80,7 +84,7 @@ cross-objective negative, own failure), and computes the metrics. The monitor ne
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt -r requirements-analysis.txt
 # data needed: rollouts_original_clean/ and cache/tokenizer/tokenizer.json (see the work log for how they were copied)
-.venv/bin/python -B -m unittest discover -s tests                   # 218 tests
+.venv/bin/python -B -m unittest discover -s tests                   # 253 tests
 .venv/bin/python -B scripts/run_experiment.py configs/experiments/baseline.toml --dry-run   # price it
 ```
 
@@ -117,13 +121,14 @@ python scripts/make_report.py runs/baseline/metrics.json --comparisons compariso
 | councils from stored verdicts | `execute` and `plan_compare` task contexts, follow-up visibility, `structured` prompt |
 | cost and latency summaries | interrogation (needs the agent; not planned) |
 | report generator | HTML or figures |
+| collection builder, control-run helper, monitor-serving command, label-free pilot summary, job scripts (tested locally) | **running any of it on the cluster**: the controls, serving a monitor, the pilot |
 | presence-label rules, annotation tool, agreement and decomposition | human annotation itself; the frozen rules |
 
 ## Testing
 
-`python -B -m unittest discover -s tests` runs 218 tests with no network, GPU or model: 38 for the hierarchical monitor, 17 data,
+`python -B -m unittest discover -s tests` runs 253 tests with no network, GPU or model: 38 for the hierarchical monitor, 17 data,
 15 registry and spec, 23 metrics and councils, 10 monitor client (against a real local HTTP server), 5 tool lists, 14 strategies,
-24 runner (end to end with fake monitors of known behavior), 9 comparisons, 6 report, 23 presence, 5 freeze, and the original
-23 + 6 for the rollout runner. Tests that need the real 41 rollouts skip themselves if `rollouts_original_clean/` is absent.
+24 runner (end to end with fake monitors of known behavior), 9 comparisons, 6 report, 23 presence, 5 freeze, 6 collection builder (against a real generator cache),
+11 control setup, 7 monitor serving, 4 pilot summary, 7 cluster-script smoke checks, and the original 23 + 6 for the rollout runner. Tests that need the real 41 rollouts skip themselves if `rollouts_original_clean/` is absent.
 The fake monitors (an oracle, an always-detects, a never-detects, and a half-detecting one) make every expected metric
 computable by hand, so a wrong formula cannot pass by agreeing with itself.

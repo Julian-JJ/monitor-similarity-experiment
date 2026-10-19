@@ -25,6 +25,7 @@ One `[monitors.NAME]` table per model:
 | `context_tokens`, `output_reserve` | the monitor's window, and tokens kept for its reply |
 | `sampling` | `temperature`, `top_p`, `max_tokens` (must not exceed `output_reserve`) |
 | `thinking` | whether the model thinks by default |
+| `reasoning_parser` | optional vLLM `--reasoning-parser` name; `qwen3` for the Qwen3 family, unset for GPT-OSS and Gemma because the right name was not verified. Part of the monitor's identity |
 | `reasoning_control` | optional, e.g. `kind = "reasoning_effort"`, `default = "medium"` for GPT-OSS |
 | `verified` | false until the model has been downloaded and its identity checked |
 | `notes` | free text (not part of the monitor's identity) |

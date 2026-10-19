@@ -193,6 +193,8 @@ fake server: [the system documentation](../docs/system/README.md) describes it e
 2. `scripts/score_run.py` scores against the saved outcome labels; `compare_cells.py` runs the pre-registered comparisons; `make_report.py` writes a report.
 3. One server serves one monitor, so each monitor is a separate job and invocation (`--monitor NAME --base-url URL`); results accumulate in one run directory.
 
+The scripts for the control rollouts, for serving a monitor and for the pilot are in `mihai/cluster/` and documented in the [cluster runbook](../docs/system/cluster.md); they are tested locally and not yet run.
+
 What still needs the cluster: serving a monitor (only Qwen3-14B is installed; other models need their own download and serving configuration),
 the control rollouts, and the format-only pilot ([framework plan, Phase B](../docs/plan/06-experiment-framework.md)). Follow-up answers and reasoning
 are not yet part of a monitor's input. The saved actors do not need regeneration, apart from the planned `main_only` controls.

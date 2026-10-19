@@ -384,7 +384,9 @@ generated from a **pristine checkout of commit `5dc0417`** (the clean copy alrea
 implementation hash will be computed and compared with `runtime_implementation_hash` in the original
 collection manifest. If they differ, the source is compared against the frozen release the originals
 used, and controls are generated from that release or the difference is documented and judged
-behavior-affecting or not. The launch scripts also require the checkout to match its commit.
+behavior-affecting or not. **Checked locally on 2026-10-19: the `monitor_experiment/*.py` files of commit `5dc0417` hash to exactly
+the recorded `8542b29e…`; the two earlier commits and the framework branch do not** (a test reproduces this), so the controls are generated
+from a pristine `5dc0417` checkout, as planned. The launch scripts also require the checkout to match its commit.
 
 **Where.** In the user's own project directory, because the existing launch script writes to a teammate's
 directory (its path is hard-coded) and the user cannot write there. The shared Qwen3-14B weights and Python
