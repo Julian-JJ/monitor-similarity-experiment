@@ -378,3 +378,23 @@ class ItemLimitTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GitStateTests(unittest.TestCase):
+    def test_a_git_checkout_reports_its_commit_and_dirtiness(self):
+        state = runner.git_state(Path(__file__).resolve().parents[1])
+        self.assertEqual(state["source"], "git")
+        self.assertEqual(len(state["commit"]), 40)
+        self.assertIsInstance(state["dirty"], bool)
+
+    def test_a_copy_without_git_falls_back_to_the_sync_file_and_says_so(self):
+        with TempDir() as d:
+            (d / ".sync-commit.json").write_text(json.dumps({"commit": "abc123", "branch": "monitor-framework", "dirty": False,
+                                                              "synced_at": "2026-10-19T00:00:00Z"}))
+            self.assertEqual(runner.git_state(d), {"commit": "abc123", "dirty": False, "branch": "monitor-framework",
+                                                   "source": "sync file", "synced_at": "2026-10-19T00:00:00Z"})
+
+    def test_with_neither_the_state_is_unknown_not_clean(self):
+        with TempDir() as d:
+            state = runner.git_state(d)
+            self.assertEqual((state["commit"], state["dirty"], state["source"]), (None, None, "none"))

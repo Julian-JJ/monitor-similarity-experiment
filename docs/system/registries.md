@@ -18,7 +18,7 @@ One `[monitors.NAME]` table per model:
 
 | Key | Meaning |
 | --- | --- |
-| `model_id`, `revision` | Hugging Face id and pinned revision (`UNPINNED` until downloaded). A `model_id` starting `TBD` is a placeholder |
+| `model_id`, `revision` | Hugging Face id and pinned revision (`UNPINNED` until downloaded; `scripts/download_monitor.py` prints the revision to pin, and `monitor_download.verify` checks a model directory against the pin. Qwen3-14B and Qwen3-32B are pinned). A `model_id` starting `TBD` is a placeholder |
 | `family`, `size_b`, `active_b`, `architecture` | for the similarity relation; architecture is `dense` or `moe`; `active_b` optional |
 | `provider`, `open_weights` | recorded; every run model is served on the cluster |
 | `base_url` | where it is served (can be overridden with `--base-url`) |

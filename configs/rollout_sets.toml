@@ -19,5 +19,5 @@ description = "The 41 complete cached Qwen3-14B actor/follow-up pairs (3 tasks, 
 [sets.main_only_v1]
 root = "rollouts_main_only_clean"
 manifest = "manifest.json"
-status = "planned"
-description = "Control rollouts with no hidden objective (clean negatives). Not generated yet: docs/plan/07-design-decisions.md 2.11."
+status = "available"
+description = "Control rollouts with no hidden objective (clean negatives): 34 pairs generated 2026-10-19/20 (job 30068222, pristine 5dc0417); 2 of 36 excluded for execution errors. docs/plan/07-design-decisions.md 2.11."

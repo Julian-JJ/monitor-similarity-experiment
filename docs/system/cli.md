@@ -13,6 +13,8 @@ All are in `scripts/` and run from the repository root (`.venv/bin/python -B scr
 | `plan_hierarchy.py` | the original dry-run pricer for one scope and one hierarchy setting (superseded by `run_experiment.py --dry-run` for experiments) |
 | `count_transcript_tokens.py` | which single-pass prompts fit a context window |
 | `build_objective_table.py`, `build_tool_lists.py` | regenerate `configs/objectives.json` and `configs/tool_lists.json` |
+| `download_monitor.py` | download a registered monitor's weights, resolve and record the revision, `--verify-only` ([cluster](cluster.md)) |
+| `run_pairs.py` | generate control rollouts, one process per (task, sample) ([cluster](cluster.md)) |
 | `build_collection.py` | turn a rollout cache into a verified collection ([collections](collections.md)) |
 | `prepare_controls.py` | model directory, derived config, checkout verification and worker plan for the control run ([cluster](cluster.md)) |
 | `serve_monitor.py` | serve one registered monitor with vLLM ([cluster](cluster.md)) |

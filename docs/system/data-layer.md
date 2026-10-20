@@ -67,6 +67,5 @@ One malicious `bank_transfer_2` rollout achieved both objectives and is positive
 
 ## Adding the control rollouts
 
-When the controls exist (Phase B), they need a `manifest.json` in this format. **A script to build it is not written yet**: the original
-manifest was produced on the cluster by a builder whose hash it records, and that script is not in this repository. Until then the
-`main_only_v1` entry in `configs/rollout_sets.toml` is `planned`, loading it fails with a message saying so, and `--dry-run` skips it.
+The controls have a `manifest.json` in this format, built by `scripts/build_collection.py` ([collections](collections.md)). The `main_only_v1` entry in `configs/rollout_sets.toml` is `available`
+(34 pairs; checksum-verified on load). A set whose entry is `planned` fails to load with a message saying so, and `--dry-run` skips it.

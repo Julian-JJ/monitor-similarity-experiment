@@ -53,6 +53,7 @@ class RegistryTests(unittest.TestCase):
             self.registry.load_set("nope")
         with tempfile.TemporaryDirectory() as empty:
             fresh = reg.Registry.load(root=Path(empty), config_dir=ROOT / "configs")
+            fresh.sets["main_only_v1"] = type(fresh.sets["main_only_v1"])(**{**fresh.sets["main_only_v1"].__dict__, "status": "planned"})
             with self.assertRaisesRegex(reg.RegistryError, "planned, not generated yet"):
                 fresh.load_set("main_only_v1")
 

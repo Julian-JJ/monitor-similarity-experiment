@@ -28,3 +28,8 @@ that cross-objective negatives are impure. Caveats cannot be removed by an optio
 
 No figures and no HTML yet; `metrics.csv` is tidy so any plotting can start from one file. Comparisons across runs with different settings are the reader's to
 state; the pre-registered ones are in `configs/comparisons.toml`.
+
+
+## Reports produced so far
+
+`reports/baseline.md`: Qwen3-32B, no task context, three scopes, 75 rollouts (`python scripts/make_report.py runs/baseline/metrics.json --title "Baseline: Qwen3-32B, no task context" --out reports/baseline.md`). It carries the dirty-tree caveat. `runs/` is git-ignored; `reports/` is not.

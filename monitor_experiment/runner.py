@@ -39,14 +39,27 @@ class RunIncomplete(RuntimeError):
 
 
 def git_state(root):
+    """Commit, branch and dirty flag of the code being run.
+
+    From git when ``root`` is a checkout. The cluster copy is made with ``rsync`` and has no ``.git``, so the sync step
+    (``mihai/cluster/sync_to_cluster.sh``) writes ``.sync-commit.json`` and that is used instead, and says so in ``source``.
+    """
     def run(*args):
         try:
-            return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, timeout=20).stdout.strip()
+            result = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, timeout=20)
+            return result.stdout.strip() if result.returncode == 0 else None
         except (OSError, subprocess.SubprocessError):
             return None
     commit = run("rev-parse", "HEAD")
-    dirty = run("status", "--porcelain")
-    return {"commit": commit or None, "dirty": None if dirty is None else bool(dirty), "branch": run("branch", "--show-current")}
+    if commit:
+        dirty = run("status", "--porcelain")
+        return {"commit": commit, "dirty": None if dirty is None else bool(dirty), "branch": run("branch", "--show-current"), "source": "git"}
+    sync = Path(root) / ".sync-commit.json"
+    if sync.is_file():
+        data = read_json(sync)
+        return {"commit": data["commit"], "dirty": data["dirty"], "branch": data.get("branch"), "source": "sync file",
+                "synced_at": data.get("synced_at")}
+    return {"commit": None, "dirty": None, "branch": None, "source": "none"}
 
 
 def limit_items(items, per_group):

@@ -68,7 +68,7 @@ max_tokens = 16768
 
 [monitors.qwen3-32b]            # same family, larger; MonitorBench's own monitor
 model_id = "Qwen/Qwen3-32B"
-revision = "UNPINNED"
+revision = "9216db5781bf21249d130ec9da846c4624c16137"
 family = "qwen3"
 size_b = 32
 architecture = "dense"
@@ -80,7 +80,7 @@ output_reserve = 16768
 reasoning_parser = "qwen3"
 thinking = true
 verified = false
-notes = "Not downloaded (about 65 GB in BF16). Fits one 141 GB H200, not one 48 GB A40."
+notes = "Downloaded 2026-10-19 (job 30068228, 26 files, 65.5 GB BF16) to $ME/models/qwen3-32b; revision pinned. Not yet served: verified stays false until it has run. Fits one 141 GB H200, not one 48 GB A40."
 [monitors.qwen3-32b.sampling]
 temperature = 0.6
 top_p = 0.9

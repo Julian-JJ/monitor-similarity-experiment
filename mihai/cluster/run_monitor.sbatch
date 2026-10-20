@@ -42,7 +42,8 @@ trap 'exit 130' INT
 cd "$FRAMEWORK"
 printf 'job=%s monitor=%s experiment=%s node=%s started_at=%s\n' "$JOB" "$MONITOR" "$EXPERIMENT" "$(hostname)" "$(date -u +%FT%TZ)" | tee -a "$STATUS"
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv | tee -a "$STATUS"
-"$ANALYSIS_PY" -c 'import socket,sys; s=socket.socket(); s.bind(("127.0.0.1", int(sys.argv[1]))); s.close()' "$PORT"
+# A port is "taken" only if something is listening. Closed connections of a previous server linger in TIME_WAIT for a minute, so bind with SO_REUSEADDR as the server does.
+"$ANALYSIS_PY" -c 'import socket,sys; s=socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); s.bind(("127.0.0.1", int(sys.argv[1]))); s.close()' "$PORT"
 
 server_log="$ME/logs/monitor-server-$MONITOR-$JOB.log"
 setsid "$SERVING_PY" scripts/serve_monitor.py --monitor "$MONITOR" --model-dir "$MODEL_DIR" --port "$PORT" \

@@ -53,7 +53,8 @@ flock -n 9 || { echo "Another controls job is active" >&2; exit 1; }
 printf 'job=%s node=%s commit=%s config_sha256=%s started_at=%s\n' "$JOB" "$(hostname)" "$EXPECTED_COMMIT" \
     "$(sha256sum "$CONFIG" | cut -d ' ' -f 1)" "$(date -u +%FT%TZ)" | tee -a "$STATUS"
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv | tee -a "$STATUS"
-"$RESEARCH_PY" -c 'import socket,sys; s=socket.socket(); s.bind(("127.0.0.1", int(sys.argv[1]))); s.close()' "$PORT"
+# A port is "taken" only if something is listening. Closed connections of a previous server linger in TIME_WAIT for a minute, so bind with SO_REUSEADDR as the server does.
+"$RESEARCH_PY" -c 'import socket,sys; s=socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); s.bind(("127.0.0.1", int(sys.argv[1]))); s.close()' "$PORT"
 
 # 3. Serve the actor exactly as the cached batch was served (the checkout's own serve_model.py).
 server_log="$ME/logs/controls-server-$JOB.log"

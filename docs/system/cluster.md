@@ -1,10 +1,10 @@
 # Cluster runbook (Phase B)
 
-Scripts: `mihai/cluster/setup_cluster.sh`, `run_controls.sbatch`, `run_monitor.sbatch`; helpers `scripts/prepare_controls.py`,
-`scripts/serve_monitor.py`, `scripts/build_collection.py`. Code: `monitor_experiment/{control_setup,monitor_serving,collection_builder}.py`.
-Tests: `tests/test_control_setup.py`, `test_monitor_serving.py`, `test_collection_builder.py`, `test_cluster_scripts.py`.
+Scripts: `mihai/cluster/setup_cluster.sh`, `sync_to_cluster.sh`, `run_controls.sbatch`, `run_monitor.sbatch`, `download_monitor.sbatch`; helpers `scripts/prepare_controls.py`,
+`scripts/serve_monitor.py`, `scripts/build_collection.py`, `scripts/download_monitor.py`. Code: `monitor_experiment/{control_setup,monitor_serving,monitor_download,collection_builder}.py`.
+Tests: `tests/test_control_setup.py`, `test_monitor_serving.py`, `test_monitor_download.py`, `test_collection_builder.py`, `test_cluster_scripts.py`.
 
-**Status (2026-10-19, updated): B1 to B3 have been run on the cluster; the control rollouts are generating.** Sections below mark what has been *verified by running it* and what has not.
+**Status (2026-10-20, updated): B1 to B3 are done; the control rollouts exist (`main_only_v1`, 34 pairs); Qwen3-32B is downloaded; the baseline is done (`reports/baseline.md`).** Sections below mark what has been *verified by running it* and what has not.
 The SSH connection must be opened by you (passphrase and MFA) and expires; the assistant cannot supply those.
 
 ## What is known about the cluster and the existing tooling
@@ -36,7 +36,7 @@ The earlier H200 job needed about 2¼ hours for 30 pairs; the A40 pair (`gpu_dev
 | `$ME/monitor-similarity-experiment/` | **pristine `5dc0417`**, used only to generate controls; `models` and `cache` are links into `$ME` | already there; `setup_cluster.sh` adds the links |
 | `$ME/monitor-framework/` | this branch, copied with `rsync` (the cluster checkout cannot pull from GitHub) | you / the assistant |
 | `$ME/models/qwen3-14b/` | symlinks to the shared weights, a copy of the download manifest, and the serving manifest the server writes | `setup_cluster.sh`, `serve_model.py` |
-| `$ME/models/<monitor>/` | other monitors' weights, when downloaded | `scripts/download_model.py`-style download (not yet written for monitors) |
+| `$ME/models/<monitor>/` | other monitors' weights, with `download-manifest.json` | `download_monitor.sbatch` |
 | `$ME/cache/` | rollout cache, vLLM/HF caches | the jobs |
 | `$ME/logs/controls-pairs-<job>/` | one log per (task, sample) and `summary.json` | `run_pairs.py` |
 | `$ME/configs/rollouts-main-only.toml` | derived control config | `setup_cluster.sh` |
@@ -46,12 +46,9 @@ The earlier H200 job needed about 2¼ hours for 30 pairs; the A40 pair (`gpu_dev
 
 ## Runbook
 
-**B1. Copy the branch (from your Mac)**, excluding data and the environment:
-
-```bash
-rsync -a --exclude .venv --exclude cache --exclude rollouts_original_clean --exclude runs --exclude presence --exclude .git \
-  -e "ssh -o ControlPath=$HOME/.ssh/cm-%r@%h:%p" ./ cpsc4880_as4833@bouchet.ycrc.yale.edu:/nfs/roberts/project/cpsc4880/cpsc4880_as4833/monitor-framework/
-```
+**B1. Copy the branch (from your Mac)** with `bash mihai/cluster/sync_to_cluster.sh` (the SSH connection must be open). It excludes data, the environment and `.git`, and first writes `.sync-commit.json`
+(commit, branch, whether the tree had uncommitted changes, time). The cluster copy has no `.git`, so the runner reads that file and records it in every run manifest with `source: "sync file"`;
+without it a manifest says `commit: null, source: "none"` (the pilot's manifest has that gap). Commit before syncing for a run you intend to report: a manifest with `dirty: true` names a commit that does not describe the code.
 
 **Setup (login node, once):** `bash $ME/monitor-framework/mihai/cluster/setup_cluster.sh`. It builds the private model directory, links the data, derives the config, **verifies that the
 checkout reproduces the cached batch's implementation hash**, and creates the analysis environment. Any failed check stops it with a message.
@@ -75,7 +72,9 @@ The retention rule is execution status only, never labels. Copy the collection (
 against the input limit, latency and throughput, from `items.jsonl`, `nodes.jsonl` and `plans/` only (a test checks that the module cannot reach labels). Judge the prompts by that and nothing else;
 wording changes are format fixes and are logged. When satisfied, `python scripts/freeze.py write --status frozen` and commit.
 
-**B4. Another monitor.** Download its weights into `$ME/models/<name>/` (Qwen3-32B is about 65 GB; check the quota first), pin the revision in `configs/monitors.toml`, set `verified = true`, then submit
+**B4. Another monitor.** `MONITOR=qwen3-32b sbatch --account=cpsc4880 --partition=day --cpus-per-task=4 --mem=16G --time=04:00:00 --output=$ME/logs/download-%j.out mihai/cluster/download_monitor.sbatch`
+downloads the weights on a CPU node (about 65 GB; 3.2 TB was free), resolves the revision to a commit before fetching, writes `download-manifest.json` last (the `.download-incomplete` marker exists until then) and re-verifies the
+directory. `serve_monitor.py` calls the same check and refuses a directory that is another model, another revision than the registry pins, or has a file whose size differs from the manifest. Then pin the revision in `configs/monitors.toml`, set `verified = true`, and submit
 `run_monitor.sbatch` with `MONITOR=qwen3-32b` and `TP` as needed. A 32B model in BF16 fits one 141 GB H200 but not one 48 GB A40.
 
 **B5. Baseline** `configs/experiments/baseline.toml` with Qwen3-32B, then score, compare and report ([cli](cli.md)).
@@ -113,5 +112,8 @@ pre-registered rule allows wording changes only for format failures, and this is
 
 ## Not verified yet
 
-* The `--reasoning-parser` name for GPT-OSS and Gemma (left unset), and `--dtype auto` for them. * That the server accepts `reasoning_effort` for GPT-OSS. * That Qwen3-32B in BF16 fits and runs on one H200 at
-the 32,768 context. * Throughput at higher concurrency and for larger monitors. * That the collection builder works on real control output (it is tested on a real generator cache, not on this run's).
+* The `--reasoning-parser` name for GPT-OSS and Gemma (left unset), and `--dtype auto` for them. * That the server accepts `reasoning_effort` for GPT-OSS. * Throughput for monitors larger than 32B.
+
+## Verified by the baseline (2026-10-20)
+
+* Qwen3-32B in BF16 fits and runs on one H200 at the 32,768 context (KV cache about 30% at 32 concurrent requests), 646 completion tokens per second at concurrency 32; 99.98% of 14,000+ requests valid. The collection builder worked on real control output (34 of 36 pairs). Run provenance via `.sync-commit.json` worked. 

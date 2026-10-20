@@ -12,6 +12,7 @@
 | [Design decisions](plan/07-design-decisions.md) | choices fixed before any results: monitor pool, councils and voting rules, plans per task, the information-presence label protocol, confirmatory comparisons, compute stance, amendment log |
 | [Hierarchical monitor](plan/05-hierarchical-monitor.md) | design of the monitor for transcripts too long for one prompt; status and open decisions |
 | [Transcript token counts](analysis/transcript-token-counts.md) | measurements: which prompts fit a context window; dry-run plan and cost |
+| [Baseline results](analysis/baseline-results.md) | Qwen3-32B baseline: what ran, metrics, per-task and per-told breakdown, confounds |
 | [Baseline research notes](research/monitor-baseline-notes.md) | what MonitorBench's code and the two papers do; reliability of each source; what is not established |
 | [Evaluator notes](evaluator-notes.md) | differences between the paper's task checks and the vendored code |
 | [Rollout format](rollout-format.md) | the saved artifact schema |
@@ -21,16 +22,16 @@
 | Item | State |
 | --- | --- |
 | Actor rollouts and follow-ups (Qwen3-14B, 3 tasks) | done; 41 clean pairs on the cluster |
-| Hierarchical monitor library, experiment framework (data, registries, spec, runner, metrics, comparisons, report, presence tooling), prompts | done; 258 offline tests pass (229 new) |
+| Hierarchical monitor library, experiment framework (data, registries, spec, runner, metrics, comparisons, report, presence tooling), prompts | done; 277 offline tests pass (248 new) |
 | Token counts and dry-run plans over the 41 rollouts | done; results in `mihai/results/` |
-| Running any monitor model | **one pilot only** (Qwen3-14B, format-only, no labels read); no results |
+| Running any monitor model | pilot (Qwen3-14B, format-only, no labels read) and the **baseline** (Qwen3-32B, 1,800 units, scored; `reports/baseline.md`); no other monitor yet |
 | Metrics (TPR, TNR, g-mean², bootstrap), comparisons, councils, report | done and tested against hand-worked numbers |
 | `scripts/run_experiment.py` (run and price experiments) | done; exercised only with fake monitors and a local fake server |
-| `main_only` control rollouts (clean negatives) | **generation in progress** on one H200 (job 30068171); then build and verify the collection ([cluster runbook](system/cluster.md)) |
+| `main_only` control rollouts (clean negatives) | **done**: 34 pairs kept of 36 (job 30068222), collection `main_only_v1` built and verified ([cluster runbook](system/cluster.md)) |
 | Design decisions pre-registered (monitor pool, councils, hierarchy settings, prompts' design, presence-label protocol) | done in [07](plan/07-design-decisions.md); **committed in `392288e`** on branch `monitor-framework` (not pushed), which dates it. Code written after that commit is uncommitted |
 | Format-only pilot (Qwen3-14B as monitor, 48 units) | **done on the cluster** (job 30068179): 352 requests, none invalid, truncated or retried; details in the work log |
 | Prompt lock | **`frozen`** after the pilot; presence rules (v0.2) stay `draft` under their own lock until the annotator agreement check |
-| Control rollouts | **running** (job 30068171), see the work log |
+| Control rollouts | **done** (job 30068222; job 30068171 was cancelled after a design flaw), see the work log |
 | Follow-up visibility in monitor input | **not implemented** |
 
 ## Changed in the repository on 2026-10-19

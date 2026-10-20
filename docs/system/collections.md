@@ -26,3 +26,8 @@ python scripts/build_collection.py --cache $ME/cache --out rollouts_main_only_cl
 
 It refuses to write into a directory that already has a manifest and fails if no complete pair exists. The result is verified by `RolloutSet.from_manifest` like any
 collection. To use it, set `status = "available"` for `main_only_v1` in `configs/rollout_sets.toml` once `rollouts_main_only_clean/` exists.
+
+
+## First use on real output (2026-10-20)
+
+`main_only_v1` was built from job 30068222's cache: 34 pairs kept, 2 excluded for execution errors (`Unparsed tool call: start vLLM with --tool-call-parser hermes`), by task 12 / 11 / 11. Execution status alone decided retention. The builder, the checksum-verified load and the duplicate guard all worked on real output. See the [work log](../worklog.md) section T.

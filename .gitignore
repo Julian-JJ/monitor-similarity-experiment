@@ -19,3 +19,4 @@ archives/
 /rollouts_main_only_clean/
 /runs/
 /presence/
+.sync-commit.json

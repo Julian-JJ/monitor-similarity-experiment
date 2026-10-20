@@ -5,7 +5,7 @@ code-verifiable dual-objective agent tasks. This implementation covers setup,
 model download, actor rollouts, programmatic grading, and generic follow-ups.
 On top of that sits an **experiment system** for monitors: choose a monitor model and variations in a TOML file, run (or price) it, and get
 metrics with confidence intervals, pre-registered comparisons and a report, including a hierarchical monitor for transcripts too long for
-one prompt. It is built and tested offline (258 tests); **no monitor model has been run yet**. See the
+one prompt. It is built and tested offline (277 tests). The format-only pilot has run on the cluster; **no scored monitor run exists yet**. See the
 [system documentation](docs/system/README.md); documentation index: [docs/README.md](docs/README.md); chronological record:
 [work log](docs/worklog.md).
 
@@ -225,7 +225,7 @@ and `all` scopes (median prompt 76k and 84k tokens against a 15.5k-token input
 limit), so a hierarchical monitor is needed
 ([measurements](docs/analysis/transcript-token-counts.md)); only 3 of 41 saved
 rollouts failed their own side objective and none are `main_only` controls, so clean
-negatives need new `main_only` rollouts from the same actor, which are planned
+negatives needed new `main_only` rollouts from the same actor, which have since been generated (34 pairs, `main_only_v1`)
 ([research notes](docs/research/monitor-baseline-notes.md),
 [pre-registered decisions](docs/plan/07-design-decisions.md#211-control-rollouts)); the cached
 cross-objective labels give a secondary, impure set of negatives. The baseline (8,336 monitor calls) and the full pre-registered grid

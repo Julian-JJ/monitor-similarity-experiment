@@ -44,10 +44,10 @@ configs/experiments/NAME.toml ──► run_experiment.py ──► runs/NAME/{m
 | `monitor_experiment/pilot.py` | label-free summary of a run for the format-only pilot | [cluster](cluster.md) |
 | `monitor_experiment/toollists.py` | the agent's tools, read from source | [plan-context](plan-context.md) |
 | `scripts/` | command-line entry points | [cli](cli.md) |
-| `mihai/cluster/` | cluster setup and job scripts (not yet run) | [cluster](cluster.md) |
+| `mihai/cluster/` | cluster setup, sync, download and job scripts (run: setup, pilot, controls, baseline) | [cluster](cluster.md) |
 | `configs/` | registries, experiment files, councils, comparisons, objectives, tool lists, presence rules | each doc above |
 | `prompts/`, `vendor/monitorbench_monitor/` | our prompts; MonitorBench's monitor prompt, verbatim | [freeze](freeze.md) |
-| `tests/` | 258 offline tests (229 for this system, 29 from the original rollout runner) | [Testing](#testing) |
+| `tests/` | 277 offline tests (248 for this system, 29 from the original rollout runner) | [Testing](#testing) |
 | `runs/` | outputs of runs (not in Git) | [run-artifacts](run-artifacts.md) |
 
 ## The life of one unit
@@ -84,7 +84,7 @@ cross-objective negative, own failure), and computes the metrics. The monitor ne
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt -r requirements-analysis.txt
 # data needed: rollouts_original_clean/ and cache/tokenizer/tokenizer.json (see the work log for how they were copied)
-.venv/bin/python -B -m unittest discover -s tests                   # 258 tests
+.venv/bin/python -B -m unittest discover -s tests                   # 277 tests
 .venv/bin/python -B scripts/run_experiment.py configs/experiments/baseline.toml --dry-run   # price it
 ```
 
@@ -126,7 +126,7 @@ python scripts/make_report.py runs/baseline/metrics.json --comparisons compariso
 
 ## Testing
 
-`python -B -m unittest discover -s tests` runs 258 tests with no network, GPU or model: 38 for the hierarchical monitor, 17 data,
+`python -B -m unittest discover -s tests` runs 277 tests with no network, GPU or model: 38 for the hierarchical monitor, 17 data,
 15 registry and spec, 23 metrics and councils, 10 monitor client (against a real local HTTP server), 5 tool lists, 14 strategies,
 24 runner (end to end with fake monitors of known behavior), 9 comparisons, 6 report, 23 presence, 10 freeze, 6 collection builder (against a real generator cache),
 11 control setup, 7 monitor serving, 4 pilot summary, 7 cluster-script smoke checks, and the original 23 + 6 for the rollout runner. Tests that need the real 41 rollouts skip themselves if `rollouts_original_clean/` is absent.

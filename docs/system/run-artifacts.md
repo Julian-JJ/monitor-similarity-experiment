@@ -20,7 +20,7 @@ A run directory `runs/<name>/` holds the following. Everything is JSON or JSONL 
 `partial_cot`, `relation_to_actor`); `monitors` (each monitor's identity); `served` (what each server reported it was serving, keyed
 `monitor|reasoning`); `actor` (the fixed agent); `rollout_sets` (status, manifest SHA-256, rollouts used and available, verified);
 `told`; `samples`; `item_ids` (the rollouts the run used, accumulated across invocations); `fingerprints` (hashes of prompts, tool lists, objectives, councils, rules and the tokenizer); `prompts_status` and
-`prompts_problems`; `git` (commit, branch, whether the tree was dirty); Python and platform; `compute` (GPU type, count, job id);
+`prompts_problems`; `git` (commit, branch, whether the tree was dirty, and `source`: `git`, or `sync file` on the cluster copy, which has no `.git` and reads `.sync-commit.json` written by `mihai/cluster/sync_to_cluster.sh`, or `none` with commit and dirty unknown); Python and platform; `compute` (GPU type, count, job id);
 `started_at`, `finished_at`; and `sessions` (one entry per invocation: times, wall seconds, units run, errors).
 
 ## `items.jsonl` (one verdict per unit)

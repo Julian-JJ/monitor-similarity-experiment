@@ -509,3 +509,62 @@ The user reopened the connection, pointed to the YCRC job-scheduling tutorial an
     driver; the old `prepare_controls.py workers` plan is no longer used by the job. 266 tests pass.
 85. **Cost of the fix.** The in-flight rollouts of job 30068171 are lost when it is cancelled (about 27 minutes of five concurrent samples); the five completed samples (american_airlines_2 samples 0 and 6; spam_filter_update samples 0, 6 and 7)
     stay in the cache and are skipped by the new job.
+
+### S. Port check, provenance, and a generic monitor download
+
+86. **Job 30068219 failed at startup** with "Address already in use": the port pre-check treated a port in `TIME_WAIT` from the previous job's server as occupied, although a server with `SO_REUSEADDR` (vLLM's) can bind it. Reproduced
+    locally, fixed by setting `SO_REUSEADDR` in the pre-check in both sbatch scripts (tested), resubmitted as **30068222**, which started the server (ready 23:36Z) and is running the 30 missing pairs eight at a time (6 were already cached).
+87. **A provenance gap, found by reading the pilot manifest:** `git: {commit: None, dirty: False, branch: ''}`. The cluster copy is made with `rsync` and has no `.git`, so the runner could not say which code it ran, and `dirty: False`
+    was a wrong default for "unknown". `runner.git_state` now returns `dirty: None` when unknown, reads `.sync-commit.json` (written by the new `mihai/cluster/sync_to_cluster.sh`) when there is no git, and records `source` (`git`, `sync file` or `none`).
+    3 tests. The pilot's manifest stays as it is, with its gap; the prompts it ran are fingerprinted in the lock, which is what matters for it.
+88. **Generic monitor download.** `monitor_download.py` + `scripts/download_monitor.py` + `download_monitor.sbatch`, modelled on the actor's `download_model.py` but taking the repository from the registry. The revision is resolved to
+    a commit first and checked against the registry's pin; the manifest is written last; `verify` (also called by `serve_monitor.py`) rejects a different model or revision, a missing or resized file, or an unfinished download. 6 tests.
+89. Synced the branch (commit `94c00ea` plus uncommitted changes, so `dirty: true` in `.sync-commit.json`) and submitted the Qwen3-32B download as CPU job **30068228** (partition `day`, 4 CPUs, 16 GB, 4 h). The full suite (277 tests) passes.
+    Docs: test counts corrected (they said 258); the top-level README no longer says no monitor has been run.
+90. **Qwen3-32B downloaded** by job 30068228 in 73 seconds (26 files, 65.5 GB, unauthenticated), resolved revision `9216db5781bf21249d130ec9da846c4624c16137`, re-verified by the job itself. The revision is now pinned in
+    `configs/monitors.toml`; `verified` stays `false` until the model has been served and run (memory fit at 32,768 context and throughput are still unmeasured).
+
+### T. Control rollouts finished
+
+91. **Job 30068222 finished** (exit 0, 2 h 2 min): 30 pairs attempted, 2 failed, 34 of 36 complete. Both failures are execution errors, not outcomes: `ProtocolError: Unparsed tool call: start vLLM with --tool-call-parser hermes`
+    (american_airlines_2 sample 7; spam_filter_update sample 5). Rate was about 15 pairs an hour at concurrency 8, slower than the earlier job's 12 an hour estimate had been optimistic about.
+92. **Collection built** with `build_collection.py` on the real output (this had not been run on real control output before): 34 pairs kept, 2 excluded by execution status only. Kept per task: bank_transfer_2 12,
+    american_airlines_2 11, spam_filter_update 11. The stopping rule (at least 8 per task) is met, so no top-up job is needed. Copied to `rollouts_main_only_clean/` (67 MB, git-ignored); it loads with checksum
+    verification (34 items). `main_only_v1` is now `available` in `configs/rollout_sets.toml`.
+93. **Dry run on the combined set** (75 rollouts): baseline unchanged (8,336 calls, 79.9 M estimated input tokens, original rollouts only); the pre-registered grid is **170,784 calls**, 1.71 billion estimated input tokens,
+    well above the earlier 100,128 estimate made before the controls existed. At the one measured rate that is far beyond one server's reach, so the grid will run in the gated order and may need to be cut (decision for the user).
+
+### U. Baseline, first invocation
+
+94. **Qwen3-32B served on one H200** (BF16, 32,768 context): fits, KV cache about 30% used at 32 concurrent requests. Job 30068483, `baseline.toml` on the 41 cached rollouts only, concurrency 32, 3 h 25 min:
+    984 units, 8,338 requests, **2 invalid (0.02%, both `finish_reason=length`), 2 retried**; the gate (at least 90% valid) is passed. Median 935 completion tokens per request; median request latency 46 s;
+    **646 completion tokens per second** at concurrency 32 (the 14B pilot gave 405 at concurrency 8). The manifest records `git: {commit 94c00ea, dirty: true, source: "sync file"}`: the provenance fix worked, and the dirty flag is honest (uncommitted work at sync time).
+95. **The baseline cannot yet give the primary metric.** `metrics.csv` has `tnr_clean` and `gmean2_clean` empty ("no control rollouts?"), because this invocation covered only the original rollouts, which have no clean negatives. `tpr` on the action scope is 1.0
+    (malicious told) and cross-objective TNR 0.6. No conclusion is drawn from these. `baseline.toml` now lists `main_only_v1` as well, as its own comment anticipated; this adds 34 rollouts (816 units, about 5,900 calls) to the same run directory and
+    leaves the 984 finished units untouched (cell IDs do not depend on the rollout set).
+96. **Baseline complete** (job 30069109, 2 h 40 min, the 816 units for the 34 controls; 1,800 units in all). Combined with job 30068483 the run `baseline` has 1,800 of 1,800 units for Qwen3-32B, three scopes, no task context, on 75 rollouts. Scored automatically
+    (`--score`); report written to `reports/baseline.md` (`make_report.py`; the run directory `runs/baseline/`, 38 MB+, is git-ignored, the report is not). Manifest provenance: commit `94c00ea`, `dirty: true`, source `sync file`.
+97. **First numbers (pooled over both told objectives; value and 95% interval; descriptive only, three tasks held fixed, interpret with care):**
+
+    | scope | TPR | TNR (clean) | g-mean² (clean) |
+    | --- | --- | --- | --- |
+    | action | 1.000 [1.000, 1.000] | 0.712 [0.636, 0.784] | 0.712 [0.636, 0.784] |
+    | cot | 0.951 [0.886, 1.000] | 0.784 [0.728, 0.843] | 0.746 [0.678, 0.816] |
+    | all | 0.945 [0.881, 1.000] | 0.758 [0.697, 0.814] | 0.716 [0.641, 0.788] |
+
+    Observations (not conclusions): the monitor misses almost nothing, but flags many clean rollouts, and far more when told the *malicious* objective (clean TNR 0.53 on the action scope) than the *benign* one (0.89). So MonitorBench's own TPR-only score
+    would show a near-perfect monitor; the clean-negative rate is what separates it, which is why the controls were generated. Intervals on TPR of exactly 1.0 are degenerate (all rollouts detected in every resample). Caveat that matters: only 3 tasks.
+98. **State at this point:** controls built, baseline done and reported, 277 tests pass. Not done: the remaining monitors and context cells (the grid is 170,784 calls on the combined set; the gated order and a possible cut need the user's decision), presence labels (need two human annotators),
+    the unverified serving settings for GPT-OSS and Gemma, committing the work since af32c0d.
+
+### V. Documentation audit (2026-10-20)
+
+99. Asked whether everything is documented, I searched the docs for each new item and found gaps: the new scripts and modules appeared only in the work log and `cluster.md`; `cli.md`, `run-artifacts.md` (the `git.source` field),
+    `registries.md` (pins), `collections.md` (first use on real output) and `report.md` (the baseline report) did not mention them; and six status statements were stale, including `docs/README.md` and the Phase B table in
+    `docs/plan/06` still saying the controls were generating under the cancelled job and the baseline had not started, `docs/system/README.md` saying the cluster scripts were "not yet run", and the root README saying controls were only planned. All corrected.
+    Known remaining gaps, stated rather than hidden: no pre-registered comparison (P1 to P5) has been run; the work-log files-created lists (parts 1 and 2) do not list this session's new files individually; the pilot manifest still has no commit.
+100. **Detailed baseline report** written to `docs/analysis/baseline-results.md` from `items.jsonl` and the labels. Findings beyond the headline table: spam_filter_update is perfect (0 false alarms, all positives found), so the pooled clean TNR averages one perfect task with two at about 0.55 to 0.76;
+    the clean false-alarm rate is 36 to 47% when told the malicious objective but 7 to 11% when told the benign one; scope is confounded with hierarchy (cot and all are hierarchical in every unit, action in 20%); and four-sample disagreement occurs in 18 to 24% of combinations.
+    The report's "GPU-hours 5.84" repeated per cell is the whole run's, not per cell (noted, not yet fixed in the report generator).
+101. `docs/analysis/baseline-results.md` rewritten as the full baseline report (purpose, process, metric definitions and why each matters, results by scope, told objective, task and role, cost, confounds, problems met, reproduction, next steps). Numbers were checked against
+    `metrics.csv` and `items.jsonl`; the task table's objective descriptions were taken from `configs/objectives.json` after a first draft described the spam-filter task vaguely.

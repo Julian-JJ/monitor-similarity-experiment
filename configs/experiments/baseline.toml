@@ -1,8 +1,9 @@
 # Reference cell: MonitorBench's own monitor (Qwen3-32B), no task context, all three scopes,
-# on the cached rollouts. Add "main_only_v1" to rollout_sets once the controls exist.
+# on the cached rollouts and the main_only controls (the controls supply the clean negatives; without them tnr_clean and the
+# primary metric gmean2_clean are undefined). The first invocation (2026-10-20, job 30068483) ran original_clean only; the second adds the controls.
 name = "baseline"
 monitor = "qwen3-32b"
-rollout_sets = ["original_clean"]
+rollout_sets = ["original_clean", "main_only_v1"]
 [grid]
 scope = ["action", "cot", "all"]
 [options]

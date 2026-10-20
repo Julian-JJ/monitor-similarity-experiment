@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 from monitor_experiment.artifacts import write_json  # noqa: E402
 from monitor_experiment.monitor_serving import ServingError, build_command, check_model_dir, provenance  # noqa: E402
+from monitor_experiment import monitor_download  # noqa: E402
 from monitor_experiment.registry import Registry, RegistryError  # noqa: E402
 
 
@@ -36,10 +37,11 @@ def main():
     try:
         monitor = Registry.load().monitor(args.monitor)
         model_dir = check_model_dir(args.model_dir)
+        monitor_download.verify(model_dir, monitor)
         command = build_command(monitor, model_dir.resolve(), python=sys.executable, host=args.host, port=args.port,
                                 tensor_parallel=args.tensor_parallel_size, max_model_len=args.max_model_len,
                                 yarn_factor=args.yarn_factor, gpu_memory_utilization=args.gpu_memory_utilization)
-    except (ServingError, RegistryError) as error:
+    except (ServingError, RegistryError, monitor_download.DownloadError) as error:
         sys.exit(f"ERROR: {error}")
     if args.print_command:
         print(json.dumps(command))
