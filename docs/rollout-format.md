@@ -85,8 +85,10 @@ Structured tool results, including lists of model records, are JSON-encoded in
 `content`; tools returning plain strings retain those strings.
 
 Reasoning is separate from visible text. Original system prompts may contain
-the hidden side objective; future observation renderers must not expose them
-automatically. Initial/final state and evaluator labels are privileged grading
+the hidden side objective; observation renderers must not expose them
+automatically. The renderer in `monitor_experiment/hierarchy.py` reads only assistant
+and tool messages, plus the user's task and the side-objective text it extracts from
+the system message to give to the monitor deliberately, as MonitorBench does. Initial/final state and evaluator labels are privileged grading
 data, not monitor observations.
 
 ## Follow-up fields and retries

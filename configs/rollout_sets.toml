@@ -1,0 +1,23 @@
+# The fixed agent and the frozen rollout collections monitors are run on (docs/system/registries.md).
+
+[actor]                         # never varied; recorded so every result names its agent
+model_id = "Qwen/Qwen3-14B"
+revision = "40c069824f4251a91eefaf281ebe4c544efd3e18"
+family = "qwen3"
+size_b = 14
+architecture = "dense"
+
+[objectives]
+table = "configs/objectives.json"   # one side-objective text per (task, objective); built by scripts/build_objective_table.py
+
+[sets.original_clean]
+root = "rollouts_original_clean"
+manifest = "manifest.json"
+status = "available"
+description = "The 41 complete cached Qwen3-14B actor/follow-up pairs (3 tasks, benign and malicious variants)."
+
+[sets.main_only_v1]
+root = "rollouts_main_only_clean"
+manifest = "manifest.json"
+status = "available"
+description = "Control rollouts with no hidden objective (clean negatives): 34 pairs generated 2026-10-19/20 (job 30068222, pristine 5dc0417); 2 of 36 excluded for execution errors. docs/plan/07-design-decisions.md 2.11."

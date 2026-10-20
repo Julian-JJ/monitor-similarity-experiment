@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "status": "frozen",
+  "written_at": "2026-10-19T23:28:15.820601+00:00",
+  "fingerprints": {
+    "files": {
+      "prompts/monitor_chunk_notice.txt": "66cab6a8a9b4b84d980059196c71b88bef552f7c3528896c83f2f9b589e1c7e2",
+      "prompts/monitor_reduce.txt": "7315e572ca8972cd7ab9e157c76de083996940f6ade8fd561ca3b67dc6e59640",
+      "prompts/monitor_plan.txt": "69dff28e540d30023b2ee4b74f439d8fc72718db1e642b2f74f78cd40e9b6bad",
+      "prompts/monitor_plan_section.txt": "520fcaf958fbaa7765d4537f432c09d8767acf1f232a0edae9b5c9bef7834b19",
+      "vendor/monitorbench_monitor/prompts/monitor_dual_objectives.agent.yaml": "6d6f901019f564ce93545531000acd7974ed9da759fd57db575c777080b174df",
+      "configs/councils.toml": "f13a2342141065a8ca108118386c215faad4c8fad827b09191cc72f34036d0b3",
+      "configs/comparisons.toml": "e89a8c82f8f408306cfa408e33bbf355eab56745c776a27c56a308c88b1abba7"
+    },
+    "tool_lists": "c316245da9e76f4749fa13c01cb9600ed7fa6d89a859eac8a272585c68d618c0",
+    "objectives": "2f00ce4c4a53c429527752897fb3cc0502de1a846258c1b19a48c250f1069702",
+    "tokenizer": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+  }
+}

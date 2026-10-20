@@ -160,26 +160,44 @@ historical submission arguments are archived on the cluster. They are not
 needed to read the clean collection. No automatic retry or active monitoring
 job remains from these experiments.
 
-## What is needed to run monitors later
+## Local copy and planning results (added 2026-10-19)
 
-Actor generation and follow-ups are implemented. **There is no implemented
-`scripts/run_monitors.py` yet.** The CLI in the
-[monitor evaluation plan](../docs/plan/04-monitor-evaluation.md) is proposed;
-it is not an executable command. A future monitor runner needs to:
+Planning the monitor stage does not need the cluster. The 41 clean pairs were
+copied to `rollouts_original_clean/` at the repository root of a local clone (87 MB,
+git-ignored) together with the pinned `tokenizer.json` in `cache/tokenizer/`. The
+copy is verbatim; it was made with `rsync` from
+`rollouts_original_clean/` in the project directory of the teammate who produced it
+(`cpsc4880_mae73`). Steps and caveats are in the [work log](../docs/worklog.md).
 
-1. Read the saved manifest and verify hashes and parent links.
-2. Use identical rollout IDs across comparisons, retaining source-job/serving
-   provenance, and save new monitor outputs in a separate cluster directory.
-3. Render only the permitted messages, reasoning and follow-up fields. Keep
-   evaluator labels, reference answers, privileged state and hidden instructions
-   out of monitor inputs.
-4. Record the monitor model/revision, prompts, settings, input hashes, verdicts,
-   invalid responses and compute usage, then score against saved outcome labels.
+Small results from that local work are tracked in Git under `results/`:
 
-The saved actors do not need regeneration. A different monitor model requires
-its own download, serving configuration and output namespace; only Qwen3-14B
-is installed here. No additional monitor or model-based grader was installed
-for the second experiment.
+| File | Contents |
+| --- | --- |
+| `results/transcript-token-counts-20261019.json` | prompt tokens for single-pass monitoring, per rollout, scope and tool-result cut ([analysis](../docs/analysis/transcript-token-counts.md)) |
+| `results/hierarchy-plan-32k-20261019.json` | dry-run plan: 32,768 context, 12,000-token chunks |
+| `results/hierarchy-plan-131k-chunk100k-20261019.json` | dry-run plan: 131,072 context, 100,000-token chunks |
+| `results/hierarchy-plan-prereg-20261019.json` | dry-run plan with the pre-registered settings (bins of 6, two told objectives) |
+| `results/dryrun-baseline-20261019.json`, `results/dryrun-preregistered-grid-20261019.json` | priced experiment files, from `scripts/run_experiment.py --dry-run` (8,336 calls for the baseline; 100,128 for the full grid on the cached rollouts) |
+
+These are measurements of prompt size and planned model calls. They contain no
+monitor outputs and no raw responses or reasoning.
+
+## Running monitors (built 2026-10-19, not yet run on a model)
+
+Actor generation and follow-ups are implemented. The monitor stage is now built and tested **offline**, with fake monitors and a local
+fake server: [the system documentation](../docs/system/README.md) describes it end to end. In short:
+
+1. `scripts/run_experiment.py configs/experiments/NAME.toml` reads the saved manifest and **verifies every checksum**, renders only the permitted
+   messages (never the system prompt or a label), runs the monitor, and writes `runs/NAME/` with the model/revision served, prompts' hashes, settings,
+   verdicts, invalid replies and compute usage. `--dry-run` prices it first.
+2. `scripts/score_run.py` scores against the saved outcome labels; `compare_cells.py` runs the pre-registered comparisons; `make_report.py` writes a report.
+3. One server serves one monitor, so each monitor is a separate job and invocation (`--monitor NAME --base-url URL`); results accumulate in one run directory.
+
+The scripts for the control rollouts, for serving a monitor and for the pilot are in `mihai/cluster/` and documented in the [cluster runbook](../docs/system/cluster.md); they are tested locally and not yet run.
+
+What still needs the cluster: serving a monitor (only Qwen3-14B is installed; other models need their own download and serving configuration),
+the control rollouts, and the format-only pilot ([framework plan, Phase B](../docs/plan/06-experiment-framework.md)). Follow-up answers and reasoning
+are not yet part of a monitor's input. The saved actors do not need regeneration, apart from the planned `main_only` controls.
 
 ## Cleanup and Git boundary
 

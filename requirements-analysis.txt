@@ -1,0 +1,6 @@
+# Packages for the analysis and planning scripts (scripts/count_transcript_tokens.py,
+# scripts/plan_hierarchy.py) and tests/test_hierarchy.py. No GPU or model weights.
+# monitor_experiment/hierarchy.py itself needs only PyYAML (in requirements.txt);
+# `tokenizers` is imported only when an exact token counter is requested.
+PyYAML>=6,<7
+tokenizers>=0.21

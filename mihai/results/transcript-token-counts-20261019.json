@@ -1,0 +1,680 @@
+{
+  "schema_version": 1,
+  "created": "2026-10-19",
+  "rollouts": 41,
+  "what": "Tokens of the complete single-pass monitor prompt (upstream template filled with main task, hidden objective and transcript).",
+  "tokenizer": "/Users/arushsrivastava/Desktop/VS Workspace/monitor-similarity-experiment/cache/tokenizer/tokenizer.json",
+  "limits": {
+    "upstream_input_limit": 15488,
+    "context_32k": 32768,
+    "context_131k": 131072
+  },
+  "variants": {
+    "action_cut2000": [
+      "action",
+      2000
+    ],
+    "action_full": [
+      "action",
+      null
+    ],
+    "cot_visible_content_only": [
+      "visible",
+      null
+    ],
+    "cot_with_reasoning": [
+      "cot",
+      null
+    ],
+    "all_cut2000": [
+      "all",
+      2000
+    ],
+    "all_full": [
+      "all",
+      null
+    ]
+  },
+  "summary": {
+    "action_cut2000": {
+      "median": 9529,
+      "p95": 22247,
+      "max": 25404,
+      "over": {
+        "upstream_input_limit": 9,
+        "context_32k": 0,
+        "context_131k": 0
+      }
+    },
+    "action_full": {
+      "median": 26007,
+      "p95": 45553,
+      "max": 60921,
+      "over": {
+        "upstream_input_limit": 39,
+        "context_32k": 6,
+        "context_131k": 0
+      }
+    },
+    "cot_visible_content_only": {
+      "median": 1026,
+      "p95": 1249,
+      "max": 1249,
+      "over": {
+        "upstream_input_limit": 0,
+        "context_32k": 0,
+        "context_131k": 0
+      }
+    },
+    "cot_with_reasoning": {
+      "median": 76108,
+      "p95": 169778,
+      "max": 212516,
+      "over": {
+        "upstream_input_limit": 41,
+        "context_32k": 38,
+        "context_131k": 8
+      }
+    },
+    "all_cut2000": {
+      "median": 84246,
+      "p95": 176242,
+      "max": 225199,
+      "over": {
+        "upstream_input_limit": 41,
+        "context_32k": 40,
+        "context_131k": 10
+      }
+    },
+    "all_full": {
+      "median": 104621,
+      "p95": 196145,
+      "max": 234989,
+      "over": {
+        "upstream_input_limit": 41,
+        "context_32k": 41,
+        "context_131k": 12
+      }
+    }
+  },
+  "by_task": {
+    "american_airlines_2": {
+      "rollouts": 13,
+      "median_turns": 48,
+      "action_cut2000": {
+        "median": 10212,
+        "max": 13410
+      },
+      "action_full": {
+        "median": 20602,
+        "max": 45870
+      },
+      "cot_visible_content_only": {
+        "median": 722,
+        "max": 810
+      },
+      "cot_with_reasoning": {
+        "median": 109948,
+        "max": 212516
+      },
+      "all_cut2000": {
+        "median": 120884,
+        "max": 225199
+      },
+      "all_full": {
+        "median": 144676,
+        "max": 234989
+      }
+    },
+    "bank_transfer_2": {
+      "rollouts": 13,
+      "median_turns": 33,
+      "action_cut2000": {
+        "median": 5787,
+        "max": 7677
+      },
+      "action_full": {
+        "median": 25388,
+        "max": 29094
+      },
+      "cot_visible_content_only": {
+        "median": 1014,
+        "max": 1026
+      },
+      "cot_with_reasoning": {
+        "median": 101674,
+        "max": 209307
+      },
+      "all_cut2000": {
+        "median": 106441,
+        "max": 213280
+      },
+      "all_full": {
+        "median": 126042,
+        "max": 222256
+      }
+    },
+    "spam_filter_update": {
+      "rollouts": 15,
+      "median_turns": 29,
+      "action_cut2000": {
+        "median": 16167,
+        "max": 25404
+      },
+      "action_full": {
+        "median": 28380,
+        "max": 60921
+      },
+      "cot_visible_content_only": {
+        "median": 1249,
+        "max": 1249
+      },
+      "cot_with_reasoning": {
+        "median": 44689,
+        "max": 58116
+      },
+      "all_cut2000": {
+        "median": 63228,
+        "max": 82265
+      },
+      "all_full": {
+        "median": 72242,
+        "max": 104359
+      }
+    }
+  },
+  "per_rollout": [
+    {
+      "task": "american_airlines_2",
+      "variant": "benign",
+      "sample": "sample_00",
+      "turns": 43,
+      "action_cut2000": 8954,
+      "action_full": 17804,
+      "cot_visible_content_only": 810,
+      "cot_with_reasoning": 76108,
+      "all_cut2000": 84246,
+      "all_full": 93096
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "benign",
+      "sample": "sample_01",
+      "turns": 48,
+      "action_cut2000": 9067,
+      "action_full": 18857,
+      "cot_visible_content_only": 810,
+      "cot_with_reasoning": 66523,
+      "all_cut2000": 74776,
+      "all_full": 84566
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "benign",
+      "sample": "sample_02",
+      "turns": 51,
+      "action_cut2000": 10245,
+      "action_full": 30721,
+      "cot_visible_content_only": 810,
+      "cot_with_reasoning": 78573,
+      "all_cut2000": 88002,
+      "all_full": 108478
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "benign",
+      "sample": "sample_04",
+      "turns": 52,
+      "action_cut2000": 11752,
+      "action_full": 20602,
+      "cot_visible_content_only": 810,
+      "cot_with_reasoning": 109948,
+      "all_cut2000": 120884,
+      "all_full": 129734
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "benign",
+      "sample": "sample_06",
+      "turns": 54,
+      "action_cut2000": 13084,
+      "action_full": 45870,
+      "cot_visible_content_only": 810,
+      "cot_with_reasoning": 102854,
+      "all_cut2000": 115122,
+      "all_full": 147908
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "benign",
+      "sample": "sample_07",
+      "turns": 40,
+      "action_cut2000": 9035,
+      "action_full": 17885,
+      "cot_visible_content_only": 810,
+      "cot_with_reasoning": 87551,
+      "all_cut2000": 95771,
+      "all_full": 104621
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "malicious",
+      "sample": "sample_00",
+      "turns": 51,
+      "action_cut2000": 12415,
+      "action_full": 22205,
+      "cot_visible_content_only": 722,
+      "cot_with_reasoning": 137960,
+      "all_cut2000": 149648,
+      "all_full": 159438
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "malicious",
+      "sample": "sample_02",
+      "turns": 59,
+      "action_cut2000": 13410,
+      "action_full": 23200,
+      "cot_visible_content_only": 722,
+      "cot_with_reasoning": 212516,
+      "all_cut2000": 225199,
+      "all_full": 234989
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "malicious",
+      "sample": "sample_03",
+      "turns": 46,
+      "action_cut2000": 10148,
+      "action_full": 18998,
+      "cot_visible_content_only": 722,
+      "cot_with_reasoning": 133602,
+      "all_cut2000": 143024,
+      "all_full": 151874
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "malicious",
+      "sample": "sample_04",
+      "turns": 43,
+      "action_cut2000": 10212,
+      "action_full": 20002,
+      "cot_visible_content_only": 722,
+      "cot_with_reasoning": 129429,
+      "all_cut2000": 138914,
+      "all_full": 148704
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "malicious",
+      "sample": "sample_05",
+      "turns": 45,
+      "action_cut2000": 9870,
+      "action_full": 19484,
+      "cot_visible_content_only": 722,
+      "cot_with_reasoning": 139544,
+      "all_cut2000": 148687,
+      "all_full": 158301
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "malicious",
+      "sample": "sample_06",
+      "turns": 54,
+      "action_cut2000": 12384,
+      "action_full": 21234,
+      "cot_visible_content_only": 722,
+      "cot_with_reasoning": 124168,
+      "all_cut2000": 135826,
+      "all_full": 144676
+    },
+    {
+      "task": "american_airlines_2",
+      "variant": "malicious",
+      "sample": "sample_07",
+      "turns": 38,
+      "action_cut2000": 9529,
+      "action_full": 38678,
+      "cot_visible_content_only": 722,
+      "cot_with_reasoning": 73646,
+      "all_cut2000": 82447,
+      "all_full": 111596
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "benign",
+      "sample": "sample_00",
+      "turns": 22,
+      "action_cut2000": 7677,
+      "action_full": 29094,
+      "cot_visible_content_only": 1014,
+      "cot_with_reasoning": 61785,
+      "all_cut2000": 68442,
+      "all_full": 89859
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "benign",
+      "sample": "sample_02",
+      "turns": 32,
+      "action_cut2000": 6104,
+      "action_full": 26007,
+      "cot_visible_content_only": 1014,
+      "cot_with_reasoning": 98043,
+      "all_cut2000": 103127,
+      "all_full": 123030
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "benign",
+      "sample": "sample_03",
+      "turns": 35,
+      "action_cut2000": 5787,
+      "action_full": 25388,
+      "cot_visible_content_only": 1014,
+      "cot_with_reasoning": 101674,
+      "all_cut2000": 106441,
+      "all_full": 126042
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "benign",
+      "sample": "sample_04",
+      "turns": 42,
+      "action_cut2000": 5385,
+      "action_full": 15547,
+      "cot_visible_content_only": 1014,
+      "cot_with_reasoning": 143142,
+      "all_cut2000": 147507,
+      "all_full": 157669
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "benign",
+      "sample": "sample_05",
+      "turns": 33,
+      "action_cut2000": 5573,
+      "action_full": 25174,
+      "cot_visible_content_only": 1014,
+      "cot_with_reasoning": 93166,
+      "all_cut2000": 97719,
+      "all_full": 117320
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "benign",
+      "sample": "sample_06",
+      "turns": 12,
+      "action_cut2000": 6008,
+      "action_full": 14682,
+      "cot_visible_content_only": 1014,
+      "cot_with_reasoning": 39867,
+      "all_cut2000": 44855,
+      "all_full": 53529
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "benign",
+      "sample": "sample_07",
+      "turns": 14,
+      "action_cut2000": 4717,
+      "action_full": 24620,
+      "cot_visible_content_only": 1014,
+      "cot_with_reasoning": 40953,
+      "all_cut2000": 44650,
+      "all_full": 64553
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "malicious",
+      "sample": "sample_01",
+      "turns": 38,
+      "action_cut2000": 5005,
+      "action_full": 13981,
+      "cot_visible_content_only": 1026,
+      "cot_with_reasoning": 209307,
+      "all_cut2000": 213280,
+      "all_full": 222256
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "malicious",
+      "sample": "sample_02",
+      "turns": 26,
+      "action_cut2000": 4979,
+      "action_full": 24882,
+      "cot_visible_content_only": 1026,
+      "cot_with_reasoning": 103574,
+      "all_cut2000": 107521,
+      "all_full": 127424
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "malicious",
+      "sample": "sample_03",
+      "turns": 38,
+      "action_cut2000": 6947,
+      "action_full": 26850,
+      "cot_visible_content_only": 1026,
+      "cot_with_reasoning": 155148,
+      "all_cut2000": 161063,
+      "all_full": 180966
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "malicious",
+      "sample": "sample_05",
+      "turns": 36,
+      "action_cut2000": 5541,
+      "action_full": 26925,
+      "cot_visible_content_only": 1026,
+      "cot_with_reasoning": 125597,
+      "all_cut2000": 130106,
+      "all_full": 151490
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "malicious",
+      "sample": "sample_06",
+      "turns": 20,
+      "action_cut2000": 7541,
+      "action_full": 27142,
+      "cot_visible_content_only": 1026,
+      "cot_with_reasoning": 95453,
+      "all_cut2000": 101962,
+      "all_full": 121563
+    },
+    {
+      "task": "bank_transfer_2",
+      "variant": "malicious",
+      "sample": "sample_07",
+      "turns": 41,
+      "action_cut2000": 7494,
+      "action_full": 27397,
+      "cot_visible_content_only": 1026,
+      "cot_with_reasoning": 169778,
+      "all_cut2000": 176242,
+      "all_full": 196145
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "benign",
+      "sample": "sample_00",
+      "turns": 33,
+      "action_cut2000": 21190,
+      "action_full": 26397,
+      "cot_visible_content_only": 1167,
+      "cot_with_reasoning": 54428,
+      "all_cut2000": 74445,
+      "all_full": 79652
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "benign",
+      "sample": "sample_01",
+      "turns": 42,
+      "action_cut2000": 16167,
+      "action_full": 26523,
+      "cot_visible_content_only": 1167,
+      "cot_with_reasoning": 51122,
+      "all_cut2000": 66116,
+      "all_full": 76472
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "benign",
+      "sample": "sample_02",
+      "turns": 25,
+      "action_cut2000": 6929,
+      "action_full": 26143,
+      "cot_visible_content_only": 1167,
+      "cot_with_reasoning": 38687,
+      "all_cut2000": 44443,
+      "all_full": 63659
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "benign",
+      "sample": "sample_03",
+      "turns": 33,
+      "action_cut2000": 14893,
+      "action_full": 40640,
+      "cot_visible_content_only": 1167,
+      "cot_with_reasoning": 54389,
+      "all_cut2000": 68113,
+      "all_full": 93862
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "benign",
+      "sample": "sample_04",
+      "turns": 24,
+      "action_cut2000": 13821,
+      "action_full": 20426,
+      "cot_visible_content_only": 1167,
+      "cot_with_reasoning": 27647,
+      "all_cut2000": 40295,
+      "all_full": 46900
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "benign",
+      "sample": "sample_06",
+      "turns": 33,
+      "action_cut2000": 20776,
+      "action_full": 28380,
+      "cot_visible_content_only": 1167,
+      "cot_with_reasoning": 45035,
+      "all_cut2000": 64638,
+      "all_full": 72242
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "benign",
+      "sample": "sample_07",
+      "turns": 34,
+      "action_cut2000": 22247,
+      "action_full": 30836,
+      "cot_visible_content_only": 1167,
+      "cot_with_reasoning": 38684,
+      "all_cut2000": 59759,
+      "all_full": 68348
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "malicious",
+      "sample": "sample_00",
+      "turns": 41,
+      "action_cut2000": 23548,
+      "action_full": 32242,
+      "cot_visible_content_only": 1249,
+      "cot_with_reasoning": 55391,
+      "all_cut2000": 77684,
+      "all_full": 86378
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "malicious",
+      "sample": "sample_01",
+      "turns": 29,
+      "action_cut2000": 16711,
+      "action_full": 60921,
+      "cot_visible_content_only": 1249,
+      "cot_with_reasoning": 44689,
+      "all_cut2000": 60145,
+      "all_full": 104359
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "malicious",
+      "sample": "sample_02",
+      "turns": 28,
+      "action_cut2000": 16043,
+      "action_full": 45553,
+      "cot_visible_content_only": 1249,
+      "cot_with_reasoning": 49633,
+      "all_cut2000": 64421,
+      "all_full": 93934
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "malicious",
+      "sample": "sample_03",
+      "turns": 17,
+      "action_cut2000": 7894,
+      "action_full": 27838,
+      "cot_visible_content_only": 1249,
+      "cot_with_reasoning": 30431,
+      "all_cut2000": 37070,
+      "all_full": 57016
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "malicious",
+      "sample": "sample_04",
+      "turns": 36,
+      "action_cut2000": 25404,
+      "action_full": 35557,
+      "cot_visible_content_only": 1249,
+      "cot_with_reasoning": 58116,
+      "all_cut2000": 82265,
+      "all_full": 92418
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "malicious",
+      "sample": "sample_05",
+      "turns": 29,
+      "action_cut2000": 20508,
+      "action_full": 25299,
+      "cot_visible_content_only": 1249,
+      "cot_with_reasoning": 43975,
+      "all_cut2000": 63228,
+      "all_full": 68019
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "malicious",
+      "sample": "sample_06",
+      "turns": 12,
+      "action_cut2000": 5241,
+      "action_full": 24459,
+      "cot_visible_content_only": 1249,
+      "cot_with_reasoning": 25051,
+      "all_cut2000": 29037,
+      "all_full": 48257
+    },
+    {
+      "task": "spam_filter_update",
+      "variant": "malicious",
+      "sample": "sample_07",
+      "turns": 28,
+      "action_cut2000": 7117,
+      "action_full": 32265,
+      "cot_visible_content_only": 1249,
+      "cot_with_reasoning": 35558,
+      "all_cut2000": 41420,
+      "all_full": 66571
+    }
+  ]
+}

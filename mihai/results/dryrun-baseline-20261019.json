@@ -1,0 +1,89 @@
+{
+  "name": "baseline",
+  "cells": [
+    {
+      "cell_id": "acb21a89b927e5d173a18644c2c68f0e03948a8883a85834a40c6ede21125ee8",
+      "label": {
+        "monitor": "qwen3-32b",
+        "scope": "action",
+        "task_context": "none",
+        "hierarchy": "upstream-limits",
+        "partial_cot": "off",
+        "followup_visibility": "none",
+        "prompt": "upstream_ad",
+        "reasoning": "default"
+      },
+      "units": 328,
+      "model_calls": 496,
+      "plan_calls": 0,
+      "level0_input_tokens": 4035128,
+      "input_tokens_estimate": 4304104,
+      "hierarchical_units": 80,
+      "max_prompt_tokens": 14787,
+      "truncated_tool_results": 496
+    },
+    {
+      "cell_id": "9e0e04edd7a08bafb649a4e0727a0d5c2dcdca65da45ac91ac4c7215fbfa4443",
+      "label": {
+        "monitor": "qwen3-32b",
+        "scope": "cot",
+        "task_context": "none",
+        "hierarchy": "upstream-limits",
+        "partial_cot": "off",
+        "followup_visibility": "none",
+        "prompt": "upstream_ad",
+        "reasoning": "default"
+      },
+      "units": 328,
+      "model_calls": 3728,
+      "plan_calls": 0,
+      "level0_input_tokens": 31534864,
+      "input_tokens_estimate": 35754256,
+      "hierarchical_units": 328,
+      "max_prompt_tokens": 13322,
+      "truncated_tool_results": 0
+    },
+    {
+      "cell_id": "bb160f7e95a0b0d82e2c557d8a14a8a4af472a8dc47ed87945c2bed2c68d21a5",
+      "label": {
+        "monitor": "qwen3-32b",
+        "scope": "all",
+        "task_context": "none",
+        "hierarchy": "upstream-limits",
+        "partial_cot": "off",
+        "followup_visibility": "none",
+        "prompt": "upstream_ad",
+        "reasoning": "default"
+      },
+      "units": 328,
+      "model_calls": 4112,
+      "plan_calls": 0,
+      "level0_input_tokens": 35187624,
+      "input_tokens_estimate": 39878736,
+      "hierarchical_units": 328,
+      "max_prompt_tokens": 13328,
+      "truncated_tool_results": 496
+    }
+  ],
+  "totals": {
+    "units": 984,
+    "model_calls": 8336,
+    "input_tokens_estimate": 79937096,
+    "plan_calls": 0
+  },
+  "rollout_sets": {
+    "original_clean": {
+      "status": "loaded",
+      "manifest_sha256": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+      "items": 41,
+      "available": 41,
+      "verified": true
+    }
+  },
+  "items": 41,
+  "assumptions": {
+    "report_tokens": 1000,
+    "placeholder_plan_tokens": 800,
+    "note": "combining-level input and plan size are estimates; level-0 prompts are exact; output tokens and wall time are unknown until a monitor runs"
+  }
+}

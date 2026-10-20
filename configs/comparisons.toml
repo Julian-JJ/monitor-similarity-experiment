@@ -1,0 +1,67 @@
+# The confirmatory comparisons P1 to P5 (docs/plan/07-design-decisions.md section 3), written by the settings of the
+# two sides. Each runs once per observation scope (`per`), pooled over both told objectives, on the primary metric,
+# with Holm correction within a scope. Unspecified settings take: task_context none, hierarchy upstream-limits,
+# partial_cot off, reasoning default. A comparison whose cells are not in the runs given is reported as skipped.
+metric = "gmean2_clean"
+told = "pooled"
+
+[[comparisons]]                      # P1: the same model beats a smaller and a larger model of its family
+id = "P1a same-model vs smaller (qwen3-4b)"
+a = { monitor = "qwen3-14b" }
+b = { monitor = "qwen3-4b" }
+[[comparisons]]
+id = "P1b same-model vs larger (qwen3-32b)"
+a = { monitor = "qwen3-14b" }
+b = { monitor = "qwen3-32b" }
+
+[[comparisons]]                      # P2: dense actor, so the dense monitor should be better than the mixture-of-experts one
+id = "P2 dense vs mixture-of-experts (qwen3-32b vs qwen3-30b-a3b)"
+a = { monitor = "qwen3-32b" }
+b = { monitor = "qwen3-30b-a3b" }
+
+[[comparisons]]                      # P3: the actor's family should beat other families
+id = "P3a qwen3-32b vs gpt-oss-120b"
+a = { monitor = "qwen3-32b" }
+b = { monitor = "gpt-oss-120b" }
+[[comparisons]]
+id = "P3b qwen3-32b vs gemma-large"
+a = { monitor = "qwen3-32b" }
+b = { monitor = "gemma-large" }
+
+[[comparisons]]                      # P4: a reference plan helps, for each monitor
+id = "P4 plan vs none (qwen3-14b)"
+a = { monitor = "qwen3-14b", task_context = "plan" }
+b = { monitor = "qwen3-14b", task_context = "none" }
+[[comparisons]]
+id = "P4 plan vs none (qwen3-4b)"
+a = { monitor = "qwen3-4b", task_context = "plan" }
+b = { monitor = "qwen3-4b", task_context = "none" }
+[[comparisons]]
+id = "P4 plan vs none (qwen3-32b)"
+a = { monitor = "qwen3-32b", task_context = "plan" }
+b = { monitor = "qwen3-32b", task_context = "none" }
+[[comparisons]]
+id = "P4 plan vs none (qwen3-30b-a3b)"
+a = { monitor = "qwen3-30b-a3b", task_context = "plan" }
+b = { monitor = "qwen3-30b-a3b", task_context = "none" }
+[[comparisons]]
+id = "P4 plan vs none (gpt-oss-120b)"
+a = { monitor = "gpt-oss-120b", task_context = "plan" }
+b = { monitor = "gpt-oss-120b", task_context = "none" }
+[[comparisons]]
+id = "P4 plan vs none (gemma-large)"
+a = { monitor = "gemma-large", task_context = "plan" }
+b = { monitor = "gemma-large", task_context = "none" }
+
+[[comparisons]]                      # P5: councils against their best single member, and diversity against the control
+id = "P5a size-diverse council vs its best member"
+a = { monitor = "council:size-diverse" }
+b = { monitor = "best_member_of:size-diverse" }
+[[comparisons]]
+id = "P5b family-diverse council vs its best member"
+a = { monitor = "council:family-diverse" }
+b = { monitor = "best_member_of:family-diverse" }
+[[comparisons]]
+id = "P5c family-diverse council vs same-model control"
+a = { monitor = "council:family-diverse" }
+b = { monitor = "council:same-model-control" }

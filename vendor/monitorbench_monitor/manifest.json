@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/ASTRAL-Group/MonitorBench",
+  "revision": "b6229e4b8ea9abcec38d61159c9cbd0f577ddf35",
+  "retrieved": "2026-10-19",
+  "retrieved_with": "curl from raw.githubusercontent.com at the pinned revision; byte-identical to upstream (verified by diff)",
+  "files": {
+    "LICENSE-MonitorBench": "cde76533e941191a287ddba36f216dde931addd143cd68846f1c5214326dd090",
+    "prompts/monitor_dual_objectives.agent.yaml": "6d6f901019f564ce93545531000acd7974ed9da759fd57db575c777080b174df"
+  },
+  "local_modifications": "none"
+}

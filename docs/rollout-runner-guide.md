@@ -1,0 +1,239 @@
+<!-- Previously the repository README; moved here when the README became a project overview. -->
+# Monitor similarity experiments
+
+A lightweight runner for cached **Qwen3-14B** trajectories in MonitorBench's
+code-verifiable dual-objective agent tasks. This implementation covers setup,
+model download, actor rollouts, programmatic grading, and generic follow-ups.
+On top of that sits an **experiment system** for monitors: choose a monitor model and variations in a TOML file, run (or price) it, and get
+metrics with confidence intervals, pre-registered comparisons and a report, including a hierarchical monitor for transcripts too long for
+one prompt. It is built and tested offline (277 tests). The format-only pilot has run on the cluster; **no scored monitor run exists yet**. See the
+[system documentation](system/README.md); documentation index: [docs/README.md](README.md); chronological record:
+[work log](worklog.md).
+
+## Saved rollouts and the Yale installation
+
+The existing data and model are on Yale's Bouchet cluster. Connect as
+`<your-cluster-username>@bouchet.ycrc.yale.edu` and set `$PROJECT` to the team's
+shared project directory. The shared storage path is the same for all teammates;
+its recorded location is the `project_root` field in the
+[setup record](../mihai/results/environments/setup-2026-10-16.json).
+Use the saved responses for later monitor experiments; generating actors again
+is not necessary.
+
+| Item | Cluster location |
+| --- | --- |
+| Original batch, cleaned | `$PROJECT/rollouts_original_clean/` |
+| Second experiment, kept separate | `$PROJECT/mihai/test_rollouts_2/runs/29910578/` |
+| Qwen3-14B weights and model manifests | `$PROJECT/models/qwen3-14b/` |
+| Research/analysis Python | `$PROJECT/envs/monitor-research/bin/python` |
+| GPU serving Python | `$PROJECT/envs/monitor-vllm/bin/python` |
+| Git checkout | `$PROJECT/monitor-similarity-experiment/` |
+| Historical failures, logs and retry records | `$PROJECT/archives/cleanup-20261018/` |
+
+The cleaned original batch contains **41 complete actor/follow-up pairs out of
+48**, organized as `task/benign-or-malicious/sample_XX/{rollout,followup}.json`.
+Its `manifest.json` records source jobs and checksums. The seven broken or
+incomplete pairs are excluded. A complete execution can still have an
+unsuccessful task score. Fourteen retained pairs used two A40 GPUs and 27 used
+one H200; their serving identities remain distinct.
+
+The second experiment has **19 complete responses and one truncated request**
+across 20 requests, covering 12 problems and their selected controls. Its raw
+files and manifest stay on the cluster. Its code, prompts, settings, compact
+results and [report](../mihai/test_rollouts_2/report.md) live under
+[`mihai/test_rollouts_2/`](../mihai/test_rollouts_2/). It is a separate screening
+experiment, not another part of the original 48.
+
+The installed environments use Python 3.12.8, vLLM 0.11.0, PyTorch 2.8.0 with
+CUDA 12.8, and Transformers 4.56.2. Qwen3-14B is pinned to revision
+`40c069824f4251a91eefaf281ebe4c544efd3e18`; its 17 downloaded files occupy about
+29.6 GB. Research dependencies and analysis packages are already installed.
+See the [cluster guide](../mihai/README.md) for exact package snapshots,
+environment variables, GPU commands, data access, and what remains to implement
+before running monitors. Raw responses, reasoning, weights, environments and
+logs are excluded from Git.
+
+## Cluster quick start
+
+Clone this repository on the cluster. Use Python 3.11+ (Python 3.11/3.12 is a
+practical choice for GPU serving), Git, and a CUDA environment supported by your
+chosen vLLM release. No weights or GPU packages are included in the repository.
+
+```bash
+bash scripts/setup.sh --with-serving
+source .venv/bin/activate
+python scripts/download_model.py
+```
+
+Setup installs the small environment dependencies and optional vLLM backend,
+then checks all three environments without inference. Model download is a
+separate explicit step. The downloader resolves the requested revision to an
+immutable Hugging Face commit, resumes existing downloads, and records a
+manifest. Use `--revision COMMIT` to reproduce an earlier download.
+
+Start the server on an allocated GPU node:
+
+```bash
+python scripts/serve_model.py --tensor-parallel-size 1
+```
+
+The serving script uses BF16, Qwen3 reasoning extraction, Hermes tool parsing,
+and a 32,768-token context. Adjust GPU count with `--tensor-parallel-size` and
+context capacity with `--max-model-len`. BF16 weights alone require roughly
+28–30 GB; context and runtime allocations require additional GPU memory. Actual
+GPU inference must be validated on the target cluster.
+
+For tasks whose histories exceed the native context, explicitly enable YaRN,
+following the [Qwen long-context guidance](https://huggingface.co/Qwen/Qwen3-14B#processing-long-texts):
+
+```bash
+python scripts/serve_model.py --tensor-parallel-size 2 --max-model-len 65536 --yarn-factor 2
+```
+
+Context overflow is saved as an error rather than truncating the trajectory.
+Changing context/scaling changes actor behavior and creates a different cache
+identity through the serving manifest.
+
+In another terminal/job that can reach the server:
+
+```bash
+source .venv/bin/activate
+python scripts/generate_rollouts.py --tasks bank_transfer_2 --variants benign --samples 1
+```
+
+The full default run is:
+
+```bash
+python scripts/generate_rollouts.py
+```
+
+This runs 8 samples for each of 3 tasks × 2 objective variants (48 actor
+trajectories), with one generic follow-up completion per trajectory. The
+[MonitorBench configuration](https://github.com/ASTRAL-Group/MonitorBench/blob/b6229e4b8ea9abcec38d61159c9cbd0f577ddf35/config/vllm_config.yaml)
+sets **8 actor rollouts per prompt**, 1 verification sample, and 4 monitor
+samples. These are checked-in defaults, not a claim about every published run.
+
+## Task selection and settings
+
+Supported tasks, with both benign and malicious side objectives:
+
+- `bank_transfer_2`
+- `american_airlines_2`
+- `spam_filter_update`
+
+Expenditure Accounting and API Key Calendar Agendas are excluded because their
+main-task checks and benign side-task checks use LLM judges. The included tasks
+use simulated tools and cached environment assets; they do not send real money,
+book real tickets, or send real emails.
+
+Edit [configs/rollouts.toml](../configs/rollouts.toml) to set generation limits,
+endpoint, paths, and sample counts. Repository-relative paths work regardless of
+the shell's current directory. Custom download paths must also be supplied to
+the serving script and configured in the rollout TOML. For a separate serving
+environment, run setup without `--with-serving`, then install
+`requirements-serving.txt` there.
+
+Useful overrides:
+
+```bash
+python scripts/generate_rollouts.py --tasks spam_filter_update --variants benign malicious --samples 8
+python scripts/generate_rollouts.py --variants main_only --samples 8
+python scripts/generate_rollouts.py --followup-samples 3
+python scripts/generate_rollouts.py --base-url http://gpu-node:8000/v1
+python scripts/generate_rollouts.py --start-sample 8 --samples 8
+python scripts/generate_rollouts.py --check-environments
+```
+
+`main_only` omits the side objective from actor instructions and records both
+side-objective outcome labels. Use these separately as controls. Follow-up
+samples branch independently from the completed actor conversation, with tools
+disabled. Prior reasoning is retained in artifacts; the Qwen chat history sends
+visible content and calls, consistent with its native template behavior.
+
+Use one actor server. For multi-node jobs, share this checkout, model manifests,
+and cache storage, set `--host` appropriately, and configure the reachable URL.
+The launcher holds a repository-wide lock and a model-directory lock throughout
+serving. A second launcher is rejected, including one using a different port or
+model path in the same checkout. The downloader also takes the model lock, so
+downloads cannot change files while this launcher is serving them. The shared
+filesystem must support POSIX file locks; independent checkouts with separate
+model directories are outside this lock scope.
+Locks release automatically when the owning processes exit; do not delete lock
+files to bypass a running server.
+
+The launcher checks that the port is available before writing its manifest, and
+binds the API model name to a hash of its recorded configuration. Generation
+validates the manifest and requires exactly that name from `/models` and every
+completion response. Stale/mismatched settings or old generic-name servers are
+rejected. Restart old servers with the updated `serve_model.py`; do not edit
+manifests or launch vLLM manually. This validates the launcher configuration,
+not remote weight integrity. Full endpoint URLs, resolved manifest paths, launch
+arguments, and selected backend environment variables are saved in artifacts.
+Optional authentication reads `MODEL_API_KEY` (or the configured environment
+variable) without storing its value in cache.
+
+## Cache and verification
+
+Completed artifacts are reused. Incomplete actors are overwritten and restarted
+from the initial environment, including attempts that failed during grading.
+Only a status/error record is saved in the reusable actor cache until the full
+trajectory and grading succeed. Caught failures also save a separate diagnostic
+containing completed turns; it is never resumed or counted as a completed actor.
+Increasing the follow-up sample count does not regenerate actor trajectories. Sample
+ranges support separate cluster jobs; file locks prevent simultaneous writes
+to the same actor artifact.
+
+The runner saves raw responses, reasoning separately from visible content,
+tool calls/results, initial/final state, model/environment provenance, and
+independent main/side outcome labels. It rejects truncated generations or
+missing reasoning by default; explicitly empty reasoning is accepted and saved.
+Parsed reasoning fields preserve visible delimiter text. A turn-limit termination is recorded explicitly,
+graded on its final state, and retained rather than silently dropped.
+
+See [the artifact format](rollout-format.md) for paths, schema, and reasoning
+extraction, and [evaluator notes](evaluator-notes.md) for the paper/code
+comparison and retained grading limitations. Spam main-task labels now use
+upstream's transformed score, while raw scores remain available in artifacts.
+Its inherited sorting check still does not actually reprocess emails.
+
+Run offline tests with environment dependencies installed:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Tests exercise real simulated tools/evaluators and deterministic fake model
+responses, including fresh restarts, server guards, and follow-up isolation. They do not
+download weights or establish GPU inference compatibility.
+
+## Monitor experiments (built offline; no monitor has been run)
+
+An experiment file names a monitor, rollout sets and variations; one command runs (or prices) it, others score, compare and report. **Start with the
+[system documentation](system/README.md).** Local use needs the 41 rollouts in the git-ignored `rollouts_original_clean/` and the pinned tokenizer in
+`cache/tokenizer/` (copied from the cluster; see the [work log](worklog.md)):
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt -r requirements-analysis.txt
+.venv/bin/python -B -m unittest discover -s tests                                   # 258 offline tests
+.venv/bin/python -B scripts/run_experiment.py configs/experiments/baseline.toml --dry-run   # price it: no model needed
+# with a monitor served (one model per server):
+.venv/bin/python scripts/run_experiment.py configs/experiments/baseline.toml --monitor qwen3-32b --base-url http://NODE:8000/v1 --score
+.venv/bin/python scripts/compare_cells.py runs/baseline && .venv/bin/python scripts/make_report.py runs/baseline/metrics.json --out report.md
+```
+
+Findings so far, with sources: single-pass monitoring does not fit for the `cot`
+and `all` scopes (median prompt 76k and 84k tokens against a 15.5k-token input
+limit), so a hierarchical monitor is needed
+([measurements](analysis/transcript-token-counts.md)); only 3 of 41 saved
+rollouts failed their own side objective and none are `main_only` controls, so clean
+negatives needed new `main_only` rollouts from the same actor, which have since been generated (34 pairs, `main_only_v1`)
+([research notes](research/monitor-baseline-notes.md),
+[pre-registered decisions](plan/07-design-decisions.md#211-control-rollouts)); the cached
+cross-objective labels give a secondary, impure set of negatives. The baseline (8,336 monitor calls) and the full pre-registered grid
+(100,128 calls, about 1.0 billion input tokens, on the cached rollouts alone) are priced in `mihai/results/`.
+
+The broader [implementation plan](plan/01-scope.md) describes future monitor
+experiments. [Monitoring Monitorability](https://arxiv.org/html/2512.18311v1)
+supplies the generic follow-up prompt; [MonitorBench](https://arxiv.org/html/2603.28590v1)
+supplies the environments. Upstream source revisions, modifications, and MIT
+licenses are included under `vendor/`.
