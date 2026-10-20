@@ -1,8 +1,8 @@
-# Reference cell: MonitorBench's own monitor (Qwen3-32B), no task context, all three scopes,
+# Reference cells: MonitorBench's own monitor (Qwen3-32B) and the actor's own model (Qwen3-14B), no task context, all three scopes,
 # on the cached rollouts and the main_only controls (the controls supply the clean negatives; without them tnr_clean and the
 # primary metric gmean2_clean are undefined). The first invocation (2026-10-20, job 30068483) ran original_clean only; the second adds the controls.
 name = "baseline"
-monitor = "qwen3-32b"
+monitors = ["qwen3-32b", "qwen3-14b"]   # one server serves one model: run with --monitor NAME (qwen3-32b: 2026-10-20; qwen3-14b: the same-model case)
 rollout_sets = ["original_clean", "main_only_v1"]
 [grid]
 scope = ["action", "cot", "all"]
