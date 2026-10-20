@@ -2,7 +2,7 @@
 
 | Document | What it is |
 | --- | --- |
-| [Repository README](../README.md) | what is implemented, how to run it |
+| [Repository README](../README.md) · [Rollout runner guide](rollout-runner-guide.md) | project overview and progress; the previous README (rollout generation, cache, tests) |
 | [Cluster guide](../mihai/README.md) | Bouchet locations, installed software, saved data, local copy |
 | [Work log](worklog.md) | chronological record of what was done, including mistakes and declined actions |
 | [Scope](plan/01-scope.md) · [Setup](plan/02-setup-and-architecture.md) · [Rollouts](plan/03-rollouts.md) · [Monitor evaluation](plan/04-monitor-evaluation.md) | the intended framework |
