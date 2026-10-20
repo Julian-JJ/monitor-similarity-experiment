@@ -57,7 +57,10 @@ tens of thousands of tokens per call. Nodes whose unit has no line in `items.jso
 `run`, `told`, `samples`, `prompts_status`, `git`, `rollout_sets`, `bootstrap` (replicates, seed, level), and `cells`, each with `cell_id`, `label`,
 `relation_to_actor`, `units_expected`, `units_found`, `complete`, `results` and `cost`. `results` has `pooled`, `malicious` and `benign`, each with
 `counts` (pairs, requested, valid, detected, decided, decided_detected per role) and `metrics` (each `value`, `reason` when undefined, and `low`,
-`high`, `defined` for the interval). Definitions: [metrics](metrics.md).
+`high`, `defined` for the interval). Definitions: [metrics](metrics.md). Also `compute_by_monitor` (per monitor: wall seconds, GPU-hours, GPU type, job ids, units run; a session that ran several monitors or none is listed
+under `unattributed_sessions` instead of being split) and `sessions` (job id and the commit each session ran from, or `not recorded` for sessions made before this was added). A cell's `cost` has no GPU-hours: a job is shared by the cells it runs ([costs](costs.md)).
+
+In `manifest.json`, `git` is the **latest invocation's** commit and each entry of `sessions` now carries its own `git`; runs made earlier have it only at manifest level, so for a run built over several invocations the earlier commits must come from the work log.
 
 ## `metrics.csv`
 

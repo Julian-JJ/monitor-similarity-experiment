@@ -9,7 +9,7 @@ or on which letter was chosen, so wording can be fixed for format without being 
 import json
 from pathlib import Path
 
-from .costs import percentile
+from .costs import percentile, sessions_by_monitor
 
 
 def read_lines(path):
@@ -22,10 +22,15 @@ def quantiles(values):
     return None if not values else {"n": len(values), "p50": percentile(values, 50), "p95": percentile(values, 95), "max": max(values)}
 
 
-def summarize(run_dir):
+def summarize(run_dir, monitor=None):
+    """Summary of a run directory, or of one monitor's cells in it (a directory accumulates several monitors; pooling them mixes models)."""
     run_dir = Path(run_dir)
     manifest = json.loads((run_dir / "manifest.json").read_text())
     items = read_lines(run_dir / "items.jsonl")
+    all_items = items
+    if monitor:
+        mine = {c["cell_id"] for c in manifest["cells"] if c["label"]["monitor"] == monitor}
+        items = [r for r in items if r["cell_id"] in mine]
     done = {r["unit_id"] for r in items}
     nodes = [n for n in read_lines(run_dir / "nodes.jsonl") if n["unit_id"] in done]   # ignore orphans of interrupted units
     attempts = [dict(a, kind=n["kind"], level=n["level"]) for n in nodes for a in n["attempts"]]
@@ -45,13 +50,16 @@ def summarize(run_dir):
     cells = {c["cell_id"]: c for c in manifest["cells"]}
     limits = {}
     for cell in cells.values():
-        monitor = manifest["monitors"][cell["label"]["monitor"]]
-        limits[cell["cell_id"]] = monitor["context_tokens"] - monitor["sampling"]["max_tokens"]
+        registered = manifest["monitors"][cell["label"]["monitor"]]
+        limits[cell["cell_id"]] = registered["context_tokens"] - registered["sampling"]["max_tokens"]
     overruns = [r for r in items if r.get("max_prompt_tokens", 0) > limits.get(r["cell_id"], 10 ** 12)]
-    wall = sum(s["wall_seconds"] for s in manifest.get("sessions", []))
+    sessions = sessions_by_monitor(manifest, all_items)
+    if monitor:
+        sessions = [e for e in sessions if e["monitors"] == [monitor]]
+    wall = sum(e["session"]["wall_seconds"] for e in sessions)
     completion = sum(r["completion_tokens"] for r in items)
     return {
-        "run": manifest["name"], "units": len(items), "units_by_status": {s: sum(1 for r in items if r["status"] == s) for s in sorted({r["status"] for r in items})},
+        "run": manifest["name"], "monitor": monitor, "units": len(items), "units_by_status": {s: sum(1 for r in items if r["status"] == s) for s in sorted({r["status"] for r in items})},
         "requests": len(attempts), "invalid_requests": sum(1 for a in attempts if not a["valid"]),
         "invalid_reasons": reasons, "finish_reasons": finishes, "by_node_kind": by_kind,
         "requests_needing_a_retry": sum(1 for n in nodes if len(n["attempts"]) > 1),
@@ -73,7 +81,7 @@ def summarize(run_dir):
 
 def render(summary):
     q = lambda v: "n/a" if v is None else f"median {v['p50']:.0f}, 95th percentile {v['p95']:.0f}, max {v['max']:.0f} (n={v['n']})"
-    lines = [f"Pilot summary of run `{summary['run']}` (label-free)", "",
+    lines = [f"Pilot summary of run `{summary['run']}`" + (f", monitor `{summary['monitor']}`" if summary.get("monitor") else "") + " (label-free)", "",
              f"* units: {summary['units']} {summary['units_by_status']}; chunked: {summary['units_chunked']}",
              f"* requests: {summary['requests']}; invalid: {summary['invalid_requests']}; needing a retry: {summary['requests_needing_a_retry']}",
              f"* invalid share, chunk calls: {summary['by_node_kind']['chunk']['invalid_share']}; combining calls: {summary['by_node_kind']['reduce']['invalid_share']}",

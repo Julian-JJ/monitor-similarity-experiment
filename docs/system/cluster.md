@@ -68,7 +68,7 @@ python $ME/monitor-framework/scripts/build_collection.py --cache $ME/cache --out
 The retention rule is execution status only, never labels. Copy the collection (about 100 MB) to your Mac, or link it as `rollouts_main_only_clean` in the framework copy, for scoring.
 
 **B3. Pilot (format only).** Qwen3-14B is already installed: `MONITOR=qwen3-14b EXPERIMENT=configs/experiments/pilot-format-only.toml MODEL_DIR=$ME/models/qwen3-14b SCORE=0 sbatch … run_monitor.sbatch`.
-`SCORE=0` keeps the job from reading any label. The job ends by writing `pilot-summary.json` with `scripts/pilot_summary.py`: validity, retries, finish reasons, reply and plan lengths, prompt sizes
+`SCORE=0` keeps the job from reading any label. The job ends by writing `pilot-summary-<monitor>.json` with `scripts/pilot_summary.py --monitor <monitor>` (a run directory can hold several monitors, and pooling them mixes models and wall times): validity, retries, finish reasons, reply and plan lengths, prompt sizes
 against the input limit, latency and throughput, from `items.jsonl`, `nodes.jsonl` and `plans/` only (a test checks that the module cannot reach labels). Judge the prompts by that and nothing else;
 wording changes are format fixes and are logged. When satisfied, `python scripts/freeze.py write --status frozen` and commit.
 
@@ -116,4 +116,4 @@ pre-registered rule allows wording changes only for format failures, and this is
 
 ## Verified by the baseline (2026-10-20)
 
-* Qwen3-32B in BF16 fits and runs on one H200 at the 32,768 context (KV cache about 30% at 32 concurrent requests), 646 completion tokens per second at concurrency 32; 99.98% of 14,000+ requests valid. The collection builder worked on real control output (34 of 36 pairs). Run provenance via `.sync-commit.json` worked. 
+* Qwen3-32B in BF16 fits and runs on one H200 at the 32,768 context (KV cache about 30% at 32 concurrent requests), 646 completion tokens per second at concurrency 32; 99.98% of 14,000+ requests valid. The collection builder worked on real control output (34 of 36 pairs). Qwen3-14B at concurrency 32: 1,263 completion tokens per second, 3.01 GPU-hours for the same 1,800 units (job 30069778; predicted 3 to 4 hours), 1 invalid request of 14,217; its private model directory passed `download_monitor.py --verify-only`. Run provenance via `.sync-commit.json` worked. 

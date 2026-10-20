@@ -22,9 +22,9 @@
 | Item | State |
 | --- | --- |
 | Actor rollouts and follow-ups (Qwen3-14B, 3 tasks) | done; 41 clean pairs on the cluster |
-| Hierarchical monitor library, experiment framework (data, registries, spec, runner, metrics, comparisons, report, presence tooling), prompts | done; 277 offline tests pass (248 new) |
+| Hierarchical monitor library, experiment framework (data, registries, spec, runner, metrics, comparisons, report, presence tooling), prompts | done; 281 offline tests pass (252 new) |
 | Token counts and dry-run plans over the 41 rollouts | done; results in `mihai/results/` |
-| Running any monitor model | pilot (Qwen3-14B, format-only, no labels read) and the **baseline** (Qwen3-32B, 1,800 units, scored; `reports/baseline.md`); no other monitor yet |
+| Running any monitor model | pilot (Qwen3-14B, format-only, no labels read) and the **baselines** (Qwen3-32B and Qwen3-14B, 1,800 units each, scored; `reports/baseline.md`, [analysis](analysis/baseline-results.md)); first comparison P1b run (no clear difference); no other monitor yet |
 | Metrics (TPR, TNR, g-mean², bootstrap), comparisons, councils, report | done and tested against hand-worked numbers |
 | `scripts/run_experiment.py` (run and price experiments) | done; exercised only with fake monitors and a local fake server |
 | `main_only` control rollouts (clean negatives) | **done**: 34 pairs kept of 36 (job 30068222), collection `main_only_v1` built and verified ([cluster runbook](system/cluster.md)) |

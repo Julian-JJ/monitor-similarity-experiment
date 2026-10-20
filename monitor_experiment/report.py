@@ -48,8 +48,19 @@ def caveats(runs, cells):
             notes.append(f"Prompts were **not frozen** when run `{run['run']}` started (status: {run.get('prompts_status')}); "
                          "treat its results as a pilot, not as confirmatory.")
         git = run.get("git") or {}
-        if git.get("dirty"):
-            notes.append(f"Run `{run['run']}` was made from a working tree with uncommitted changes (commit {git.get('commit', '?')[:10]}).")
+        if "sessions" not in run:   # metrics written before per-session commits were recorded: only the latest invocation's commit is known
+            if git.get("dirty"):
+                notes.append(f"Run `{run['run']}` was made from a working tree with uncommitted changes (commit {git.get('commit', '?')[:10]}).")
+            continue
+        for session in run["sessions"]:
+            g = session["git"]
+            if g == "not recorded" or g is None:
+                notes.append(f"Run `{run['run']}`: the commit used by job {session['job_id']} was not recorded (it ran before sessions recorded their own commit; "
+                             f"the manifest keeps only the latest invocation's: {(git.get('commit') or '?')[:10]}, dirty: {git.get('dirty')}). Check the work log.")
+            elif g.get("dirty"):
+                notes.append(f"Run `{run['run']}`: job {session['job_id']} was made from a working tree with uncommitted changes (commit {(g.get('commit') or '?')[:10]}).")
+            elif g.get("commit") is None:
+                notes.append(f"Run `{run['run']}`: job {session['job_id']} has no recorded commit.")
     incomplete = [cell_name(c) for c in cells if not c["complete"]]
     if incomplete:
         notes.append("Incomplete cells (fewer units than requested): " + "; ".join(incomplete) + ".")
@@ -106,16 +117,26 @@ def render(metrics_paths, comparisons_path=None, title="Monitor experiment repor
                                          ("positive", "clean_negative", "cross_negative", "own_failure")] for c in cells]))
     out += ["", "## Cost and latency", "",
             "Tokens are as the server counted them. `served s` is the sum of request latencies (load, not GPU occupancy). "
-            "`critical path` is the per-unit wall time if each tree level ran in parallel. GPU-hours appear only when the run recorded its GPUs.", ""]
+            "`critical path` is the per-unit wall time if each tree level ran in parallel. Compute is per monitor, below, because a job is shared by the cells it runs.", ""]
     rows = []
     for c in cells:
         k = c["cost"]
         rows.append([cell_name(c), k["units"], k["calls"], k["model_requests"], f"{k['prompt_tokens']:,}", f"{k['completion_tokens']:,}",
                      f"{k['served_seconds']:.0f}", "n/a" if k["call_latency_p50"] is None else f"{k['call_latency_p50']:.1f}/{k['call_latency_p95']:.1f}",
-                     "n/a" if k["critical_path_mean"] is None else f"{k['critical_path_mean']:.1f}",
-                     "n/a" if k["gpu_hours"] is None else f"{k['gpu_hours']:.2f}"])
+                     "n/a" if k["critical_path_mean"] is None else f"{k['critical_path_mean']:.1f}"])
     out.append(table(["cell", "units", "calls", "requests", "prompt tokens", "completion tokens", "served s", "call latency p50/p95 s",
-                      "critical path mean s", "GPU-hours"], rows))
+                      "critical path mean s"], rows))
+    compute = [(r["run"], name, row) for r in runs for name, row in (r.get("compute_by_monitor") or {}).get("monitors", {}).items()]
+    if compute:
+        out += ["", "Compute per monitor: job wall time of the sessions that ran only that monitor, times the GPU count. It includes server "
+                "start-up and idle time inside the job.", ""]
+        out.append(table(["run", "monitor", "jobs", "GPU", "wall time (h)", "GPU-hours"],
+                         [[run, name, ", ".join(str(j) for j in row["jobs"]), row["gpu_type"] or "n/a", f"{row['wall_seconds'] / 3600:.2f}",
+                           "n/a" if row["gpu_hours"] is None else f"{row['gpu_hours']:.2f}"] for run, name, row in compute]))
+    for r in runs:
+        for u in (r.get("compute_by_monitor") or {}).get("unattributed_sessions", []):
+            out.append(f"\n* Run `{r['run']}`: job {u['job_id']} ({u['wall_seconds'] / 3600:.2f} h) could not be attributed to one monitor "
+                       f"(monitors found: {', '.join(u['monitors']) or 'none'}), so it is left out of the table above.")
     if comparisons_path:
         comp = json.loads(Path(comparisons_path).read_text())
         out += ["", f"## Pre-registered comparisons (primary metric `{comp['metric']}`, told: {comp['told']})", "",

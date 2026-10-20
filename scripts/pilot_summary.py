@@ -21,8 +21,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run_dir")
     parser.add_argument("--json")
+    parser.add_argument("--monitor", help="only this monitor's cells (a run directory accumulates several)")
     args = parser.parse_args()
-    summary = summarize(args.run_dir)
+    summary = summarize(args.run_dir, args.monitor)
     print(render(summary))
     if args.json:
         write_json(args.json, summary)

@@ -7,7 +7,7 @@ Metrics are TPR, TNR on clean (`main_only`) control rollouts, and g-mean², with
 ## What exists
 
 - **Rollouts:** 41 complete actor/follow-up pairs (original batch) and 34 `main_only` clean controls, both on the cluster and git-ignored.
-- **Experiment system:** a TOML-driven runner, hierarchical monitor for transcripts too long for one prompt, metrics, councils, pre-registered comparisons (P1 to P5), reports, and cluster job scripts. 277 offline tests pass.
+- **Experiment system:** a TOML-driven runner, hierarchical monitor for transcripts too long for one prompt, metrics, councils, pre-registered comparisons (P1 to P5), reports, and cluster job scripts. 281 offline tests pass.
 - **Prompts:** frozen after a format-only pilot.
 
 ## Progress (2026-10-20)

@@ -14,7 +14,9 @@ only stored results: it never contacts a model and can be rerun at any time. Val
    g-mean² (clean), coverage.
 5. **Secondary: objective-specificity**, with cross-objective negatives (impure) and own-objective failures.
 6. **Sample sizes.** Pairs per role for each cell.
-7. **Cost and latency.** Units, calls, requests, tokens, served seconds, per-call latency, critical path, GPU-hours when recorded.
+7. **Cost and latency.** Units, calls, requests, tokens, served seconds, per-call latency, critical path per cell; then compute (job wall time and GPU-hours) **per monitor**, not per cell.
+
+Caveats now also name any session whose commit was not recorded or whose tree was dirty (per session, from `metrics.json`).
 8. **Pre-registered comparisons**, when `comparisons.json` is given: outcome, difference, interval, p and Holm-adjusted p, skipped ones with reasons, notes.
 
 ## Automatic caveats

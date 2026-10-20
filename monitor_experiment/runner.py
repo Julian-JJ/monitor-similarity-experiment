@@ -22,7 +22,7 @@ from . import hierarchy as h
 from . import metrics as mt
 from . import spec as sp
 from .artifacts import digest, read_json, write_json
-from .costs import summarize
+from .costs import compute_by_monitor, summarize
 from .data import ObjectiveTable, make_pairs
 from .registry import RegistryError
 from .strategies import JudgeStrategy, PlanBook
@@ -346,7 +346,7 @@ def run_experiment(spec, registry, out_root, *, make_complete, count, prompts, r
         list(pool.map(work, todo))
     wall = (datetime.now(timezone.utc) - began).total_seconds()
     manifest["sessions"].append({"started_at": started, "finished_at": now(), "wall_seconds": wall, "units_run": finished[0],
-                                 "errors": len(errors), "compute": compute or {}})
+                                 "errors": len(errors), "compute": compute or {}, "git": manifest.get("git")})
     manifest["finished_at"] = now()
     write_json(manifest_path, manifest)
     if errors:
@@ -370,9 +370,6 @@ def score_run(run_dir, registry, *, bootstrap_n=2000, seed=0, verify=True):
             info["items"] = sum(1 for i in items if i.set_name == name)
     by_id = {i.item_id: i for i in items}
     pairs = {p.key: p for p in make_pairs(items, tuple(manifest["told"]))}
-    sessions = manifest.get("sessions", [])
-    wall = sum(s["wall_seconds"] for s in sessions) if sessions else None
-    gpus = (manifest.get("compute") or {}).get("gpu_count")
     rows, cells_out = [], []
     for cell in manifest["cells"]:
         mine = [r for r in records if r["cell_id"] == cell["cell_id"] and r["item_id"] in by_id]
@@ -390,11 +387,13 @@ def score_run(run_dir, registry, *, bootstrap_n=2000, seed=0, verify=True):
                                                                                                   for k in ("low", "high", "defined")}}
                                                          for name, (v, reason) in by["metrics"].items()}}
                                       for told, by in point.items()},
-                          "cost": summarize(mine, wall_seconds=wall, gpu_count=gpus)})
+                          "cost": summarize(mine)})
     out = {"schema_version": SCHEMA_VERSION, "run": manifest["name"], "told": manifest["told"], "samples": manifest["samples"],
            "prompts_status": manifest.get("prompts_status"), "git": manifest.get("git"),
            "rollout_sets": sets_info, "bootstrap": {"replicates": bootstrap_n, "seed": seed,
-                                                    "level": 0.95}, "cells": cells_out}
+                                                    "level": 0.95}, "cells": cells_out,
+           "compute_by_monitor": compute_by_monitor(manifest, records),
+           "sessions": [{"job_id": (s.get("compute") or {}).get("job_id"), "git": s.get("git", "not recorded")} for s in manifest.get("sessions", [])]}
     write_json(run_dir / "metrics.json", out)
     columns = ["cell_id", "monitor", "scope", "task_context", "hierarchy", "partial_cot", "followup_visibility", "prompt",
                "reasoning", "relation_to_actor", "told", "metric", "value", "ci_low", "ci_high", "replicates", "note"]

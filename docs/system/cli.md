@@ -18,7 +18,7 @@ All are in `scripts/` and run from the repository root (`.venv/bin/python -B scr
 | `build_collection.py` | turn a rollout cache into a verified collection ([collections](collections.md)) |
 | `prepare_controls.py` | model directory, derived config, checkout verification and worker plan for the control run ([cluster](cluster.md)) |
 | `serve_monitor.py` | serve one registered monitor with vLLM ([cluster](cluster.md)) |
-| `pilot_summary.py` | label-free summary of a run for the format-only pilot |
+| `pilot_summary.py` | label-free summary of a run (or of one monitor's cells with `--monitor`): validity, finish reasons, lengths, latency, throughput |
 | `generate_rollouts.py`, `serve_model.py`, `download_model.py` | the original actor tooling (not changed) |
 
 ## `run_experiment.py`

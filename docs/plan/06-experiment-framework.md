@@ -278,8 +278,8 @@ The step list that follows is the original plan, kept for the record.
 | B1 sync code to the cluster | **done** (149 files, 3 minutes); setup verified the code identity on the cluster |
 | B2 control rollouts | **done**: job 30068222 (job 30068171 cancelled, see work log R); 34 of 36 pairs; `build_collection.py` ran on real output; `main_only_v1` available |
 | B3 pilot | **done** (job 30068179): no format failure; prompts **frozen** |
-| B4 download and serve another monitor | `download_monitor.py` written; Qwen3-32B downloaded and pinned; served on one H200 for the baseline; other monitors **not started** (GPT-OSS and Gemma flags unverified) |
-| B5 baseline | **done**: Qwen3-32B, 1,800 units, scored, `reports/baseline.md` (jobs 30068483 and 30069109); comparisons not yet run |
+| B4 download and serve another monitor | `download_monitor.py` written; Qwen3-32B downloaded and pinned; served on one H200 for the baseline; Qwen3-14B served from its private directory for the second baseline; other monitors **not started** (GPT-OSS and Gemma flags unverified) |
+| B5 baseline | **done**: Qwen3-32B (jobs 30068483, 30069109) and Qwen3-14B (job 30069778), 1,800 units each, scored, `reports/baseline.md`; P1b run (no clear difference, [analysis](../analysis/baseline-results.md)); the rest of P1 to P5 need more monitors |
 
 1. **A1. Registries and data layer.** `data.py`, `registry.py`; load the 41 rollouts
    with hash verification; observable/privileged separation. Test: labels unreachable from

@@ -63,4 +63,4 @@ printf 'server_ready_at=%s\n' "$(date -u +%FT%TZ)" >> "$STATUS"
     --out "$ME/runs" --gpu "$GPU_LABEL" --job-id "$JOB" "${score_flag[@]}" $EXTRA_ARGS 2>&1 | tee -a "$STATUS"
 # Always write the label-free summary (validity, reply lengths, plan sizes, latency): it is what the pilot is judged on.
 run_name=$("$ANALYSIS_PY" -c 'import sys, tomllib; print(tomllib.load(open(sys.argv[1], "rb"))["name"])' "$EXPERIMENT")
-"$ANALYSIS_PY" scripts/pilot_summary.py "$ME/runs/$run_name" --json "$ME/runs/$run_name/pilot-summary.json" 2>&1 | tee -a "$STATUS"
+"$ANALYSIS_PY" scripts/pilot_summary.py "$ME/runs/$run_name" --monitor "$MONITOR" --json "$ME/runs/$run_name/pilot-summary-$MONITOR.json" 2>&1 | tee -a "$STATUS"
