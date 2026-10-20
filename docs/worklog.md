@@ -568,3 +568,12 @@ The user reopened the connection, pointed to the YCRC job-scheduling tutorial an
     The report's "GPU-hours 5.84" repeated per cell is the whole run's, not per cell (noted, not yet fixed in the report generator).
 101. `docs/analysis/baseline-results.md` rewritten as the full baseline report (purpose, process, metric definitions and why each matters, results by scope, told objective, task and role, cost, confounds, problems met, reproduction, next steps). Numbers were checked against
     `metrics.csv` and `items.jsonl`; the task table's objective descriptions were taken from `configs/objectives.json` after a first draft described the spam-filter task vaguely.
+
+### W. Qwen3-14B baseline (the same-model case)
+
+102. **Committed** everything to date as `60078eb` (not pushed). Then `configs/experiments/baseline.toml` was changed from `monitor = "qwen3-32b"` to `monitors = ["qwen3-32b", "qwen3-14b"]` (committed as `8d8979f`): the 32B cells and their IDs are unchanged, the run
+    directory `runs/baseline/` accumulates, and the 14B is selected with `--monitor qwen3-14b` because one server serves one model. Dry run: 1,800 units, 14,216 calls, 135.9 M estimated input tokens, the same as the 32B (the tokenizer is shared, so chunking is identical).
+103. **Checks before submitting.** The code was synced from the clean commit (`.sync-commit.json`: `8d8979f`, `dirty: false`, the first run to record a clean tree). `download_monitor.py qwen3-14b --verify-only` on the cluster passed for the private 14B directory
+    (17 files, 29.6 GB, revision `40c06982…` equal to the registry pin), which also exercises the new verification path on the model used earlier by the pilot.
+104. **Submitted** job **30069778**, `gpu_h200`, one H200, 8 CPUs, 96 GB, 8 h limit, concurrency 32 (the setting used for the 32B). Prediction recorded before the result: 3 to 4 hours (extrapolated from the 32B run's
+    646 completion tokens/s and the 14B pilot's 405 tokens/s at concurrency 8; the 14B's speed at concurrency 32 is unmeasured).
