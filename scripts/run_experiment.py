@@ -25,6 +25,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("experiment")
     parser.add_argument("--monitor", help="run only this monitor of the experiment's list (one server serves one model)")
+    parser.add_argument("--registry-dir", help="use a pinned job registry instead of configs/")
     parser.add_argument("--set", action="append", default=[], metavar="PATH=VALUE", help="override a spec value (TOML syntax)")
     parser.add_argument("--dry-run", action="store_true", help="price the experiment without contacting any model")
     parser.add_argument("--out", default=str(ROOT / "runs"), help="runs are written to OUT/<experiment name>/")
@@ -37,7 +38,7 @@ def main():
     parser.add_argument("--report-tokens", type=int, default=1000, help="dry run: assumed size of one chunk analysis")
     parser.add_argument("--output-json", help="dry run: also write the report here")
     args = parser.parse_args()
-    registry = Registry.load()
+    registry = Registry.load(config_dir=args.registry_dir)
     spec = load_spec(args.experiment, args.set)
     if args.monitor:
         if args.monitor not in spec.monitors:

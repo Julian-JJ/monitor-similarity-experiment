@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+# Submit the remaining size/family baselines on Bouchet; never runs inference on the login node.
+set -euo pipefail
+
+usage() {
+    cat <<'HELP'
+Usage: bash junlin/submit_qwen_gemma_baselines.sh [--dry-run] [MODEL ...]
+
+Default models: qwen3-1.7b qwen3-4b gemma4-e2b gemma4-e4b gemma4-12b gemma4-31b
+Optional model: qwen3-30b-a3b
+
+Each model gets a CPU preparation job (download/reuse weights, pin a private registry)
+and an H200 monitor job dependent on successful preparation. GPU jobs run sequentially
+and append to runs/baseline, retaining completed work. --dry-run prints commands only.
+
+Environment overrides:
+  ME, FRAMEWORK, MODELS_DIR, ANALYSIS_PY, SERVING_PY, GEMMA_SERVING_PY, SUBMIT_PY
+  ACCOUNT=cpsc4880 CPU_PARTITION=day GPU_PARTITION=gpu_h200
+  CPU_TIME=04:00:00 GPU_TIME=08:00:00 GPU_COUNT=1 GPU_MEM=96G
+  DEPENDENCY_JOB_ID=<existing monitor job> (serialize after an already queued run)
+
+GEMMA_SERVING_PY is an optional path to the Python executable in an existing
+environment supporting Gemma 4 and the gemma4 reasoning parser. Setting it does
+not create/install an environment. It defaults to SERVING_PY if unset; use one
+environment for both families if that environment supports both.
+Sync this branch and prepare the two rollout collections and reference tokenizer first.
+HELP
+}
+
+dry_run=0
+monitors=()
+while (($#)); do
+    case "$1" in
+        --dry-run) dry_run=1 ;;
+        -h|--help) usage; exit 0 ;;
+        --*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+        *) monitors+=("$1") ;;
+    esac
+    shift
+done
+if ((${#monitors[@]} == 0)); then
+    monitors=(qwen3-1.7b qwen3-4b gemma4-e2b gemma4-e4b gemma4-12b gemma4-31b)
+fi
+
+ME="${ME:-/nfs/roberts/project/cpsc4880/cpsc4880_as4833}"
+FRAMEWORK="${FRAMEWORK:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)}"
+MODELS_DIR="${MODELS_DIR:-$ME/models}"
+ANALYSIS_PY="${ANALYSIS_PY:-$ME/envs/monitor-analysis/bin/python}"
+SERVING_PY="${SERVING_PY:-/nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-vllm/bin/python}"
+GEMMA_SERVING_PY="${GEMMA_SERVING_PY:-$SERVING_PY}"
+SUBMIT_PY="${SUBMIT_PY:-python3}"
+ACCOUNT="${ACCOUNT:-cpsc4880}"
+CPU_PARTITION="${CPU_PARTITION:-day}"
+GPU_PARTITION="${GPU_PARTITION:-gpu_h200}"
+CPU_TIME="${CPU_TIME:-04:00:00}"
+GPU_TIME="${GPU_TIME:-08:00:00}"
+GPU_COUNT="${GPU_COUNT:-1}"
+GPU_MEM="${GPU_MEM:-96G}"
+previous="${DEPENDENCY_JOB_ID:-}"
+EXPERIMENT="$FRAMEWORK/configs/experiments/qwen-gemma-baseline.toml"
+[[ "$GPU_COUNT" =~ ^[1-9][0-9]*$ ]] || { echo "GPU_COUNT must be positive" >&2; exit 2; }
+[[ -z "$previous" || "$previous" =~ ^[0-9]+$ ]] || { echo "DEPENDENCY_JOB_ID must be numeric" >&2; exit 2; }
+
+# Validate the WHOLE selection before submitting anything. No tokenizer, weights,
+# network access or inference dependencies are needed by this check.
+"$SUBMIT_PY" - "$FRAMEWORK" "$EXPERIMENT" "$dry_run" "${monitors[@]}" <<'PY'
+import sys
+from pathlib import Path
+root, experiment, dry = Path(sys.argv[1]), sys.argv[2], sys.argv[3] == '1'
+sys.path.insert(0, str(root))
+from monitor_experiment.registry import Registry
+from monitor_experiment.spec import load_spec
+from monitor_experiment import freeze
+registry, spec = Registry.load(root=root), load_spec(experiment)
+names = sys.argv[4:]
+if len(names) != len(set(names)):
+    sys.exit('Duplicate model in submission list')
+for name in names:
+    if name not in spec.monitors:
+        sys.exit(f'{name!r} is not in {experiment}; choose from {list(spec.monitors)}')
+    monitor = registry.monitor(name).runnable()
+    if (monitor.context_tokens, monitor.output_reserve) != (32768, 16768):
+        sys.exit(f'{name}: context/output limits differ from the completed baseline')
+    if monitor.sampling != {'temperature': 0.6, 'top_p': 0.9, 'max_tokens': 16768}:
+        sys.exit(f'{name}: sampling differs from the completed baseline')
+if not dry:
+    if not registry.reference_tokenizer.is_file():
+        sys.exit(f'Missing reference tokenizer: {registry.reference_tokenizer}')
+    for name in spec.rollout_sets:
+        entry = registry.sets[name]
+        if not (entry.root / entry.manifest).is_file():
+            sys.exit(f'Missing rollout collection: {entry.root / entry.manifest}')
+    freeze.require_ready(root, registry.reference_tokenizer)
+PY
+
+batch_dir="$ME/logs/qwen-gemma-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+receipt="$batch_dir/submissions.tsv"
+if [[ "$dry_run" == 0 ]]; then
+    command -v sbatch >/dev/null || { echo "Run this script on the Slurm cluster" >&2; exit 1; }
+    [[ -x "$ANALYSIS_PY" ]] || { echo "Missing analysis Python: $ANALYSIS_PY" >&2; exit 1; }
+    for monitor in "${monitors[@]}"; do
+        serving="$SERVING_PY"
+        [[ "$monitor" == gemma4-* ]] && serving="$GEMMA_SERVING_PY"
+        [[ -x "$serving" ]] || { echo "Missing serving Python for $monitor: $serving" >&2; exit 1; }
+    done
+    mkdir -p "$batch_dir"
+    printf 'stage\tmonitor\tjob_id\tdependency\tregistry_dir\n' > "$receipt"
+fi
+
+submit() {
+    local placeholder=$1 result
+    shift
+    if [[ "$dry_run" == 1 ]]; then
+        printf 'DRY-RUN ' >&2
+        printf '%q ' "$@" >&2
+        printf '\n' >&2
+        printf '%s\n' "$placeholder"
+    else
+        result=$("$@")
+        result=${result%%;*}   # sbatch --parsable may append ;cluster
+        [[ "$result" =~ ^[0-9]+$ ]] || { echo "Unexpected sbatch response: $result" >&2; return 1; }
+        printf '%s\n' "$result"
+    fi
+}
+
+for monitor in "${monitors[@]}"; do
+    registry_dir="$batch_dir/registries/$monitor"
+    model_dir="$MODELS_DIR/$monitor"
+    download_job=$(submit "DOWNLOAD_$monitor" env ME="$ME" FRAMEWORK="$FRAMEWORK" \
+        ANALYSIS_PY="$ANALYSIS_PY" MONITOR="$monitor" OUT="$model_dir" REVISION="" \
+        PIN_REGISTRY_DIR="$registry_dir" \
+        sbatch --parsable --account="$ACCOUNT" --partition="$CPU_PARTITION" --nodes=1 --ntasks=1 \
+        --cpus-per-task=4 --mem=16G --time="$CPU_TIME" --job-name="prepare-$monitor" \
+        --output="$batch_dir/prepare-$monitor-%j.out" --export=ALL \
+        "$FRAMEWORK/mihai/cluster/download_monitor.sbatch")
+    if [[ "$dry_run" == 0 ]]; then
+        printf 'prepare\t%s\t%s\t-\t%s\n' "$monitor" "$download_job" "$registry_dir" >> "$receipt"
+        printf '%s: preparation=%s\n' "$monitor" "$download_job"
+    fi
+    dependency="afterok:$download_job"
+    [[ -n "$previous" ]] && dependency+=",afterany:$previous"
+    serving="$SERVING_PY"
+    [[ "$monitor" == gemma4-* ]] && serving="$GEMMA_SERVING_PY"
+    monitor_job=$(submit "MONITOR_$monitor" env ME="$ME" FRAMEWORK="$FRAMEWORK" \
+        ANALYSIS_PY="$ANALYSIS_PY" SERVING_PY="$serving" MONITOR="$monitor" \
+        EXPERIMENT="$EXPERIMENT" MODEL_DIR="$model_dir" REGISTRY_DIR="$registry_dir" \
+        TP="$GPU_COUNT" GPU_LABEL="H200:$GPU_COUNT" SCORE=1 EXTRA_ARGS="" \
+        sbatch --parsable --account="$ACCOUNT" --partition="$GPU_PARTITION" --nodes=1 --ntasks=1 \
+        --gpus="h200:$GPU_COUNT" --cpus-per-task=8 --mem="$GPU_MEM" --time="$GPU_TIME" \
+        --job-name="baseline-$monitor" --dependency="$dependency" --kill-on-invalid-dep=yes \
+        --output="$batch_dir/baseline-$monitor-%j.out" --export=ALL \
+        "$FRAMEWORK/mihai/cluster/run_monitor.sbatch")
+    previous="$monitor_job"
+    printf '%s: preparation=%s monitor=%s\n' "$monitor" "$download_job" "$monitor_job"
+    if [[ "$dry_run" == 0 ]]; then
+        printf 'monitor\t%s\t%s\t%s\t%s\n' "$monitor" "$monitor_job" "$dependency" "$registry_dir" >> "$receipt"
+    fi
+done
+[[ "$dry_run" == 1 ]] || printf 'Submission receipt: %s\n' "$receipt"

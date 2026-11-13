@@ -31,6 +31,7 @@ run_experiment.py EXPERIMENT.toml [--dry-run] [--monitor NAME] [--set PATH=VALUE
 
 * `--dry-run` prices without contacting a model; `--output-json` saves the report; `--report-tokens` sets the assumed size of one chunk analysis.
 * `--monitor` runs one monitor of a list. `--base-url` is refused with several monitors, because one server serves one model.
+* `--registry-dir DIR` selects a private registry snapshot; `serve_monitor.py` accepts the same flag. `download_monitor.py --pin-registry DIR` writes one pinned to a verified download. The [Qwen/Gemma submission wrapper](qwen-gemma-jobs.md) connects these automatically.
 * `--gpu H200:1 --job-id $SLURM_JOB_ID` record the compute for GPU-hour reporting.
 * `--score` computes `metrics.json` and `metrics.csv` afterwards (needs the rollout files for labels).
 * Exit status 2 means some units hit transport errors and will rerun when you run the same command again.

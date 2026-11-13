@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = {name: ROOT / "mihai/cluster" / name for name in ("setup_cluster.sh", "run_controls.sbatch", "run_monitor.sbatch", "sync_to_cluster.sh", "download_monitor.sbatch")}
+SCRIPTS["submit_qwen_gemma_baselines.sh"] = ROOT / "junlin/submit_qwen_gemma_baselines.sh"
 WRITES = re.compile(r"(?:>>?\s*|\bmkdir(?:\s+-p)?\s+|\bln\s+-s\s+\S+\s+|\bcp\s+\S+\s+|\btee(?:\s+-a)?\s+|--out(?:put)?\s+|--cache-dir\s+)\"?\$SHARED")
 
 
@@ -53,6 +54,9 @@ class ScriptTests(unittest.TestCase):
         for needle in ("--monitor \"$MONITOR\"", "--base-url", "--gpu \"$GPU_LABEL\"", "--job-id \"$JOB\"", "--score", "serve_monitor.py",
                        ': "${MONITOR:?', "trap cleanup EXIT"):
             self.assertIn(needle, text)
+        self.assertIn('flock -n 9', text)
+        self.assertEqual(text.count('"${registry_args[@]}"'), 2,
+                         "both server and runner must use the same pinned registry")
 
     def test_the_port_precheck_tolerates_time_wait_sockets_from_a_previous_server(self):
         """A job submitted right after another ended on the same node failed because the check bound without SO_REUSEADDR."""

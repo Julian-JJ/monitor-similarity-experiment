@@ -1,6 +1,9 @@
 """The monitor downloader and its verification, with the Hugging Face calls replaced."""
 
 import json
+import dataclasses
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -79,6 +82,57 @@ class DownloadTests(unittest.TestCase):
         with TempDir() as d:
             with self.assertRaisesRegex(md.DownloadError, "nothing to download"):
                 md.download(api_monitor, d / "m", resolve=lambda r, v: "e" * 40, fetch=fake_fetch(GOOD))
+
+    def test_a_job_registry_pins_the_download_without_editing_the_source_registry(self):
+        source_path = Path(__file__).resolve().parents[1] / "configs/monitors.toml"
+        original = source_path.read_bytes()
+        for name in ("qwen3-1.7b", "gemma4-e2b"):
+            with self.subTest(monitor=name), TempDir() as d:
+                monitor = Registry.load().monitor(name)
+                md.download(monitor, d / "model", resolve=lambda *args: "a" * 40, fetch=fake_fetch(GOOD))
+                target = md.pin_registry(d / "model", name, d / "registry")
+                registry = Registry.load(config_dir=target)
+                self.assertEqual(set(registry.monitors), {name})
+                self.assertEqual(registry.monitor(name).identity(),
+                                 dataclasses.replace(monitor, revision="a" * 40).identity())
+                self.assertFalse(registry.monitor(name).verified)
+                self.assertEqual(set(registry.sets), {"original_clean", "main_only_v1"})
+                record = json.loads((target / "resolved-model.json").read_text())
+                self.assertEqual(record["revision"], "a" * 40)
+                self.assertEqual(record["download_manifest"]["files"], GOOD)
+                self.assertEqual(source_path.read_bytes(), original)
+                # The actual launcher must accept and use this registry without
+                # importing vLLM or starting a server in print-command mode.
+                command = [sys.executable, str(source_path.parents[1] / "scripts/serve_monitor.py"),
+                           "--monitor", name, "--model-dir", str(d / "model"),
+                           "--registry-dir", str(target), "--print-command"]
+                launched = subprocess.run(command, capture_output=True, text=True)
+                self.assertEqual(launched.returncode, 0, launched.stderr)
+                self.assertIn(monitor.model_id, json.loads(launched.stdout))
+                md.pin_registry(d / "model", name, target)  # identical snapshots are reusable
+                manifest_path = d / "model/download-manifest.json"
+                manifest = json.loads(manifest_path.read_text())
+                manifest["revision"] = "b" * 40
+                manifest_path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(md.DownloadError, "existing pinned"):
+                    md.pin_registry(d / "model", name, target)
+                rejected = subprocess.run(command, capture_output=True, text=True)
+                self.assertNotEqual(rejected.returncode, 0)
+                self.assertIn("pins", rejected.stderr)
+
+    def test_a_job_registry_refuses_the_wrong_model_or_a_mutable_revision(self):
+        with TempDir() as d:
+            source_dir = Path(__file__).resolve().parents[1] / "configs"
+            with self.assertRaisesRegex(md.DownloadError, "private registry"):
+                md.pin_registry(d / "model", "qwen3-4b", source_dir)
+            self.run_download(d / "model")
+            with self.assertRaisesRegex(md.DownloadError, "holds"):
+                md.pin_registry(d / "model", "gemma4-e2b", d / "registry")
+            monitor = Registry.load().monitor("qwen3-4b")
+            md.download(monitor, d / "other", resolve=lambda *args: "main", fetch=fake_fetch(GOOD))
+            with self.assertRaisesRegex(md.DownloadError, "immutable"):
+                md.pin_registry(d / "other", monitor.name, d / "registry")
+            self.assertFalse((d / "registry").exists())
 
 
 if __name__ == "__main__":

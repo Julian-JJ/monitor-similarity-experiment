@@ -29,10 +29,19 @@ class CommandTests(unittest.TestCase):
         self.assertNotIn("--rope-scaling", command)
         self.assertEqual(self.flag(command, "--generation-config"), "vllm")
 
-    def test_other_families_get_dtype_auto_and_no_assumed_reasoning_parser(self):
+    def test_other_families_get_dtype_auto_and_their_configured_reasoning_parser(self):
         command = ms.build_command(self.registry.monitor("gpt-oss-120b"), "/m/gpt-oss")
         self.assertEqual(self.flag(command, "--dtype"), "auto")
         self.assertNotIn("--reasoning-parser", command)
+
+        for name in ("gemma4-e2b", "gemma4-e4b", "gemma4-12b", "gemma4-31b"):
+            with self.subTest(monitor=name):
+                monitor = self.registry.monitor(name)
+                command = ms.build_command(monitor, "/m/" + name)
+                self.assertEqual(self.flag(command, "--dtype"), "auto")
+                self.assertEqual(self.flag(command, "--served-model-name"), monitor.model_id)
+                self.assertEqual(self.flag(command, "--reasoning-parser"), "gemma4")
+                self.assertNotIn("--rope-scaling", command)
 
     def test_a_longer_context_needs_a_yarn_factor_and_a_shorter_one_is_refused(self):
         monitor = self.registry.monitor("qwen3-32b")

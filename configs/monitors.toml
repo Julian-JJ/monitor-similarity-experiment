@@ -147,3 +147,90 @@ notes = "PLACEHOLDER. The exact Gemma model is fixed at download time (docs/plan
 temperature = 0.6
 top_p = 0.9
 max_tokens = 16768
+
+# Proposed Gemma 4 instruction-tuned monitors. Keep the legacy gemma-large
+# placeholder above for the existing frozen comparisons; select these names
+# explicitly in new experiments. Availability checked against Google's model
+# cards; revisions and cluster serving remain unverified until download/testing.
+# The 32K window and sampling match the existing monitor pool, rather than
+# claiming each model's native context or developer-recommended sampling.
+
+[monitors.gemma4-e2b]
+model_id = "google/gemma-4-E2B-it"
+revision = "UNPINNED"
+family = "gemma4"
+size_b = 5.1
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+reasoning_parser = "gemma4"
+thinking = true
+verified = false
+notes = "Not downloaded or tested on the cluster. Google lists 5.1B parameters including embeddings and 2.3B effective; E2B is not a 2B total-parameter model. Pin the revision at download time. Source: https://huggingface.co/google/gemma-4-E2B-it"
+[monitors.gemma4-e2b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+
+[monitors.gemma4-e4b]
+model_id = "google/gemma-4-E4B-it"
+revision = "UNPINNED"
+family = "gemma4"
+size_b = 8.0
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+reasoning_parser = "gemma4"
+thinking = true
+verified = false
+notes = "Not downloaded or tested on the cluster. Google lists 8B parameters including embeddings and 4.5B effective; E4B is not a 4B total-parameter model. Pin the revision at download time. Source: https://huggingface.co/google/gemma-4-E4B-it"
+[monitors.gemma4-e4b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+
+[monitors.gemma4-12b]
+model_id = "google/gemma-4-12B-it"
+revision = "UNPINNED"
+family = "gemma4"
+size_b = 11.95
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+reasoning_parser = "gemma4"
+thinking = true
+verified = false
+notes = "Not downloaded or tested on the cluster. Google lists 11.95B total parameters for the unified 12B model. Pin the revision at download time. Source: https://huggingface.co/google/gemma-4-12B-it"
+[monitors.gemma4-12b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768
+
+[monitors.gemma4-31b]
+model_id = "google/gemma-4-31B-it"
+revision = "UNPINNED"
+family = "gemma4"
+size_b = 30.7
+architecture = "dense"
+provider = "cluster"
+open_weights = true
+base_url = "http://127.0.0.1:8000/v1"
+context_tokens = 32768
+output_reserve = 16768
+reasoning_parser = "gemma4"
+thinking = true
+verified = false
+notes = "Not downloaded or tested on the cluster. Google lists 30.7B total parameters for the dense 31B model. Pin the revision at download time. Source: https://huggingface.co/google/gemma-4-31B-it"
+[monitors.gemma4-31b.sampling]
+temperature = 0.6
+top_p = 0.9
+max_tokens = 16768

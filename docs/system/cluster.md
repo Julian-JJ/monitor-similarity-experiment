@@ -4,6 +4,11 @@ Scripts: `mihai/cluster/setup_cluster.sh`, `sync_to_cluster.sh`, `run_controls.s
 `scripts/serve_monitor.py`, `scripts/build_collection.py`, `scripts/download_monitor.py`. Code: `monitor_experiment/{control_setup,monitor_serving,monitor_download,collection_builder}.py`.
 Tests: `tests/test_control_setup.py`, `test_monitor_serving.py`, `test_monitor_download.py`, `test_collection_builder.py`, `test_cluster_scripts.py`.
 
+For the remaining Qwen/Gemma baselines, use
+[`submit_qwen_gemma_baselines.sh`](../../junlin/submit_qwen_gemma_baselines.sh).
+The [submission guide](qwen-gemma-jobs.md) covers model selection, CPU preparation,
+pinned job registries, sequential GPU jobs, resource overrides, and dry runs.
+
 **Status (2026-10-20, updated): B1 to B3 are done; the control rollouts exist (`main_only_v1`, 34 pairs); Qwen3-32B is downloaded; the baseline is done (`reports/baseline.md`).** Sections below mark what has been *verified by running it* and what has not.
 The SSH connection must be opened by you (passphrase and MFA) and expires; the assistant cannot supply those.
 
@@ -112,7 +117,7 @@ pre-registered rule allows wording changes only for format failures, and this is
 
 ## Not verified yet
 
-* The `--reasoning-parser` name for GPT-OSS and Gemma (left unset), and `--dtype auto` for them. * That the server accepts `reasoning_effort` for GPT-OSS. * Throughput for monitors larger than 32B.
+* Reasoning extraction and thinking for Gemma 4 (registered 2026-11-13 with the documented `--reasoning-parser gemma4`; not cluster-tested), the parser for GPT-OSS (left unset), and `--dtype auto` for these families. * That the server accepts `reasoning_effort` for GPT-OSS. * Throughput for monitors larger than 32B.
 
 ## Verified by the baseline (2026-10-20)
 

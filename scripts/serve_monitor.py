@@ -32,10 +32,11 @@ def main():
     parser.add_argument("--yarn-factor", type=float)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.9)
     parser.add_argument("--manifest", help="write what is being served (command, vLLM version, monitor identity) here")
+    parser.add_argument("--registry-dir", help="use a pinned job registry instead of configs/")
     parser.add_argument("--print-command", action="store_true")
     args = parser.parse_args()
     try:
-        monitor = Registry.load().monitor(args.monitor)
+        monitor = Registry.load(config_dir=args.registry_dir).monitor(args.monitor)
         model_dir = check_model_dir(args.model_dir)
         monitor_download.verify(model_dir, monitor)
         command = build_command(monitor, model_dir.resolve(), python=sys.executable, host=args.host, port=args.port,

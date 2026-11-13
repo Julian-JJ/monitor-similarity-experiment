@@ -6,9 +6,12 @@ the whole download, and ``download-manifest.json`` is written last, so a directo
 :func:`verify` is what the server launcher uses to refuse a directory that is not the registered model at the registered revision.
 """
 
+import json
+import re
+import tomllib
 from pathlib import Path
 
-from .artifacts import lock, read_json, write_json
+from .artifacts import digest, lock, read_json, write_json
 
 PATTERNS = ["*.json", "*.safetensors", "*.jinja", "*.txt", "*.model", "*.md", "LICENSE*"]
 UNPINNED = "UNPINNED"
@@ -74,3 +77,50 @@ def verify(model_dir, monitor):
         if not target.is_file() or target.stat().st_size != size:
             raise DownloadError(f"{target} is missing or its size differs from the manifest")
     return manifest
+
+
+def pin_registry(model_dir, name, destination, config_dir=None):
+    """Write a private, one-monitor registry pinned to a verified download.
+
+    Queued jobs use this snapshot instead of editing the shared source registry.
+    Rollout paths and the reference tokenizer still resolve against the checkout.
+    """
+    from .registry import ROOT, Registry
+    config_dir = Path(config_dir) if config_dir else ROOT / "configs"
+    destination = Path(destination)
+    if destination.resolve() == config_dir.resolve():
+        raise DownloadError("Choose a private registry directory, not the source configs directory")
+    monitor = Registry.load(config_dir=config_dir).monitor(name)
+    manifest = verify(model_dir, monitor)
+    if not re.fullmatch(r"[0-9a-f]{40}", manifest["revision"]):
+        raise DownloadError("A registry snapshot needs an immutable Hugging Face commit")
+    source = tomllib.loads((config_dir / "monitors.toml").read_text())
+    entry = {**source["monitors"][name], "revision": manifest["revision"]}
+    lines = [f'reference_tokenizer = {json.dumps(source["reference_tokenizer"])}', ""]
+
+    def table(values, keys):
+        lines.append("[" + ".".join(json.dumps(key) for key in keys) + "]")
+        for key, value in values.items():
+            if not isinstance(value, dict):
+                lines.append(f"{json.dumps(key)} = {json.dumps(value, allow_nan=False)}")
+        lines.append("")
+        for key, value in values.items():
+            if isinstance(value, dict):
+                table(value, [*keys, key])
+
+    table(entry, ["monitors", name])
+    payloads = {"monitors.toml": "\n".join(lines).encode("utf-8"),
+                "rollout_sets.toml": (config_dir / "rollout_sets.toml").read_bytes()}
+    for filename, content in payloads.items():
+        path = destination / filename
+        if path.exists() and path.read_bytes() != content:
+            raise DownloadError(f"Refusing to change an existing pinned registry: {path}")
+    destination.mkdir(parents=True, exist_ok=True)
+    for filename, content in payloads.items():
+        (destination / filename).write_bytes(content)
+    write_json(destination / "resolved-model.json", {
+        "monitor": name, "model_id": monitor.model_id, "revision": manifest["revision"],
+        "model_dir": str(Path(model_dir).resolve()), "download_manifest": manifest,
+        "registry_hash": digest({filename: (destination / filename).read_text()
+                                 for filename in ("monitors.toml", "rollout_sets.toml")})})
+    return destination

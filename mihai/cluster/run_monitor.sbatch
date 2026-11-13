@@ -19,7 +19,9 @@ SCORE="${SCORE:-1}"
 score_flag=()
 [[ "$SCORE" == 1 ]] && score_flag=(--score)
 SERVING_PY="${SERVING_PY:-/nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-vllm/bin/python}"
-ANALYSIS_PY="$ME/envs/monitor-analysis/bin/python"
+ANALYSIS_PY="${ANALYSIS_PY:-$ME/envs/monitor-analysis/bin/python}"
+registry_args=()
+[[ -n "${REGISTRY_DIR:-}" ]] && registry_args=(--registry-dir "$REGISTRY_DIR")
 JOB="${SLURM_JOB_ID:-local}"
 STATUS="$ME/logs/monitor-$MONITOR-$JOB.status"
 server_pid=
@@ -40,6 +42,13 @@ trap 'exit 143' TERM
 trap 'exit 130' INT
 
 cd "$FRAMEWORK"
+# A run directory has one manifest and JSONL streams. Separate processes must
+# not append to it simultaneously, even if another submitter bypassed the queue.
+run_name=$("$ANALYSIS_PY" -c 'import sys, tomllib; print(tomllib.load(open(sys.argv[1], "rb"))["name"])' "$EXPERIMENT")
+[[ "$run_name" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || { echo "Unsafe experiment name: $run_name" >&2; exit 1; }
+mkdir -p "$ME/runs/$run_name"
+exec 9> "$ME/runs/$run_name/.monitor-job.lock"
+flock -n 9 || { echo "Another job is writing run $run_name" >&2; exit 1; }
 printf 'job=%s monitor=%s experiment=%s node=%s started_at=%s\n' "$JOB" "$MONITOR" "$EXPERIMENT" "$(hostname)" "$(date -u +%FT%TZ)" | tee -a "$STATUS"
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv | tee -a "$STATUS"
 # A port is "taken" only if something is listening. Closed connections of a previous server linger in TIME_WAIT for a minute, so bind with SO_REUSEADDR as the server does.
@@ -47,7 +56,7 @@ nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv | tee -a "$
 
 server_log="$ME/logs/monitor-server-$MONITOR-$JOB.log"
 setsid "$SERVING_PY" scripts/serve_monitor.py --monitor "$MONITOR" --model-dir "$MODEL_DIR" --port "$PORT" \
-    --tensor-parallel-size "$TP" --manifest "$ME/logs/serving-$MONITOR-$JOB.json" > "$server_log" 2>&1 &
+    --tensor-parallel-size "$TP" --manifest "$ME/logs/serving-$MONITOR-$JOB.json" "${registry_args[@]}" > "$server_log" 2>&1 &
 server_pid=$!
 ready=0
 for ((attempt = 0; attempt < 720; attempt++)); do   # large models take a while to load: up to an hour
@@ -60,7 +69,6 @@ printf 'server_ready_at=%s\n' "$(date -u +%FT%TZ)" >> "$STATUS"
 
 # shellcheck disable=SC2086   # EXTRA_ARGS is deliberately word-split
 "$ANALYSIS_PY" scripts/run_experiment.py "$EXPERIMENT" --monitor "$MONITOR" --base-url "http://127.0.0.1:$PORT/v1" \
-    --out "$ME/runs" --gpu "$GPU_LABEL" --job-id "$JOB" "${score_flag[@]}" $EXTRA_ARGS 2>&1 | tee -a "$STATUS"
+    --out "$ME/runs" --gpu "$GPU_LABEL" --job-id "$JOB" "${registry_args[@]}" "${score_flag[@]}" $EXTRA_ARGS 2>&1 | tee -a "$STATUS"
 # Always write the label-free summary (validity, reply lengths, plan sizes, latency): it is what the pilot is judged on.
-run_name=$("$ANALYSIS_PY" -c 'import sys, tomllib; print(tomllib.load(open(sys.argv[1], "rb"))["name"])' "$EXPERIMENT")
 "$ANALYSIS_PY" scripts/pilot_summary.py "$ME/runs/$run_name" --monitor "$MONITOR" --json "$ME/runs/$run_name/pilot-summary-$MONITOR.json" 2>&1 | tee -a "$STATUS"
