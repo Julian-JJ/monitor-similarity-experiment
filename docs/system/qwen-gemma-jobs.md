@@ -74,6 +74,13 @@ actual GPU kernels and model inference are checked when a monitor job runs.
 Selected package versions, data hashes, and interpreter paths are saved in a
 timestamped `$ME/logs/cluster-env-*.json` report.
 
+Transformers configuration support is checked by constructing `gemma4` and
+`gemma4_unified` configurations through `AutoConfig.for_model`, with no model
+weights or network access. This works when newer Transformers versions import
+their registration tables from another module. If an earlier setup installed
+packages successfully but failed this check, pull the corrected helper and run
+`bash junlin/setup.sh` to verify and save settings without reinstalling packages.
+
 ### Manual configuration
 
 Sync this branch to the cluster before submitting. The analysis environment must

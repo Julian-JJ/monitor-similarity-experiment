@@ -189,8 +189,14 @@ if sys.argv[1] == 'gemma':
     assert {'Gemma4ForConditionalGeneration', 'Gemma4UnifiedForConditionalGeneration'} <= architectures, \
         'vLLM lacks Gemma 4 / unified 12B model registration; rerun --install'
     assert 'gemma4' in constants(base / 'reasoning/__init__.py'), 'vLLM lacks the gemma4 reasoning parser'
-    configs = constants(distribution('transformers').locate_file('transformers/models/auto/configuration_auto.py'))
-    assert {'gemma4', 'gemma4_unified'} <= configs, 'Transformers lacks Gemma 4 / unified 12B configuration support'
+    # Registration tables can live in a separate module. Ask the public API
+    # instead of inferring support from string literals in one source file.
+    from transformers import AutoConfig
+    for model_type in ('gemma4', 'gemma4_unified'):
+        try:
+            AutoConfig.for_model(model_type)
+        except (KeyError, ValueError) as error:
+            sys.exit(f'Transformers {version("transformers")} cannot construct {model_type} configuration: {error}')
 print(json.dumps({'python': sys.executable, 'version': sys.version,
     'packages': {p: version(p) for p in ('vllm', 'torch', 'transformers')}}))
 """

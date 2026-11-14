@@ -132,7 +132,7 @@ class SetupTests(unittest.TestCase):
                 self.assertEqual(setup.main(arguments), 1)
                 self.assertFalse((root / ".env.cluster").exists())
 
-    def test_static_serving_checks_reject_old_gemma_support_without_loading_torch(self):
+    def test_serving_checks_reject_old_gemma_and_accept_split_transformers_mapping(self):
         with TempDir() as directory:
             for package in ("vllm", "torch", "transformers"):
                 metadata = directory / f"{package}-0.0.0.dist-info"
@@ -145,7 +145,19 @@ class SetupTests(unittest.TestCase):
                 path.parent.mkdir(parents=True, exist_ok=True)
             model.write_text("registry = {'Gemma3ForConditionalGeneration': None}")
             reasoning.write_text("parsers = {'gemma4': None}")
-            config.write_text("configs = {'gemma4': None, 'gemma4_unified': None}")
+            # Transformers 5.16+ imports its mappings from another file. Looking
+            # only for string constants in configuration_auto.py rejects it.
+            mapping = config.with_name("auto_mappings.py")
+            mapping.write_text("CONFIG_MAPPING_NAMES = {'gemma4': 'Gemma4Config', 'gemma4_unified': 'Gemma4UnifiedConfig'}")
+            config.write_text('''from .auto_mappings import CONFIG_MAPPING_NAMES
+class AutoConfig:
+    @classmethod
+    def for_model(cls, model_type):
+        if model_type not in CONFIG_MAPPING_NAMES:
+            raise ValueError('Unknown model type: ' + model_type)
+        return type('Config', (), {'model_type': model_type})()
+''')
+            (directory / "transformers/__init__.py").write_text("from .models.auto.configuration_auto import AutoConfig\n")
             command = [sys.executable, "-S", "-c", setup.SERVING_CHECK, "gemma"]
             result = subprocess.run(command, env={**os.environ, "PYTHONPATH": str(directory)}, text=True, capture_output=True)
             self.assertNotEqual(result.returncode, 0)
@@ -154,6 +166,10 @@ class SetupTests(unittest.TestCase):
             result = subprocess.run(command, env={**os.environ, "PYTHONPATH": str(directory)}, text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(json.loads(result.stdout)["packages"]["vllm"], "0.0.0")
+            mapping.write_text("CONFIG_MAPPING_NAMES = {'gemma4': 'Gemma4Config'}")
+            result = subprocess.run(command, env={**os.environ, "PYTHONPATH": str(directory)}, text=True, capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Transformers 0.0.0 cannot construct gemma4_unified", result.stderr)
 
     def test_successful_setup_saves_environment_and_verification_report(self):
         with TempDir() as directory:
