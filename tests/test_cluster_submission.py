@@ -43,6 +43,13 @@ fields = ('MONITOR', 'FRAMEWORK', 'OUT', 'MODEL_DIR', 'PIN_REGISTRY_DIR', 'REGIS
 record = {'args': sys.argv[1:], 'env': {k: os.environ.get(k) for k in fields}}
 with path.open('a') as stream:
     stream.write(json.dumps(record) + '\\n')
+gpu_arg = next((a for a in sys.argv[1:] if a.startswith('--gpus=')), None)
+if gpu_arg:
+    gpu_count = int(gpu_arg.rsplit(':', 1)[1])
+    cpu_count = int(next(a.split('=', 1)[1] for a in sys.argv[1:] if a.startswith('--cpus-per-task=')))
+    if cpu_count > 6 * gpu_count:
+        print('At most 6 CPUs per GPU are allowed', file=sys.stderr)
+        sys.exit(1)
 if os.environ.get('FAIL_GPU_SUBMIT') and any(a.startswith('--gpus=') for a in sys.argv):
     sys.exit(1)
 print(str(1000 + len(rows)) + ';test-cluster')
@@ -86,7 +93,9 @@ print(str(1000 + len(rows)) + ';test-cluster')
             self.assertIn("--kill-on-invalid-dep=yes", gpu2["args"])
             for cpu, gpu in ((cpu1, gpu1), (cpu2, gpu2)):
                 self.assertIn("--partition=day", cpu["args"])
+                self.assertIn("--cpus-per-task=4", cpu["args"])
                 self.assertIn("--gpus=h200:1", gpu["args"])
+                self.assertIn("--cpus-per-task=6", gpu["args"])
                 self.assertIn("--time=08:00:00", gpu["args"])
                 self.assertEqual(cpu["env"]["PIN_REGISTRY_DIR"], gpu["env"]["REGISTRY_DIR"])
                 self.assertEqual(cpu["env"]["OUT"], gpu["env"]["MODEL_DIR"])
@@ -99,6 +108,18 @@ print(str(1000 + len(rows)) + ';test-cluster')
                 rows = list(csv.DictReader(stream, delimiter="\t"))
             self.assertEqual([r["stage"] for r in rows], ["prepare", "monitor", "prepare", "monitor"])
             self.assertEqual([r["job_id"] for r in rows], ["1000", "1001", "1002", "1003"])
+
+    def test_gpu_count_scales_the_allocation_and_tensor_parallelism(self):
+        with TempDir() as temporary:
+            env = {**self.environment(temporary), "GPU_COUNT": "2"}
+            result = self.run_script(env, "gemma4-e2b")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            cpu, gpu = [json.loads(line) for line in Path(env["CAPTURE"]).read_text().splitlines()]
+            self.assertIn("--cpus-per-task=4", cpu["args"])
+            self.assertIn("--gpus=h200:2", gpu["args"])
+            self.assertIn("--cpus-per-task=12", gpu["args"])
+            self.assertEqual(gpu["env"]["TP"], "2")
+            self.assertEqual(gpu["env"]["GPU_LABEL"], "H200:2")
 
     def test_invalid_or_duplicate_selections_submit_nothing(self):
         with TempDir() as temporary:

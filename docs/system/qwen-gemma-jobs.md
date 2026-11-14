@@ -58,10 +58,11 @@ bash "$FRAMEWORK/junlin/submit_qwen_gemma_baselines.sh" qwen3-30b-a3b
 `ME`, `FRAMEWORK`, `MODELS_DIR`, `ANALYSIS_PY`, `SERVING_PY`, and
 `GEMMA_SERVING_PY` can be overridden. `FRAMEWORK` defaults to the checkout
 containing the script. CPU preparation defaults to partition `day`, 4 CPUs,
-16 GB RAM and four hours. GPU jobs default to `gpu_h200`, one H200, 8 CPUs,
+16 GB RAM and four hours. GPU jobs default to `gpu_h200`, one H200, 6 CPUs,
 96 GB RAM and eight hours. `ACCOUNT`, `CPU_PARTITION`, `GPU_PARTITION`,
 `CPU_TIME`, `GPU_TIME`, `GPU_COUNT` and `GPU_MEM` override resources; the GPU
 type stays H200. `GPU_COUNT` also sets tensor parallelism and GPU-hour accounting.
+GPU jobs request six CPUs per GPU, matching the cluster allocation limit.
 
 ## Preparation, dependencies, and provenance
 

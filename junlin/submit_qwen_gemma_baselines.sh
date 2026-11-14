@@ -12,6 +12,7 @@ Optional model: qwen3-30b-a3b
 Each model gets a CPU preparation job (download/reuse weights, pin a private registry)
 and an H200 monitor job dependent on successful preparation. GPU jobs run sequentially
 and append to runs/baseline, retaining completed work. --dry-run prints commands only.
+GPU jobs request 6 CPUs per GPU to match the cluster allocation limit.
 
 Environment overrides:
   ME, FRAMEWORK, MODELS_DIR, ANALYSIS_PY, SERVING_PY, GEMMA_SERVING_PY, SUBMIT_PY
@@ -146,7 +147,7 @@ for monitor in "${monitors[@]}"; do
         EXPERIMENT="$EXPERIMENT" MODEL_DIR="$model_dir" REGISTRY_DIR="$registry_dir" \
         TP="$GPU_COUNT" GPU_LABEL="H200:$GPU_COUNT" SCORE=1 EXTRA_ARGS="" \
         sbatch --parsable --account="$ACCOUNT" --partition="$GPU_PARTITION" --nodes=1 --ntasks=1 \
-        --gpus="h200:$GPU_COUNT" --cpus-per-task=8 --mem="$GPU_MEM" --time="$GPU_TIME" \
+        --gpus="h200:$GPU_COUNT" --cpus-per-task="$((6 * GPU_COUNT))" --mem="$GPU_MEM" --time="$GPU_TIME" \
         --job-name="baseline-$monitor" --dependency="$dependency" --kill-on-invalid-dep=yes \
         --output="$batch_dir/baseline-$monitor-%j.out" --export=ALL \
         "$FRAMEWORK/mihai/cluster/run_monitor.sbatch")

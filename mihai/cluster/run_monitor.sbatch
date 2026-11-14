@@ -2,7 +2,7 @@
 # Serve ONE registered monitor on this job's GPU(s) and run an experiment file against it. One model per server, so one monitor per job.
 # See docs/system/cluster.md. Submit, for example:
 #   MONITOR=qwen3-32b EXPERIMENT=configs/experiments/baseline.toml MODEL_DIR=$ME/models/qwen3-32b \
-#   sbatch --gres=gpu:h200:1 --cpus-per-task=8 --mem=96G --time=06:00:00 mihai/cluster/run_monitor.sbatch
+#   sbatch --gres=gpu:h200:1 --cpus-per-task=6 --mem=96G --time=06:00:00 mihai/cluster/run_monitor.sbatch
 # Environment: MONITOR, EXPERIMENT, MODEL_DIR (required); TP (tensor parallel, 1); GPU_LABEL (for GPU-hour accounting, "H200:1");
 #              EXTRA_ARGS (more run_experiment.py arguments, e.g. "--set options.samples=2"); PORT;
 #              SCORE (1 = compute metrics after the run, the default; use SCORE=0 for the format-only pilot, which must not read labels).

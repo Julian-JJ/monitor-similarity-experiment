@@ -28,8 +28,8 @@ Verified by reading the existing scripts or by earlier commands in this project:
 * The shared Python environments (`$SHARED/envs/monitor-research`, `monitor-vllm`) and the shared weights were readable and executable by your account in earlier commands.
 * The project filesystem is slow (copying 8 MB took about 15 minutes); the scheduler limit noted in the repository is six hours.
 
-**Slurm settings (learned on 2026-10-19):** account `cpsc4880`, QOS `normal`; partition `gpu_h200` accepts all accounts and has no maximum time; the flags that work (from the teammate's readable submission
-records and confirmed by jobs 30068171 and 30068179) are `--account=cpsc4880 --partition=gpu_h200 --nodes=1 --ntasks=1 --gpus=h200:1 --cpus-per-task=8 --mem=96G --no-requeue`, with a time limit chosen per job.
+**Slurm settings:** account `cpsc4880`, QOS `normal`. Earlier records (2026-10-19, jobs 30068171 and 30068179) used eight CPUs per GPU; the current submission limit reported on 2026-11-13 is **six CPUs per GPU**.
+For current jobs use `--account=cpsc4880 --partition=gpu_h200 --nodes=1 --ntasks=1 --gpus=h200:1 --cpus-per-task=6 --mem=96G --no-requeue`, with a time limit chosen per job. The Qwen/Gemma wrapper scales CPUs at six per GPU.
 The earlier H200 job needed about 2¼ hours for 30 pairs; the A40 pair (`gpu_devel`, 2×a40) hit its 6-hour limit. Other GPU partitions exist (`gpu_h100`, `gpu_b200`, `gpu_rtx6000`, `gpu`); they have not been used.
 `sbatch --test-only` reports a start time exactly one year ahead for every GPU partition: that is the end of a 365-day `EmergencyMaintenance` reservation on other nodes, not a real wait. The queues are long
 (hundreds pending per partition) but jobs submitted to `gpu_h200` started within seconds because GPUs were free. Check `sinfo`/`scontrol show node` for free GPUs, and read `squeue --me` after submitting.

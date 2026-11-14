@@ -4,7 +4,7 @@
 # the variant is main_only; each (task, sample) runs in its own process (scripts/run_pairs.py). See docs/system/cluster.md.
 #
 # Submit (partition/account/time are cluster specifics, not set here):
-#   sbatch --gres=gpu:h200:1 --cpus-per-task=8 --mem=96G --time=06:00:00 [--partition=... --account=...] \
+#   sbatch --gres=gpu:h200:1 --cpus-per-task=6 --mem=96G --time=06:00:00 [--partition=... --account=...] \
 #          mihai/cluster/run_controls.sbatch
 # Environment (all optional): FIRST_SAMPLE (default 0), SAMPLES_PER_TASK (12), PARALLEL (8), PORT (28473).
 set -euo pipefail
