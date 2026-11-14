@@ -3,6 +3,7 @@
 import csv
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -57,7 +58,12 @@ print(str(1000 + len(rows)) + ';test-cluster')
         fake.chmod(0o755)
         gemma_python = binaries / "gemma python"
         gemma_python.symlink_to(sys.executable)
+        packages = temporary / "serving packages"
+        metadata = packages / "vllm-0.0.0.dist-info"
+        metadata.mkdir(parents=True)
+        (metadata / "METADATA").write_text("Metadata-Version: 2.1\nName: vllm\nVersion: 0.0.0\n")
         return {**os.environ, "PATH": str(binaries) + os.pathsep + os.environ["PATH"],
+                "PYTHONPATH": str(packages) + os.pathsep + os.environ.get("PYTHONPATH", ""),
                 "ME": str(temporary / "my project"), "FRAMEWORK": str(root),
                 "SUBMIT_PY": sys.executable, "ANALYSIS_PY": sys.executable,
                 "SERVING_PY": sys.executable, "GEMMA_SERVING_PY": str(gemma_python),
@@ -69,6 +75,8 @@ print(str(1000 + len(rows)) + ';test-cluster')
     def test_default_dry_run_submits_nothing_and_excludes_the_completed_monitors(self):
         with TempDir() as temporary:
             env = self.environment(temporary)
+            env["SERVING_PY"] = str(temporary / "missing qwen environment/bin/python")
+            env["GEMMA_SERVING_PY"] = str(temporary / "missing gemma environment/bin/python")
             result = self.run_script(env, "--dry-run")
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(result.stderr.count("DRY-RUN"), 12)
@@ -78,6 +86,52 @@ print(str(1000 + len(rows)) + ';test-cluster')
                 self.assertNotIn("MONITOR=" + name + " ", result.stderr)
             self.assertFalse(Path(env["CAPTURE"]).exists())
             self.assertFalse(Path(env["ME"]).exists())
+
+    def test_a_serving_python_without_vllm_prevents_all_submissions(self):
+        with TempDir() as temporary:
+            env = self.environment(temporary)
+            isolated = temporary / "python without vllm"
+            isolated.write_text("#!/bin/sh\nexec " + shlex.quote(sys.executable) + ' -I -S "$@"\n')
+            isolated.chmod(0o755)
+            for setting, name in (("SERVING_PY", "qwen3-4b"), ("GEMMA_SERVING_PY", "gemma4-e2b")):
+                with self.subTest(setting=setting):
+                    selected = {**env, setting: str(isolated)}
+                    result = self.run_script(selected, "qwen3-4b", "gemma4-e2b")
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn(name, result.stderr)
+                    self.assertIn(setting, result.stderr)
+                    self.assertIn(str(isolated), result.stderr)
+                    self.assertIn("vLLM is not installed", result.stderr)
+                    self.assertFalse(Path(env["CAPTURE"]).exists())
+                    self.assertFalse(Path(env["ME"]).exists())
+
+    def test_saved_configuration_restores_defaults_after_a_fresh_login(self):
+        from junlin.setup_cluster_env import save_settings
+        with TempDir() as temporary:
+            env = self.environment(temporary)
+            root = Path(env["FRAMEWORK"])
+            (root / "junlin").mkdir()
+            script = root / "junlin" / SCRIPT.name
+            shutil.copy(SCRIPT, script)
+            save_settings(root / ".env.cluster", {key: env[key] for key in (
+                "ME", "FRAMEWORK", "SUBMIT_PY", "ANALYSIS_PY", "SERVING_PY", "GEMMA_SERVING_PY")})
+            clean = {key: value for key, value in env.items() if key not in (
+                "ME", "FRAMEWORK", "SUBMIT_PY", "ANALYSIS_PY", "SERVING_PY", "GEMMA_SERVING_PY")}
+            result = subprocess.run(["bash", str(script), "gemma4-e2b"], env=clean, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            records = [json.loads(line) for line in Path(env["CAPTURE"]).read_text().splitlines()]
+            self.assertEqual(records[1]["env"]["SERVING_PY"], env["GEMMA_SERVING_PY"])
+            self.assertEqual(records[1]["env"]["FRAMEWORK"], str(root))
+
+    def test_short_gemma_and_qwen_commands_select_only_the_requested_family(self):
+        for family, names in (("gemma", MODELS[2:]), ("qwen", MODELS[:2])):
+            with self.subTest(family=family), TempDir() as temporary:
+                env = self.environment(temporary)
+                result = subprocess.run(["bash", str(ROOT / "junlin/run.sh"), family, "--dry-run"],
+                                        env=env, text=True, capture_output=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stderr.count("DRY-RUN"), 2 * len(names))
+                self.assertEqual([line.split(":")[0] for line in result.stdout.splitlines()], list(names))
 
     def test_preparations_gate_each_gpu_and_gpu_jobs_are_serialized(self):
         with TempDir() as temporary:

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Submit the remaining size/family baselines on Bouchet; never runs inference on the login node.
 set -euo pipefail
+submission_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+# Restore verified cluster defaults after a new login; explicit environment overrides win.
+if [[ -f "$submission_root/.env.cluster" ]]; then
+    source "$submission_root/.env.cluster"
+fi
 
 usage() {
     cat <<'HELP'
@@ -25,6 +30,10 @@ environment supporting Gemma 4 and the gemma4 reasoning parser. Setting it does
 not create/install an environment. It defaults to SERVING_PY if unset; use one
 environment for both families if that environment supports both.
 Sync this branch and prepare the two rollout collections and reference tokenizer first.
+Real submissions check that vLLM is installed in every selected serving Python
+before queuing any jobs. --dry-run does not require serving environments.
+Run bash junlin/setup.sh --install once to prepare and save defaults.
+The submitter automatically restores .env.cluster after a new login.
 HELP
 }
 
@@ -103,6 +112,20 @@ if [[ "$dry_run" == 0 ]]; then
         serving="$SERVING_PY"
         [[ "$monitor" == gemma4-* ]] && serving="$GEMMA_SERVING_PY"
         [[ -x "$serving" ]] || { echo "Missing serving Python for $monitor: $serving" >&2; exit 1; }
+        "$serving" - "$monitor" "$serving" <<'PY'
+import sys
+from importlib.metadata import PackageNotFoundError, version
+
+name, executable = sys.argv[1:]
+setting = "GEMMA_SERVING_PY" if name.startswith("gemma4-") else "SERVING_PY"
+try:
+    vllm_version = version("vllm")
+except PackageNotFoundError:
+    sys.exit(f"ERROR: {name}: vLLM is not installed in {executable} "
+             f"(sys.executable={sys.executable}). Set {setting} to the Python "
+             "executable where vLLM was installed.")
+print(f"Preflight {name}: serving_python={executable} vllm={vllm_version}", flush=True)
+PY
     done
     mkdir -p "$batch_dir"
     printf 'stage\tmonitor\tjob_id\tdependency\tregistry_dir\n' > "$receipt"

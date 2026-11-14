@@ -21,6 +21,61 @@ manifest; completed units are reused. No actor trajectories are generated here.
 
 ## Run on the cluster
 
+### Automatic setup and commands after a new login
+
+From the repository root, submit the CPU setup job:
+
+```bash
+sbatch junlin/setup.sbatch
+```
+
+Setup uses your account's project directory (for Junlin, `cpsc4880_jjj49`) and
+the shared data under `cpsc4880_mae73`. It creates/repairs a private analysis
+environment and a separate Gemma serving environment, reuses the shared Qwen
+serving environment when available, links the existing collections, and restores
+the pinned reference tokenizer. **No model weights are downloaded.** The Gemma
+installation uses the [official vLLM CUDA 12.9 nightly recipe](https://docs.vllm.ai/projects/recipes/en/stable/Google/Gemma4.html#installing-vllm)
+with PyPI explicitly enabled. Re-running `--install` can update serving packages;
+use `--check` for verification without installation or writes.
+
+The setup job's output is `slurm-<jobid>.out` in the submission directory. It
+must finish successfully. Settings are then saved in the Git-ignored
+`.env.cluster`, which the submitter loads automatically after subsequent logins.
+Existing explicitly set environment variables override the saved defaults.
+There is no need to activate a virtual environment or retype exports.
+
+The short commands are:
+
+```bash
+bash junlin/setup.sh --check    # verify environments, frozen inputs and data checksums
+bash junlin/setup.sh --status   # check old/new model jobs and available monitoring results
+bash junlin/run.sh gemma        # restart only the four Gemma baselines
+bash junlin/run.sh qwen         # restart only the two Qwen baselines, if needed
+bash junlin/run.sh              # submit all six
+```
+
+`--status` requires no GPU or working serving environment. It reports both Qwen
+jobs as **HEALTHY** only when each has a recorded job exit of zero, 1,800 distinct
+valid monitoring units, and complete scored results for all three scopes. A log
+file or a zero exit code alone does not qualify. `DONE_INVALID` means the job
+finished and scored, but some verdicts were invalid; resubmission retains those
+cached units. Pending/interrupted jobs, missing job status logs, and absent
+scoring are reported as unconfirmed; use `squeue --me` for live queue state.
+Completed monitoring units are reused when resubmitted. This does not resume
+actor rollout generation.
+
+Custom locations can be supplied to `setup.sh` (or after the filename in the
+`sbatch` command): `--project-dir DIR`, `--shared-dir DIR`,
+`--original-rollouts DIR`, and `--control-rollouts DIR`. Collection directories
+must contain their existing `manifest.json`. The helper refuses to replace
+existing data directories or install into shared storage. Its CPU checks inspect
+the installed Gemma 4/unified 12B architecture and reasoning-parser registrations;
+actual GPU kernels and model inference are checked when a monitor job runs.
+Selected package versions, data hashes, and interpreter paths are saved in a
+timestamped `$ME/logs/cluster-env-*.json` report.
+
+### Manual configuration
+
 Sync this branch to the cluster before submitting. The analysis environment must
 have the normal project dependencies, `tokenizers`, and `huggingface_hub` (see
 `requirements.txt`, `requirements-analysis.txt`, and `requirements-download.txt`).
@@ -39,9 +94,15 @@ an environment or install packages. The path below is an example, not an
 environment created or verified by this project. This workflow has been tested
 offline, not on Slurm or with Gemma inference.
 
+Before queuing any jobs, real submissions check the installed vLLM version in
+each selected serving interpreter using package metadata. A missing installation
+fails with the model name, Python path, and setting to correct. This check needs
+no GPU and does not load model weights or establish model/kernel compatibility.
+`--dry-run` skips serving-environment checks.
+
 ```bash
-export ME=/nfs/roberts/project/cpsc4880/cpsc4880_as4833
-export FRAMEWORK="$ME/monitor-framework"
+export ME=/nfs/roberts/project/cpsc4880/cpsc4880_jjj49
+export FRAMEWORK="$PWD"  # run from the repository root
 export GEMMA_SERVING_PY="$ME/envs/monitor-vllm-gemma4/bin/python"  # an existing, compatible environment
 
 # Print all job commands without Slurm, downloads, or writes:
@@ -93,3 +154,9 @@ GPU jobs write serving manifests, status/server logs, metrics, and per-monitor
 label-free summaries using the existing job script. Re-running the submitter
 reuses complete downloads and completed monitor units. Keep the shared checkout
 and frozen experiment inputs stable while these jobs are queued or running.
+
+The `qwen-gemma-*` directories contain submission receipts and Slurm logs, not
+monitoring results. Results go under `$ME/runs/baseline/`, outside the checkout
+unless it is itself `$ME`. Each `monitor-<model>-<job>.status` log records the
+results directory and the actual selected analysis/serving Python paths. Server
+startup failures produce logs but no monitor verdicts or metrics.
