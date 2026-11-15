@@ -188,6 +188,26 @@ from `.env.cluster` when saved with `bash junlin/setup.sh`. Matching toolkits in
 custom locations can instead be supplied through `CUDA_HOME`. This addresses
 the missing compiler error; GPU inference still needs to succeed on the cluster.
 
+If the original `/usr/local/cuda` traceback recurs and the job has no
+`torch_cuda=` line, inspect the newest submission with:
+
+```bash
+bash junlin/setup.sh --diagnose-gemma
+```
+
+This reads the current and configured submission checkout paths/revisions, the
+newest Gemma job's status and first CUDA error. Where Slurm still retains the
+job, it inspects the submitted batch script using
+[`scontrol write batch_script JOB -`](https://slurm.schedmd.com/scontrol.html)
+(stdout only). An `ABSENT` submitted-script check proves that job used a launcher
+without the CUDA setup. A missing status line alone does not establish why the
+setup did not complete. Slurm transfers the batch script at submission time;
+pulling a change after submission does not update that saved script. Submit a
+fresh job after updating the correct checkout. The diagnostic requires no GPU,
+working serving environment, package installation or new submission.
+New submissions also reject a configured checkout that lacks the CUDA helper
+or its call in the GPU launcher, before queuing any preparation or GPU jobs.
+
 Transformers configuration support is checked by constructing `gemma4` and
 `gemma4_unified` configurations through `AutoConfig.for_model`, with no model
 weights or network access. This works when newer Transformers versions import

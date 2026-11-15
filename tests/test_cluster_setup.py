@@ -54,6 +54,78 @@ class SetupTests(unittest.TestCase):
             self.assertEqual(result.stdout.splitlines()[0], "override")
             self.assertFalse((directory / "SHOULD_NOT_EXIST").exists())
 
+    def test_gemma_diagnostic_identifies_old_submitted_script_and_checkout_mismatch(self):
+        with TempDir() as directory:
+            root, _, values = self.fixture(directory)
+            launcher = root / "mihai/cluster/run_monitor.sbatch"
+            launcher.parent.mkdir(parents=True)
+            launcher.write_text("configure_monitor_cuda\n")
+            other = directory / "other checkout"
+            other.mkdir()
+            logs = Path(values["ME"]) / "logs"
+            old, latest = logs / "qwen-gemma-z-old", logs / "qwen-gemma-parallel-a-new"
+            for batch, job in ((old, "10"), (latest, "20")):
+                batch.mkdir(parents=True)
+                receipt = batch / "submissions.tsv"
+                receipt.write_text(f"stage\tmonitor\tjob_id\nmonitor\tgemma4-e2b\t{job}\n")
+                os.utime(receipt, (int(job), int(job)))
+            (logs / "monitor-gemma4-e2b-20.status").write_text("framework=/old results=/results\nexit_code=1\n")
+            (logs / "monitor-server-gemma4-e2b-20.log").write_text(
+                "RuntimeError: Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist\n")
+            before = {p: p.read_bytes() for p in directory.rglob("*") if p.is_file()}
+            commands, output = [], io.StringIO()
+
+            def probe(command, **kwargs):
+                commands.append(command)
+                return subprocess.CompletedProcess(command, 0, "old script without preflight\n" if command[0] == "scontrol" else "abcdef\n", "")
+
+            with patch.object(setup, "ROOT", root), patch.object(setup.subprocess, "run", side_effect=probe), redirect_stdout(output):
+                setup.diagnose_gemma(values, {"FRAMEWORK": str(other)})
+            text = output.getvalue()
+            self.assertIn("CHECKOUT MISMATCH", text)
+            self.assertIn("job=20", text)
+            self.assertIn("Job CUDA setup: NOT RECORDED", text)
+            self.assertIn("Submitted script CUDA check: ABSENT", text)
+            self.assertIn("Could not find nvcc", text)
+            self.assertIn(["scontrol", "write", "batch_script", "20", "-"], commands)
+            self.assertEqual(before, {p: p.read_bytes() for p in directory.rglob("*") if p.is_file()})
+
+    def test_gemma_diagnostic_distinguishes_completed_cuda_setup_from_missing_slurm_history(self):
+        for available in (True, False):
+            with self.subTest(available=available), TempDir() as directory:
+                root, _, values = self.fixture(directory)
+                logs = Path(values["ME"]) / "logs"
+                batch = logs / "qwen-gemma-new"
+                batch.mkdir(parents=True)
+                (batch / "submissions.tsv").write_text("stage\tmonitor\tjob_id\nmonitor\tgemma4-31b\t30\n")
+                (logs / "monitor-gemma4-31b-30.status").write_text("torch_cuda=12.9 nvcc_version=12.9 cuda_home=/cuda\n")
+                output = io.StringIO()
+
+                def probe(command, **kwargs):
+                    if command[0] == "scontrol" and not available:
+                        raise FileNotFoundError("scontrol is unavailable")
+                    return subprocess.CompletedProcess(command, 0, "configure_monitor_cuda\n", "")
+
+                with patch.object(setup, "ROOT", root), patch.object(setup.subprocess, "run", side_effect=probe), redirect_stdout(output):
+                    setup.diagnose_gemma(values, {})
+                text = output.getvalue()
+                self.assertIn("Job CUDA setup: torch_cuda=12.9", text)
+                self.assertIn("Submitted script CUDA check: " + ("present" if available else "unavailable"), text)
+                self.assertNotIn("this job used the older launcher", text)
+
+    def test_gemma_diagnostic_mode_bypasses_environment_installation_and_data_validation(self):
+        with TempDir() as directory:
+            root, _, values = self.fixture(directory)
+            output = io.StringIO()
+            with patch.object(setup, "ROOT", root), patch.object(setup, "diagnose_gemma") as diagnose, \
+                 patch.object(setup, "verify") as verify, patch.object(setup, "install") as install, redirect_stdout(output):
+                self.assertEqual(setup.main(["--diagnose-gemma", "--project-dir", values["ME"], "--shared-dir", values["SHARED"]]), 0)
+                diagnose.assert_called_once()
+                verify.assert_not_called()
+                install.assert_not_called()
+            self.assertFalse((root / ".env.cluster").exists())
+            self.assertFalse(Path(values["ME"]).exists())
+
     def test_shared_environments_are_never_installed_into(self):
         with TempDir() as directory:
             _, _, values = self.fixture(directory)

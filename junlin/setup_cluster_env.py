@@ -296,6 +296,70 @@ def read_run(run_dir):
     return cells, records, metrics, malformed
 
 
+def diagnose_gemma(values, environ=None):
+    """Inspect the newest Gemma submission without installations or GPU jobs."""
+    environ = os.environ if environ is None else environ
+
+    def probe(command):
+        try:
+            result = subprocess.run(command, text=True, capture_output=True, timeout=10)
+            return result.stdout.strip() if result.returncode == 0 else None
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+
+    checkout = ROOT.resolve()
+    submission_checkout = Path(environ.get("FRAMEWORK") or values["FRAMEWORK"]).resolve()
+    for label, path in (("Current checkout", checkout), ("Submission checkout", submission_checkout)):
+        commit = probe(["git", "-C", str(path), "rev-parse", "--short", "HEAD"])
+        launcher = path / "mihai/cluster/run_monitor.sbatch"
+        aware = launcher.is_file() and "configure_monitor_cuda" in launcher.read_text()
+        print(f"{label}: {path} commit={commit or 'unknown'} CUDA_check={'present' if aware else 'ABSENT'}")
+    if checkout != submission_checkout:
+        print("CHECKOUT MISMATCH: the submitter is configured to use a different checkout.")
+
+    latest = None
+    logs = Path(values["ME"]) / "logs"
+    for receipt in sorted(logs.glob("qwen-gemma-*/submissions.tsv"), key=lambda p: p.stat().st_mtime_ns):
+        with receipt.open() as stream:
+            for row in csv.DictReader(stream, delimiter="\t"):
+                if row["stage"] == "monitor" and row["monitor"].startswith("gemma4-"):
+                    latest = row, receipt.parent
+    if latest is None:
+        print("No Gemma submission receipt found in your project logs.")
+        return
+    row, batch_dir = latest
+    model, job = row["monitor"], row["job_id"]
+    if model not in MODELS or not re.fullmatch(r"[0-9]+", job):
+        raise SetupError("Invalid Gemma model/job ID in the submission receipt.")
+    status_path = logs / f"monitor-{model}-{job}.status"
+    status = status_path.read_text() if status_path.is_file() else ""
+    cuda_line = next((line for line in status.splitlines() if line.startswith("torch_cuda=")), None)
+    print(f"Newest Gemma job: {model} job={job}")
+    print(f"Job CUDA setup: {cuda_line or 'NOT RECORDED'}")
+    framework_line = next((line for line in status.splitlines() if line.startswith("framework=")), None)
+    if framework_line:
+        print(f"Job paths: {framework_line}")
+    batch_script = probe(["scontrol", "write", "batch_script", job, "-"])
+    if batch_script is None:
+        print("Submitted script CUDA check: unavailable (job may have left Slurm's active records)")
+    elif "configure_monitor_cuda" not in batch_script:
+        print("Submitted script CUDA check: ABSENT; this job used the older launcher.")
+        print("Submit fresh Gemma jobs after updating the submission checkout.")
+    else:
+        print("Submitted script CUDA check: present")
+    server_log = logs / f"monitor-server-{model}-{job}.log"
+    for path in (server_log, *sorted(batch_dir.glob(f"*-{job}.out"))):
+        if path.is_file():
+            with path.open(errors="replace") as stream:
+                error = next((line.strip() for line in stream if any(text in line for text in
+                             ("Could not find nvcc", "Cannot load CUDA/", "Need nvcc "))), None)
+            if error:
+                print(f"CUDA error: {error}")
+                print(f"Error log: {path}")
+                break
+    print(f"Job status file: {status_path}")
+
+
 def batch_status(project):
     """Read legacy/shared and parallel per-model results, using submission receipts."""
     project = Path(project)
@@ -356,11 +420,15 @@ def main(argv=None):
     mode.add_argument("--check", action="store_true")
     mode.add_argument("--status", action="store_true")
     mode.add_argument("--repair-gemma", action="store_true")
+    mode.add_argument("--diagnose-gemma", action="store_true")
     for name in ("project-dir", "shared-dir", "original-rollouts", "control-rollouts"):
         parser.add_argument("--" + name, type=Path)
     args = parser.parse_args(argv)
     try:
         values = settings(ROOT, args, os.environ)
+        if args.diagnose_gemma:
+            diagnose_gemma(values)
+            return 0
         if args.status:
             batch_status(values["ME"])
             return 0

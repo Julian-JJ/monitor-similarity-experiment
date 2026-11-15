@@ -28,6 +28,9 @@ class SubmissionTests(unittest.TestCase):
         (root / "configs/experiments").mkdir()
         for filename in ("qwen-gemma-baseline.toml", "cuda-debug-qwen3-1.7b.toml"):
             shutil.copy(ROOT / "configs/experiments" / filename, root / "configs/experiments")
+        (root / "mihai/cluster").mkdir(parents=True)
+        for filename in ("run_monitor.sbatch", "cuda_toolkit.sh"):
+            shutil.copy(ROOT / "mihai/cluster" / filename, root / "mihai/cluster")
         tokenizer = root / "cache/tokenizer/tokenizer.json"
         tokenizer.parent.mkdir(parents=True)
         tokenizer.write_text("{}")
@@ -126,6 +129,20 @@ print(str(1000 + len(rows)) + ';test-cluster')
             self.assertEqual(records[1]["env"]["SERVING_PY"], env["GEMMA_SERVING_PY"])
             self.assertEqual(records[1]["env"]["FRAMEWORK"], str(root))
             self.assertEqual(records[1]["env"]["CUDA_MODULE"], "CUDA/12.9.1")
+
+    def test_gemma_selection_rejects_checkout_without_cuda_setup_before_queuing_jobs(self):
+        for filename in ("cuda_toolkit.sh", "run_monitor.sbatch"):
+            with self.subTest(filename=filename), TempDir() as temporary:
+                env = self.environment(temporary)
+                path = Path(env["FRAMEWORK"]) / "mihai/cluster" / filename
+                if filename == "cuda_toolkit.sh":
+                    path.unlink()
+                else:
+                    path.write_text("#!/bin/bash\n# Older monitor launcher\n")
+                result = self.run_script(env, "qwen3-1.7b", "gemma4-e2b")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("Gemma CUDA setup is missing from FRAMEWORK=", result.stderr)
+                self.assertFalse(Path(env["CAPTURE"]).exists())
 
     def test_short_gemma_and_qwen_commands_select_only_the_requested_family(self):
         for family, names in (("gemma", MODELS[2:]), ("qwen", MODELS[:2])):

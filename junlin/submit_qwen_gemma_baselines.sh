@@ -151,7 +151,14 @@ if [[ "$dry_run" == 0 ]]; then
     [[ -x "$ANALYSIS_PY" ]] || { echo "Missing analysis Python: $ANALYSIS_PY" >&2; exit 1; }
     for monitor in "${monitors[@]}"; do
         serving="$SERVING_PY"
-        [[ "$monitor" == gemma4-* ]] && serving="$GEMMA_SERVING_PY"
+        if [[ "$monitor" == gemma4-* ]]; then
+            serving="$GEMMA_SERVING_PY"
+            if [[ ! -r "$FRAMEWORK/mihai/cluster/cuda_toolkit.sh" || ! -r "$FRAMEWORK/mihai/cluster/run_monitor.sbatch" ]] ||
+                [[ "$(< "$FRAMEWORK/mihai/cluster/run_monitor.sbatch")" != *configure_monitor_cuda* ]]; then
+                echo "Gemma CUDA setup is missing from FRAMEWORK=$FRAMEWORK. Update that checkout, or run 'bash junlin/setup.sh' from the updated checkout to save its path, then submit fresh jobs." >&2
+                exit 1
+            fi
+        fi
         [[ -x "$serving" ]] || { echo "Missing serving Python for $monitor: $serving" >&2; exit 1; }
         "$serving" - "$monitor" "$serving" <<'PY'
 import sys
