@@ -26,7 +26,8 @@ class SubmissionTests(unittest.TestCase):
         make_project(root)
         (root / "monitor_experiment").symlink_to(ROOT / "monitor_experiment", target_is_directory=True)
         (root / "configs/experiments").mkdir()
-        shutil.copy(ROOT / "configs/experiments/qwen-gemma-baseline.toml", root / "configs/experiments")
+        for filename in ("qwen-gemma-baseline.toml", "cuda-debug-qwen3-1.7b.toml"):
+            shutil.copy(ROOT / "configs/experiments" / filename, root / "configs/experiments")
         tokenizer = root / "cache/tokenizer/tokenizer.json"
         tokenizer.parent.mkdir(parents=True)
         tokenizer.write_text("{}")
@@ -40,7 +41,8 @@ from pathlib import Path
 path = Path(os.environ['CAPTURE'])
 rows = path.read_text().splitlines() if path.exists() else []
 fields = ('MONITOR', 'FRAMEWORK', 'OUT', 'MODEL_DIR', 'PIN_REGISTRY_DIR', 'REGISTRY_DIR',
-          'SERVING_PY', 'ANALYSIS_PY', 'EXPERIMENT', 'GPU_LABEL', 'TP', 'SCORE', 'EXTRA_ARGS')
+          'SERVING_PY', 'ANALYSIS_PY', 'EXPERIMENT', 'GPU_LABEL', 'TP', 'SCORE', 'EXTRA_ARGS',
+          'ENFORCE_EAGER', 'CUDA_LAUNCH_BLOCKING', 'PORT')
 record = {'args': sys.argv[1:], 'env': {k: os.environ.get(k) for k in fields}}
 with path.open('a') as stream:
     stream.write(json.dumps(record) + '\\n')
@@ -133,6 +135,40 @@ print(str(1000 + len(rows)) + ';test-cluster')
                 self.assertEqual(result.stderr.count("DRY-RUN"), 2 * len(names))
                 self.assertEqual([line.split(":")[0] for line in result.stdout.splitlines()], list(names))
 
+    def test_debug_job_uses_a_separate_run_and_single_gpu_with_synchronous_eager_execution(self):
+        with TempDir() as temporary:
+            env = {**self.environment(temporary), "GPU_TIME": "", "GPU_COUNT": "2", "PORT": ""}
+            result = subprocess.run(["bash", str(ROOT / "junlin/run.sh"), "debug"],
+                                    env=env, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            cpu, gpu = [json.loads(line) for line in Path(env["CAPTURE"]).read_text().splitlines()]
+            self.assertEqual(gpu["env"]["MONITOR"], "qwen3-1.7b")
+            self.assertEqual(gpu["env"]["ENFORCE_EAGER"], "1")
+            self.assertEqual(gpu["env"]["CUDA_LAUNCH_BLOCKING"], "1")
+            self.assertEqual(gpu["env"]["PORT"], "28475")
+            self.assertEqual(gpu["env"]["SCORE"], "0")
+            self.assertIn("--gpus=h200:1", gpu["args"])
+            self.assertIn("--time=02:00:00", gpu["args"])
+            self.assertIn("logs/cuda-debug-", gpu["env"]["REGISTRY_DIR"])
+            self.assertEqual(cpu["env"]["PIN_REGISTRY_DIR"], gpu["env"]["REGISTRY_DIR"])
+            debug_spec = spec.load_spec(gpu["env"]["EXPERIMENT"])
+            self.assertNotEqual(debug_spec.name, "baseline")
+            self.assertEqual(debug_spec.options["item_limit"], 1)
+            self.assertEqual(debug_spec.options["samples"], 1)
+            self.assertEqual(debug_spec.options["concurrency"], 1)
+            self.assertEqual(tuple(debug_spec.axes["scope"]), ("action", "cot", "all"))
+            self.assertFalse(list(Path(env["ME"]).glob("logs/qwen-gemma-*")))
+
+    def test_full_eager_retry_is_opt_in(self):
+        with TempDir() as temporary:
+            env = self.environment(temporary)
+            result = self.run_script(env, "--eager", "qwen3-1.7b")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            _, gpu = [json.loads(line) for line in Path(env["CAPTURE"]).read_text().splitlines()]
+            self.assertEqual(gpu["env"]["ENFORCE_EAGER"], "1")
+            self.assertEqual(gpu["env"]["SCORE"], "1")
+            self.assertEqual(spec.load_spec(gpu["env"]["EXPERIMENT"]).name, "baseline")
+
     def test_preparations_gate_each_gpu_and_gpu_jobs_are_serialized(self):
         with TempDir() as temporary:
             env = self.environment(temporary)
@@ -154,6 +190,7 @@ print(str(1000 + len(rows)) + ';test-cluster')
                 self.assertEqual(cpu["env"]["PIN_REGISTRY_DIR"], gpu["env"]["REGISTRY_DIR"])
                 self.assertEqual(cpu["env"]["OUT"], gpu["env"]["MODEL_DIR"])
                 self.assertEqual(gpu["env"]["SCORE"], "1")
+                self.assertEqual(gpu["env"]["ENFORCE_EAGER"], "0")
                 self.assertEqual(gpu["env"]["EXTRA_ARGS"], "")
             self.assertEqual(gpu1["env"]["SERVING_PY"], env["SERVING_PY"])
             self.assertEqual(gpu2["env"]["SERVING_PY"], env["GEMMA_SERVING_PY"])

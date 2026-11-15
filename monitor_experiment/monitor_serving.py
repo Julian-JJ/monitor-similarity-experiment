@@ -31,7 +31,7 @@ def check_model_dir(model_dir):
 
 
 def build_command(monitor, model_dir, *, python="python", host="127.0.0.1", port=8000, tensor_parallel=1,
-                  max_model_len=None, yarn_factor=None, gpu_memory_utilization=0.9):
+                  max_model_len=None, yarn_factor=None, gpu_memory_utilization=0.9, enforce_eager=False):
     monitor.runnable()
     max_model_len = max_model_len or monitor.context_tokens
     if max_model_len < monitor.context_tokens:
@@ -49,6 +49,8 @@ def build_command(monitor, model_dir, *, python="python", host="127.0.0.1", port
                "--generation-config", "vllm"]
     if monitor.reasoning_parser:
         command += ["--reasoning-parser", monitor.reasoning_parser]
+    if enforce_eager:
+        command += ["--enforce-eager"]
     if yarn_factor:
         command += ["--rope-scaling", json.dumps({"rope_type": "yarn", "factor": yarn_factor,
                                                   "original_max_position_embeddings": NATIVE_CONTEXT})]

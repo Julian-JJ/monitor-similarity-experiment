@@ -106,9 +106,12 @@ class DownloadTests(unittest.TestCase):
                 command = [sys.executable, str(source_path.parents[1] / "scripts/serve_monitor.py"),
                            "--monitor", name, "--model-dir", str(d / "model"),
                            "--registry-dir", str(target), "--print-command"]
+                if name == "qwen3-1.7b":
+                    command.append("--enforce-eager")
                 launched = subprocess.run(command, capture_output=True, text=True)
                 self.assertEqual(launched.returncode, 0, launched.stderr)
                 self.assertIn(monitor.model_id, json.loads(launched.stdout))
+                self.assertEqual("--enforce-eager" in json.loads(launched.stdout), name == "qwen3-1.7b")
                 md.pin_registry(d / "model", name, target)  # identical snapshots are reusable
                 manifest_path = d / "model/download-manifest.json"
                 manifest = json.loads(manifest_path.read_text())

@@ -22,6 +22,12 @@ SERVING_PY="${SERVING_PY:-/nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/moni
 ANALYSIS_PY="${ANALYSIS_PY:-$ME/envs/monitor-analysis/bin/python}"
 registry_args=()
 [[ -n "${REGISTRY_DIR:-}" ]] && registry_args=(--registry-dir "$REGISTRY_DIR")
+eager_args=()
+case "${ENFORCE_EAGER:-0}" in
+    0) ;;
+    1) eager_args=(--enforce-eager) ;;
+    *) echo 'ENFORCE_EAGER must be 0 or 1' >&2; exit 1 ;;
+esac
 JOB="${SLURM_JOB_ID:-local}"
 STATUS="$ME/logs/monitor-$MONITOR-$JOB.status"
 server_pid=
@@ -51,13 +57,14 @@ exec 9> "$ME/runs/$run_name/.monitor-job.lock"
 flock -n 9 || { echo "Another job is writing run $run_name" >&2; exit 1; }
 printf 'job=%s monitor=%s experiment=%s node=%s started_at=%s\n' "$JOB" "$MONITOR" "$EXPERIMENT" "$(hostname)" "$(date -u +%FT%TZ)" | tee -a "$STATUS"
 printf 'framework=%s results=%s analysis_python=%s serving_python=%s\n' "$FRAMEWORK" "$ME/runs/$run_name" "$ANALYSIS_PY" "$SERVING_PY" | tee -a "$STATUS"
+printf 'enforce_eager=%s cuda_launch_blocking=%s\n' "${ENFORCE_EAGER:-0}" "${CUDA_LAUNCH_BLOCKING:-0}" | tee -a "$STATUS"
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv | tee -a "$STATUS"
 # A port is "taken" only if something is listening. Closed connections of a previous server linger in TIME_WAIT for a minute, so bind with SO_REUSEADDR as the server does.
 "$ANALYSIS_PY" -c 'import socket,sys; s=socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); s.bind(("127.0.0.1", int(sys.argv[1]))); s.close()' "$PORT"
 
 server_log="$ME/logs/monitor-server-$MONITOR-$JOB.log"
 setsid "$SERVING_PY" scripts/serve_monitor.py --monitor "$MONITOR" --model-dir "$MODEL_DIR" --port "$PORT" \
-    --tensor-parallel-size "$TP" --manifest "$ME/logs/serving-$MONITOR-$JOB.json" "${registry_args[@]}" > "$server_log" 2>&1 &
+    --tensor-parallel-size "$TP" --manifest "$ME/logs/serving-$MONITOR-$JOB.json" "${registry_args[@]}" "${eager_args[@]}" > "$server_log" 2>&1 &
 server_pid=$!
 ready=0
 for ((attempt = 0; attempt < 720; attempt++)); do   # large models take a while to load: up to an hour

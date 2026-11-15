@@ -74,6 +74,45 @@ actual GPU kernels and model inference are checked when a monitor job runs.
 Selected package versions, data hashes, and interpreter paths are saved in a
 timestamped `$ME/logs/cluster-env-*.json` report.
 
+### CUDA illegal-access diagnostics
+
+If a monitoring server reports a CUDA illegal memory access, the process needs
+to be restarted. [NVIDIA documents](https://docs.nvidia.com/cuda/cuda-runtime-api/cuda_runtime_api/group__CUDART__TYPES.html)
+that this error leaves the process in an inconsistent state. Later HTTP 500s
+can therefore be a cascade from the first CUDA failure, rather than separate
+problems with every request. Keep the cached outputs and inspect the first
+exception in the server log.
+
+For the Qwen3-1.7B failure, the short diagnostic command is:
+
+```bash
+bash junlin/run.sh debug
+```
+
+This submits the normal preparation step and a fresh, single-H200 server with
+`--enforce-eager` and `CUDA_LAUNCH_BLOCKING=1`. Those are diagnostic options
+recommended by [vLLM's troubleshooting guide](https://docs.vllm.ai/en/v0.11.0/usage/troubleshooting.html).
+It runs one monitor sample, one rollout per task/variant group and one request
+at a time, retaining all three observation scopes and hierarchical aggregation.
+With the current collections this is 9 rollouts and 54 units. The GPU job's
+default time limit is two hours, overridable with `GPU_TIME`.
+Its server uses port 28475 by default, distinct from the baseline's 28474;
+`PORT` can override it.
+
+Outputs go to `$ME/runs/cuda-debug-qwen3-1.7b/` and submission logs to
+`$ME/logs/cuda-debug-*/`. The baseline status checker ignores these diagnostic
+receipts. Scoring is disabled; the run writes the normal verdict/node files and
+a label-free summary on completion. Serving provenance records `--enforce-eager`,
+and job status records synchronous-error reporting. Default baseline jobs retain
+their existing serving settings.
+
+This tests an alternative execution path and collects a more precise traceback;
+success does not isolate the original cause because batching is also reduced.
+For a subsequent full Qwen3-1.7B retry with eager execution, use
+`bash junlin/run.sh qwen3-1.7b --eager`. It reuses finalized baseline units and
+records the changed server command; eager execution can change performance, so
+retain that provenance when interpreting runtime comparisons.
+
 Transformers configuration support is checked by constructing `gemma4` and
 `gemma4_unified` configurations through `AutoConfig.for_model`, with no model
 weights or network access. This works when newer Transformers versions import

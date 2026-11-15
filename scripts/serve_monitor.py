@@ -31,6 +31,7 @@ def main():
     parser.add_argument("--max-model-len", type=int)
     parser.add_argument("--yarn-factor", type=float)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.9)
+    parser.add_argument("--enforce-eager", action="store_true", help="disable CUDA graphs for diagnostics")
     parser.add_argument("--manifest", help="write what is being served (command, vLLM version, monitor identity) here")
     parser.add_argument("--registry-dir", help="use a pinned job registry instead of configs/")
     parser.add_argument("--print-command", action="store_true")
@@ -41,7 +42,8 @@ def main():
         monitor_download.verify(model_dir, monitor)
         command = build_command(monitor, model_dir.resolve(), python=sys.executable, host=args.host, port=args.port,
                                 tensor_parallel=args.tensor_parallel_size, max_model_len=args.max_model_len,
-                                yarn_factor=args.yarn_factor, gpu_memory_utilization=args.gpu_memory_utilization)
+                                yarn_factor=args.yarn_factor, gpu_memory_utilization=args.gpu_memory_utilization,
+                                enforce_eager=args.enforce_eager)
     except (ServingError, RegistryError, monitor_download.DownloadError) as error:
         sys.exit(f"ERROR: {error}")
     if args.print_command:

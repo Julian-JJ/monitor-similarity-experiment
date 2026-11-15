@@ -27,7 +27,16 @@ class CommandTests(unittest.TestCase):
                          ("9001", "2", "32768"))
         self.assertNotIn("--enable-auto-tool-choice", command, "monitors do not call tools")
         self.assertNotIn("--rope-scaling", command)
+        self.assertNotIn("--enforce-eager", command)
         self.assertEqual(self.flag(command, "--generation-config"), "vllm")
+
+    def test_eager_execution_is_explicit_and_recorded_in_server_provenance(self):
+        monitor = self.registry.monitor("qwen3-1.7b")
+        command = ms.build_command(monitor, "/m", enforce_eager=True)
+        self.assertIn("--enforce-eager", command)
+        record = ms.provenance(monitor, command, "0.11.0", "/m")
+        self.assertIn("--enforce-eager", record["command"])
+        self.assertEqual(record["monitor_identity"], monitor.identity())
 
     def test_other_families_get_dtype_auto_and_their_configured_reasoning_parser(self):
         command = ms.build_command(self.registry.monitor("gpt-oss-120b"), "/m/gpt-oss")

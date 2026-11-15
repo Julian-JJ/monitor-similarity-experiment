@@ -9,7 +9,7 @@ fi
 
 usage() {
     cat <<'HELP'
-Usage: bash junlin/submit_qwen_gemma_baselines.sh [--dry-run] [MODEL ...]
+Usage: bash junlin/submit_qwen_gemma_baselines.sh [--dry-run] [--diagnostic] [--eager] [MODEL ...]
 
 Default models: qwen3-1.7b qwen3-4b gemma4-e2b gemma4-e4b gemma4-12b gemma4-31b
 Optional model: qwen3-30b-a3b
@@ -18,6 +18,8 @@ Each model gets a CPU preparation job (download/reuse weights, pin a private reg
 and an H200 monitor job dependent on successful preparation. GPU jobs run sequentially
 and append to runs/baseline, retaining completed work. --dry-run prints commands only.
 GPU jobs request 6 CPUs per GPU to match the cluster allocation limit.
+--diagnostic runs a small Qwen3-1.7B job with eager execution and synchronous
+CUDA errors in a separate run directory. --eager disables CUDA graphs for normal jobs.
 
 Environment overrides:
   ME, FRAMEWORK, MODELS_DIR, ANALYSIS_PY, SERVING_PY, GEMMA_SERVING_PY, SUBMIT_PY
@@ -38,10 +40,14 @@ HELP
 }
 
 dry_run=0
+diagnostic=0
+enforce_eager=0
 monitors=()
 while (($#)); do
     case "$1" in
         --dry-run) dry_run=1 ;;
+        --diagnostic) diagnostic=1 ;;
+        --eager) enforce_eager=1 ;;
         -h|--help) usage; exit 0 ;;
         --*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
         *) monitors+=("$1") ;;
@@ -49,7 +55,11 @@ while (($#)); do
     shift
 done
 if ((${#monitors[@]} == 0)); then
-    monitors=(qwen3-1.7b qwen3-4b gemma4-e2b gemma4-e4b gemma4-12b gemma4-31b)
+    if [[ "$diagnostic" == 1 ]]; then
+        monitors=(qwen3-1.7b)
+    else
+        monitors=(qwen3-1.7b qwen3-4b gemma4-e2b gemma4-e4b gemma4-12b gemma4-31b)
+    fi
 fi
 
 ME="${ME:-/nfs/roberts/project/cpsc4880/cpsc4880_as4833}"
@@ -63,11 +73,29 @@ ACCOUNT="${ACCOUNT:-cpsc4880}"
 CPU_PARTITION="${CPU_PARTITION:-day}"
 GPU_PARTITION="${GPU_PARTITION:-gpu_h200}"
 CPU_TIME="${CPU_TIME:-04:00:00}"
-GPU_TIME="${GPU_TIME:-08:00:00}"
+gpu_time_default=08:00:00
 GPU_COUNT="${GPU_COUNT:-1}"
 GPU_MEM="${GPU_MEM:-96G}"
 previous="${DEPENDENCY_JOB_ID:-}"
 EXPERIMENT="$FRAMEWORK/configs/experiments/qwen-gemma-baseline.toml"
+batch_prefix=qwen-gemma
+run_prefix=baseline
+score=1
+launch_blocking="${CUDA_LAUNCH_BLOCKING:-0}"
+server_port="${PORT:-28474}"
+if [[ "$diagnostic" == 1 ]]; then
+    [[ "${#monitors[@]}" == 1 && "${monitors[0]}" == qwen3-1.7b ]] || { echo 'Diagnostic mode supports only qwen3-1.7b' >&2; exit 2; }
+    EXPERIMENT="$FRAMEWORK/configs/experiments/cuda-debug-qwen3-1.7b.toml"
+    batch_prefix=cuda-debug
+    run_prefix=cuda-debug
+    enforce_eager=1
+    launch_blocking=1
+    server_port="${PORT:-28475}"
+    GPU_COUNT=1
+    gpu_time_default=02:00:00
+    score=0
+fi
+GPU_TIME="${GPU_TIME:-$gpu_time_default}"
 [[ "$GPU_COUNT" =~ ^[1-9][0-9]*$ ]] || { echo "GPU_COUNT must be positive" >&2; exit 2; }
 [[ -z "$previous" || "$previous" =~ ^[0-9]+$ ]] || { echo "DEPENDENCY_JOB_ID must be numeric" >&2; exit 2; }
 
@@ -103,7 +131,7 @@ if not dry:
     freeze.require_ready(root, registry.reference_tokenizer)
 PY
 
-batch_dir="$ME/logs/qwen-gemma-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+batch_dir="$ME/logs/$batch_prefix-$(date -u +%Y%m%dT%H%M%SZ)-$$"
 receipt="$batch_dir/submissions.tsv"
 if [[ "$dry_run" == 0 ]]; then
     command -v sbatch >/dev/null || { echo "Run this script on the Slurm cluster" >&2; exit 1; }
@@ -168,11 +196,13 @@ for monitor in "${monitors[@]}"; do
     monitor_job=$(submit "MONITOR_$monitor" env ME="$ME" FRAMEWORK="$FRAMEWORK" \
         ANALYSIS_PY="$ANALYSIS_PY" SERVING_PY="$serving" MONITOR="$monitor" \
         EXPERIMENT="$EXPERIMENT" MODEL_DIR="$model_dir" REGISTRY_DIR="$registry_dir" \
-        TP="$GPU_COUNT" GPU_LABEL="H200:$GPU_COUNT" SCORE=1 EXTRA_ARGS="" \
+        TP="$GPU_COUNT" GPU_LABEL="H200:$GPU_COUNT" SCORE="$score" EXTRA_ARGS="" \
+        ENFORCE_EAGER="$enforce_eager" CUDA_LAUNCH_BLOCKING="$launch_blocking" \
+        PORT="$server_port" \
         sbatch --parsable --account="$ACCOUNT" --partition="$GPU_PARTITION" --nodes=1 --ntasks=1 \
         --gpus="h200:$GPU_COUNT" --cpus-per-task="$((6 * GPU_COUNT))" --mem="$GPU_MEM" --time="$GPU_TIME" \
-        --job-name="baseline-$monitor" --dependency="$dependency" --kill-on-invalid-dep=yes \
-        --output="$batch_dir/baseline-$monitor-%j.out" --export=ALL \
+        --job-name="$run_prefix-$monitor" --dependency="$dependency" --kill-on-invalid-dep=yes \
+        --output="$batch_dir/$run_prefix-$monitor-%j.out" --export=ALL \
         "$FRAMEWORK/mihai/cluster/run_monitor.sbatch")
     previous="$monitor_job"
     printf '%s: preparation=%s monitor=%s\n' "$monitor" "$download_job" "$monitor_job"
