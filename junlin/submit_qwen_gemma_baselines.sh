@@ -9,7 +9,7 @@ fi
 
 usage() {
     cat <<'HELP'
-Usage: bash junlin/submit_qwen_gemma_baselines.sh [--dry-run] [--diagnostic] [--eager] [MODEL ...]
+Usage: bash junlin/submit_qwen_gemma_baselines.sh [--dry-run] [--parallel] [--repair-gemma] [--diagnostic] [--eager] [MODEL ...]
 
 Default models: qwen3-1.7b qwen3-4b gemma4-e2b gemma4-e4b gemma4-12b gemma4-31b
 Optional model: qwen3-30b-a3b
@@ -20,6 +20,9 @@ and append to runs/baseline, retaining completed work. --dry-run prints commands
 GPU jobs request 6 CPUs per GPU to match the cluster allocation limit.
 --diagnostic runs a small Qwen3-1.7B job with eager execution and synchronous
 CUDA errors in a separate run directory. --eager disables CUDA graphs for normal jobs.
+--parallel gives each model its own run directory/port and removes GPU chaining.
+--repair-gemma adds one CPU native-library repair prerequisite for all Gemma jobs.
+For the five unfinished models use: bash junlin/retry.sh
 
 Environment overrides:
   ME, FRAMEWORK, MODELS_DIR, ANALYSIS_PY, SERVING_PY, GEMMA_SERVING_PY, SUBMIT_PY
@@ -42,12 +45,16 @@ HELP
 dry_run=0
 diagnostic=0
 enforce_eager=0
+parallel=0
+repair_gemma=0
 monitors=()
 while (($#)); do
     case "$1" in
         --dry-run) dry_run=1 ;;
         --diagnostic) diagnostic=1 ;;
         --eager) enforce_eager=1 ;;
+        --parallel) parallel=1 ;;
+        --repair-gemma) repair_gemma=1 ;;
         -h|--help) usage; exit 0 ;;
         --*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
         *) monitors+=("$1") ;;
@@ -84,6 +91,7 @@ score=1
 launch_blocking="${CUDA_LAUNCH_BLOCKING:-0}"
 server_port="${PORT:-28474}"
 if [[ "$diagnostic" == 1 ]]; then
+    [[ "$parallel" == 0 ]] || { echo 'Diagnostic mode cannot use --parallel' >&2; exit 2; }
     [[ "${#monitors[@]}" == 1 && "${monitors[0]}" == qwen3-1.7b ]] || { echo 'Diagnostic mode supports only qwen3-1.7b' >&2; exit 2; }
     EXPERIMENT="$FRAMEWORK/configs/experiments/cuda-debug-qwen3-1.7b.toml"
     batch_prefix=cuda-debug
@@ -94,6 +102,9 @@ if [[ "$diagnostic" == 1 ]]; then
     GPU_COUNT=1
     gpu_time_default=02:00:00
     score=0
+fi
+if [[ "$parallel" == 1 ]]; then
+    batch_prefix=qwen-gemma-parallel
 fi
 GPU_TIME="${GPU_TIME:-$gpu_time_default}"
 [[ "$GPU_COUNT" =~ ^[1-9][0-9]*$ ]] || { echo "GPU_COUNT must be positive" >&2; exit 2; }
@@ -131,6 +142,7 @@ if not dry:
     freeze.require_ready(root, registry.reference_tokenizer)
 PY
 
+run_name=$("$SUBMIT_PY" -c 'import sys,tomllib; print(tomllib.load(open(sys.argv[1], "rb"))["name"])' "$EXPERIMENT")
 batch_dir="$ME/logs/$batch_prefix-$(date -u +%Y%m%dT%H%M%SZ)-$$"
 receipt="$batch_dir/submissions.tsv"
 if [[ "$dry_run" == 0 ]]; then
@@ -156,7 +168,7 @@ print(f"Preflight {name}: serving_python={executable} vllm={vllm_version}", flus
 PY
     done
     mkdir -p "$batch_dir"
-    printf 'stage\tmonitor\tjob_id\tdependency\tregistry_dir\n' > "$receipt"
+    printf 'stage\tmonitor\tjob_id\tdependency\tregistry_dir\trun_dir\n' > "$receipt"
 fi
 
 submit() {
@@ -175,9 +187,41 @@ submit() {
     fi
 }
 
+repair_job=
+gemma_lock=
+if [[ "$repair_gemma" == 1 ]]; then
+    gemma_lock="$ME/envs/.gemma-repair.lock"
+    repair_job=$(submit REPAIR_GEMMA env ME="$ME" FRAMEWORK="$FRAMEWORK" GEMMA_SERVING_PY="$GEMMA_SERVING_PY" \
+        sbatch --parsable --account="$ACCOUNT" --partition="$CPU_PARTITION" --nodes=1 --ntasks=1 \
+        --cpus-per-task=4 --mem=16G --time="$CPU_TIME" --job-name=repair-gemma \
+        --output="$batch_dir/repair-gemma-%j.out" --export=ALL "$FRAMEWORK/junlin/repair_gemma.sbatch")
+    if [[ "$dry_run" == 0 ]]; then
+        printf 'repair\tgemma-environment\t%s\t-\t-\t-\n' "$repair_job" >> "$receipt"
+        printf 'Gemma environment repair=%s\n' "$repair_job"
+    fi
+fi
+
 for monitor in "${monitors[@]}"; do
     registry_dir="$batch_dir/registries/$monitor"
     model_dir="$MODELS_DIR/$monitor"
+    runs_dir="$ME/runs"
+    port="$server_port"
+    seed_baseline=
+    if [[ "$parallel" == 1 ]]; then
+        runs_dir="$ME/runs/parallel/$monitor"
+        seed_baseline="$ME/runs/baseline"
+        # Fixed registry-wide model ordering gives each model a distinct port
+        # even when selections differ between submissions. Duplicate writers
+        # for the same model are rejected by its run-directory lock.
+        port=$("$SUBMIT_PY" - "$FRAMEWORK" "$monitor" <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+from monitor_experiment.registry import Registry
+print(28500 + sorted(Registry.load(root=Path(sys.argv[1])).monitors).index(sys.argv[2]))
+PY
+)
+    fi
     download_job=$(submit "DOWNLOAD_$monitor" env ME="$ME" FRAMEWORK="$FRAMEWORK" \
         ANALYSIS_PY="$ANALYSIS_PY" MONITOR="$monitor" OUT="$model_dir" REVISION="" \
         PIN_REGISTRY_DIR="$registry_dir" \
@@ -186,11 +230,16 @@ for monitor in "${monitors[@]}"; do
         --output="$batch_dir/prepare-$monitor-%j.out" --export=ALL \
         "$FRAMEWORK/mihai/cluster/download_monitor.sbatch")
     if [[ "$dry_run" == 0 ]]; then
-        printf 'prepare\t%s\t%s\t-\t%s\n' "$monitor" "$download_job" "$registry_dir" >> "$receipt"
+        printf 'prepare\t%s\t%s\t-\t%s\t%s/%s\n' "$monitor" "$download_job" "$registry_dir" "$runs_dir" "$run_name" >> "$receipt"
         printf '%s: preparation=%s\n' "$monitor" "$download_job"
     fi
     dependency="afterok:$download_job"
     [[ -n "$previous" ]] && dependency+=",afterany:$previous"
+    env_lock=
+    if [[ "$monitor" == gemma4-* && -n "$repair_job" ]]; then
+        dependency+=",afterok:$repair_job"
+        env_lock="$gemma_lock"
+    fi
     serving="$SERVING_PY"
     [[ "$monitor" == gemma4-* ]] && serving="$GEMMA_SERVING_PY"
     monitor_job=$(submit "MONITOR_$monitor" env ME="$ME" FRAMEWORK="$FRAMEWORK" \
@@ -198,16 +247,16 @@ for monitor in "${monitors[@]}"; do
         EXPERIMENT="$EXPERIMENT" MODEL_DIR="$model_dir" REGISTRY_DIR="$registry_dir" \
         TP="$GPU_COUNT" GPU_LABEL="H200:$GPU_COUNT" SCORE="$score" EXTRA_ARGS="" \
         ENFORCE_EAGER="$enforce_eager" CUDA_LAUNCH_BLOCKING="$launch_blocking" \
-        PORT="$server_port" \
+        RUNS_DIR="$runs_dir" SEED_BASELINE="$seed_baseline" GEMMA_ENV_LOCK="$env_lock" PORT="$port" \
         sbatch --parsable --account="$ACCOUNT" --partition="$GPU_PARTITION" --nodes=1 --ntasks=1 \
         --gpus="h200:$GPU_COUNT" --cpus-per-task="$((6 * GPU_COUNT))" --mem="$GPU_MEM" --time="$GPU_TIME" \
         --job-name="$run_prefix-$monitor" --dependency="$dependency" --kill-on-invalid-dep=yes \
         --output="$batch_dir/$run_prefix-$monitor-%j.out" --export=ALL \
         "$FRAMEWORK/mihai/cluster/run_monitor.sbatch")
-    previous="$monitor_job"
+    [[ "$parallel" == 1 ]] || previous="$monitor_job"
     printf '%s: preparation=%s monitor=%s\n' "$monitor" "$download_job" "$monitor_job"
     if [[ "$dry_run" == 0 ]]; then
-        printf 'monitor\t%s\t%s\t%s\t%s\n' "$monitor" "$monitor_job" "$dependency" "$registry_dir" >> "$receipt"
+        printf 'monitor\t%s\t%s\t%s\t%s\t%s/%s\n' "$monitor" "$monitor_job" "$dependency" "$registry_dir" "$runs_dir" "$run_name" >> "$receipt"
     fi
 done
 [[ "$dry_run" == 1 ]] || printf 'Submission receipt: %s\n' "$receipt"

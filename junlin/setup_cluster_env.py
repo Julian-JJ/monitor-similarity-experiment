@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 from monitor_experiment import freeze
 from monitor_experiment.registry import Registry
+from monitor_experiment.artifacts import lock
 
 MODELS = ("qwen3-1.7b", "qwen3-4b", "gemma4-e2b", "gemma4-e4b", "gemma4-12b", "gemma4-31b")
 
@@ -201,6 +202,43 @@ print(json.dumps({'python': sys.executable, 'version': sys.version,
     'packages': {p: version(p) for p in ('vllm', 'torch', 'transformers')}}))
 """
 
+NATIVE_AUDIO_CHECK = """
+import torch, torchaudio
+from transformers import Gemma4Processor, Gemma4UnifiedProcessor
+print('TorchAudio and Gemma processor native imports OK')
+"""
+
+
+def repair_gemma(values, runner=run):
+    """Repair only TorchAudio's binary build, preserving the installed Torch and vLLM."""
+    python = values["GEMMA_SERVING_PY"]
+    writable_private(Path(python).absolute().parent.parent, values)
+    info_code = """
+import json, torch
+from importlib.metadata import version
+print(json.dumps({'torch': version('torch'), 'cuda': torch.version.cuda,
+                  'torchaudio': version('torchaudio'), 'vllm': version('vllm')}))
+"""
+    before = json.loads(runner([python, "-c", info_code], capture=True))
+    try:
+        runner([python, "-c", NATIVE_AUDIO_CHECK], capture=True)
+        return {"before": before, "after": before, "repaired": False}
+    except SetupError as error:
+        print(f"Gemma native import failed; repairing TorchAudio: {error}", flush=True)
+    if not before["cuda"]:
+        raise SetupError("Gemma serving Torch has no CUDA runtime; use a CUDA-enabled vLLM environment")
+    backend = "cu" + "".join(before["cuda"].split(".")[:2])
+    index = "https://download.pytorch.org/whl/" + backend
+    audio_version = before["torchaudio"].split("+", 1)[0]
+    runner([python, "-m", "pip", "--isolated", "install", "--force-reinstall", "--no-deps",
+            "--only-binary=:all:", "--index-url", index, "torchaudio==" + audio_version])
+    after = json.loads(runner([python, "-c", info_code], capture=True))
+    if (before["torch"], before["vllm"]) != (after["torch"], after["vllm"]):
+        raise SetupError("Torch or vLLM changed during audio repair; refusing to launch inference")
+    runner([python, "-m", "pip", "check"])
+    runner([python, "-c", NATIVE_AUDIO_CHECK], capture=True)
+    return {"before": before, "after": after, "repaired": True, "wheel_index": index}
+
 
 def verify(values, registry, root, runner=run):
     errors, report = [], {}
@@ -211,6 +249,8 @@ def verify(values, registry, root, runner=run):
     ):
         try:
             report[label] = json.loads(runner([executable, "-c", code, *extra], capture=True))
+            if label == "gemma":
+                runner([executable, "-c", NATIVE_AUDIO_CHECK], capture=True)
             print(f"OK {label}: {executable} {report[label]['packages']}", flush=True)
         except (SetupError, OSError, ValueError) as error:
             errors.append(f"{label} environment: {error}")
@@ -235,16 +275,8 @@ def verify(values, registry, root, runner=run):
     return report
 
 
-def batch_status(project):
-    """Read existing artifacts only; a log file alone never implies success."""
-    project = Path(project)
-    run_dir, logs = project / "runs/baseline", project / "logs"
-    jobs = {}
-    for receipt in sorted(logs.glob("qwen-gemma-*/submissions.tsv")):
-        with receipt.open() as stream:
-            for row in csv.DictReader(stream, delimiter="\t"):
-                if row["stage"] == "monitor":
-                    jobs[row["monitor"]] = row["job_id"]
+def read_run(run_dir):
+    run_dir = Path(run_dir)
     manifest_path, metrics_path = run_dir / "manifest.json", run_dir / "metrics.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
     metrics = json.loads(metrics_path.read_text()) if metrics_path.is_file() else {}
@@ -260,9 +292,27 @@ def batch_status(project):
                     records[item["unit_id"]] = item
                 except (ValueError, KeyError):
                     malformed = True  # May be an append in progress; do not report healthy yet.
-    print(f"Results: {run_dir}\nHealth requires a successful job, all 1,800 valid units and all three scored scopes.")
+    return cells, records, metrics, malformed
+
+
+def batch_status(project):
+    """Read legacy/shared and parallel per-model results, using submission receipts."""
+    project = Path(project)
+    baseline, logs = project / "runs/baseline", project / "logs"
+    jobs, paths, cache = {}, {}, {}
+    for receipt in sorted(logs.glob("qwen-gemma-*/submissions.tsv"), key=lambda p: p.stat().st_mtime_ns):
+        with receipt.open() as stream:
+            for row in csv.DictReader(stream, delimiter="\t"):
+                if row["stage"] == "monitor":
+                    jobs[row["monitor"]] = row["job_id"]
+                    paths[row["monitor"]] = Path(row.get("run_dir") or baseline)
+    print(f"Original baseline: {baseline}\nHealth requires a successful job, all 1,800 valid units and all three scored scopes.")
     out = {}
     for model in MODELS:
+        run_dir = paths.get(model, baseline)
+        if run_dir not in cache:
+            cache[run_dir] = read_run(run_dir)
+        cells, records, metrics, malformed = cache[run_dir]
         job = jobs.get(model)
         status_path = logs / f"monitor-{model}-{job}.status" if job else None
         status_text = status_path.read_text() if status_path and status_path.is_file() else ""
@@ -286,11 +336,12 @@ def batch_status(project):
         else:
             state = "INCOMPLETE"
         out[model] = {"state": state, "job_id": job, "exit_code": exit_code,
-                      "units": len(mine), "valid_units": valid, "scored": scored_ok}
+                      "units": len(mine), "valid_units": valid, "scored": scored_ok, "run_dir": str(run_dir)}
         print(f"{model:13} {state:10} job={job or 'unknown'} exit={exit_code if exit_code is not None else 'unknown'} "
               f"units={len(mine)}/1800 valid={valid} scored={'yes' if scored_ok else 'no'}")
         if state != "HEALTHY" and job:
             print(f"  {logs / f'monitor-server-{model}-{job}.log'}")
+        print(f"  results: {run_dir}")
     qwen_healthy = all(out[m]["state"] == "HEALTHY" for m in MODELS[:2])
     print("Both Qwen jobs completed healthily." if qwen_healthy else "Both Qwen jobs are NOT yet confirmed healthy.")
     print("For current queued/running states: squeue --me")
@@ -303,6 +354,7 @@ def main(argv=None):
     mode.add_argument("--install", action="store_true")
     mode.add_argument("--check", action="store_true")
     mode.add_argument("--status", action="store_true")
+    mode.add_argument("--repair-gemma", action="store_true")
     for name in ("project-dir", "shared-dir", "original-rollouts", "control-rollouts"):
         parser.add_argument("--" + name, type=Path)
     args = parser.parse_args(argv)
@@ -310,6 +362,13 @@ def main(argv=None):
         values = settings(ROOT, args, os.environ)
         if args.status:
             batch_status(values["ME"])
+            return 0
+        if args.repair_gemma:
+            with lock(writable_private(Path(values["ME"]) / "envs/.gemma-repair.lock", values)):
+                report = repair_gemma(values)
+                report_path = Path(values["ME"]) / "logs" / f"gemma-repair-{os.getpid()}.json"
+                atomic_write(report_path, (json.dumps(report, indent=2) + "\n").encode())
+            print(f"Gemma native imports verified. Report: {report_path}")
             return 0
         registry = Registry.load(root=ROOT)
         for name, source, directory in (("original_clean", args.original_rollouts, "rollouts_original_clean"),

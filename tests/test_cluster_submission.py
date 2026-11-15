@@ -42,7 +42,7 @@ path = Path(os.environ['CAPTURE'])
 rows = path.read_text().splitlines() if path.exists() else []
 fields = ('MONITOR', 'FRAMEWORK', 'OUT', 'MODEL_DIR', 'PIN_REGISTRY_DIR', 'REGISTRY_DIR',
           'SERVING_PY', 'ANALYSIS_PY', 'EXPERIMENT', 'GPU_LABEL', 'TP', 'SCORE', 'EXTRA_ARGS',
-          'ENFORCE_EAGER', 'CUDA_LAUNCH_BLOCKING', 'PORT')
+          'ENFORCE_EAGER', 'CUDA_LAUNCH_BLOCKING', 'PORT', 'RUNS_DIR', 'SEED_BASELINE', 'GEMMA_ENV_LOCK')
 record = {'args': sys.argv[1:], 'env': {k: os.environ.get(k) for k in fields}}
 with path.open('a') as stream:
     stream.write(json.dumps(record) + '\\n')
@@ -168,6 +168,35 @@ print(str(1000 + len(rows)) + ';test-cluster')
             self.assertEqual(gpu["env"]["ENFORCE_EAGER"], "1")
             self.assertEqual(gpu["env"]["SCORE"], "1")
             self.assertEqual(spec.load_spec(gpu["env"]["EXPERIMENT"]).name, "baseline")
+
+    def test_parallel_retry_excludes_healthy_qwen_and_gates_only_gemma_on_one_repair(self):
+        with TempDir() as temporary:
+            env = self.environment(temporary)
+            result = subprocess.run(["bash", str(ROOT / "junlin/retry.sh")], env=env, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            records = [json.loads(line) for line in Path(env["CAPTURE"]).read_text().splitlines()]
+            self.assertEqual(len(records), 11)  # One repair, five downloads, five GPU jobs.
+            repair, rest = records[0], records[1:]
+            self.assertIn("--job-name=repair-gemma", repair["args"])
+            gpus = [r for r in rest if any(a.startswith("--gpus=") for a in r["args"])]
+            self.assertEqual([r["env"]["MONITOR"] for r in gpus], ["qwen3-1.7b", *MODELS[2:]])
+            self.assertEqual(len({r["env"]["PORT"] for r in gpus}), 5)
+            self.assertEqual(len({r["env"]["RUNS_DIR"] for r in gpus}), 5)
+            for i, gpu in enumerate(gpus):
+                dependency = next(a for a in gpu["args"] if a.startswith("--dependency="))
+                download_id = str(1001 + 2 * i)
+                expected = "--dependency=afterok:" + download_id
+                if i:
+                    expected += ",afterok:1000"
+                    self.assertTrue(gpu["env"]["GEMMA_ENV_LOCK"])
+                self.assertEqual(dependency, expected)
+                self.assertEqual(gpu["env"]["ENFORCE_EAGER"], "0")
+                self.assertEqual(gpu["env"]["SEED_BASELINE"], env["ME"] + "/runs/baseline")
+                self.assertIn("/runs/parallel/" + gpu["env"]["MONITOR"], gpu["env"]["RUNS_DIR"])
+            receipt = next(Path(env["ME"]).glob("logs/qwen-gemma-parallel-*/submissions.tsv"))
+            with receipt.open() as stream:
+                rows = list(csv.DictReader(stream, delimiter="\t"))
+            self.assertTrue(all(row["run_dir"].endswith("/baseline") for row in rows if row["stage"] == "monitor"))
 
     def test_preparations_gate_each_gpu_and_gpu_jobs_are_serialized(self):
         with TempDir() as temporary:

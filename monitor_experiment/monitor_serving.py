@@ -51,6 +51,8 @@ def build_command(monitor, model_dir, *, python="python", host="127.0.0.1", port
         command += ["--reasoning-parser", monitor.reasoning_parser]
     if enforce_eager:
         command += ["--enforce-eager"]
+    if monitor.family == "gemma4":
+        command += ["--limit-mm-per-prompt", json.dumps({"image": 0, "audio": 0})]
     if yarn_factor:
         command += ["--rope-scaling", json.dumps({"rope_type": "yarn", "factor": yarn_factor,
                                                   "original_max_position_embeddings": NATIVE_CONTEXT})]

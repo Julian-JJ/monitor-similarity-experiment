@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 import unittest
 from unittest.mock import patch, Mock
@@ -188,6 +189,34 @@ class AutoConfig:
             self.assertFalse(report["gpu_inference_tested"])
             self.assertFalse(Path(values["SHARED"]).exists())
 
+    def test_audio_repair_reinstalls_only_the_existing_audio_version_for_torch_cuda(self):
+        with TempDir() as directory:
+            _, _, values = self.fixture(directory)
+            before = {"torch": "2.14.0+cu130", "cuda": "13.0", "torchaudio": "2.11.1+cu129", "vllm": "0.33.0"}
+            after = {**before, "torchaudio": "2.11.1+cu130"}
+            commands, queries, checks = [], [0], [0]
+            def runner(command, *, capture=False):
+                command = [str(p) for p in command]
+                commands.append(command)
+                if "-c" in command:
+                    if command[-1] == setup.NATIVE_AUDIO_CHECK:
+                        checks[0] += 1
+                        if checks[0] == 1:
+                            raise setup.SetupError("OSError: could not load _torchaudio.abi3.so")
+                        return "native imports OK"
+                    queries[0] += 1
+                    return json.dumps(before if queries[0] == 1 else after)
+            with redirect_stdout(io.StringIO()):
+                report = setup.repair_gemma(values, runner)
+            self.assertTrue(report["repaired"])
+            install = next(c for c in commands if "install" in c)
+            self.assertIn("--no-deps", install)
+            self.assertIn("https://download.pytorch.org/whl/cu130", install)
+            self.assertEqual(install[-1], "torchaudio==2.11.1")
+            self.assertEqual(report["before"]["torch"], report["after"]["torch"])
+            self.assertEqual(report["before"]["vllm"], report["after"]["vllm"])
+            self.assertEqual(checks[0], 2)
+
 
 class HealthTests(unittest.TestCase):
     def test_job_exit_zero_alone_is_not_healthy_and_invalid_or_unscored_results_are_flagged(self):
@@ -226,6 +255,25 @@ class HealthTests(unittest.TestCase):
             (project / "logs/monitor-qwen3-4b-2.status").write_text("exit_code=1\n")
             with redirect_stdout(io.StringIO()):
                 self.assertEqual(setup.batch_status(project)["qwen3-4b"]["state"], "FAILED")
+            # A parallel retry lives elsewhere; the healthy 4B stays in the original baseline.
+            (project / "logs/monitor-qwen3-4b-2.status").write_text("exit_code=0\n")
+            parallel = project / "runs/parallel/qwen3-1.7b/baseline"
+            parallel.mkdir(parents=True)
+            for filename in ("manifest.json", "metrics.json"):
+                shutil.copy(run_dir / filename, parallel / filename)
+            items[0]["status"] = "complete"
+            (parallel / "items.jsonl").write_text("".join(json.dumps(item) + "\n" for item in items))
+            retry_logs = project / "logs/qwen-gemma-parallel-20261115"
+            retry_logs.mkdir()
+            (retry_logs / "submissions.tsv").write_text(
+                "stage\tmonitor\tjob_id\trun_dir\nmonitor\tqwen3-1.7b\t3\t" + str(parallel) + "\n")
+            (project / "logs/monitor-qwen3-1.7b-3.status").write_text("exit_code=0\n")
+            with redirect_stdout(io.StringIO()):
+                status = setup.batch_status(project)
+            self.assertEqual(status["qwen3-1.7b"]["state"], "HEALTHY")
+            self.assertEqual(status["qwen3-4b"]["state"], "HEALTHY")
+            self.assertEqual(status["qwen3-1.7b"]["run_dir"], str(parallel))
+            self.assertEqual(status["qwen3-4b"]["run_dir"], str(run_dir))
 
 
 if __name__ == "__main__":

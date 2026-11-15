@@ -8,11 +8,12 @@ if [[ -f "$setup_root/.env.cluster" ]]; then
 fi
 if [[ "${1:-}" == -h || "${1:-}" == --help ]]; then
     cat <<'HELP'
-Usage: bash junlin/setup.sh [--install | --check | --status] [options]
+Usage: bash junlin/setup.sh [--install | --check | --status | --repair-gemma] [options]
 
   --install                Create/repair analysis and Gemma serving environments.
   --check                  Read-only verification; no installs, downloads or writes.
   --status                 Report job exits, progress and scoring for the new batch.
+  --repair-gemma           Repair the native TorchAudio wheel without upgrading Torch/vLLM.
   --project-dir DIR        Your writable project directory (default: cluster account).
   --shared-dir DIR         Existing shared data/Qwen environment (default: cpsc4880_mae73).
   --original-rollouts DIR   Original collection directory containing manifest.json.

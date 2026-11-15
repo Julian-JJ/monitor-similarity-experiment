@@ -16,10 +16,55 @@ prompts, 32,768 context, 16,768 output reserve, 12,000-token chunks, bins of six
 temperature 0.6 and top-p 0.9. With the existing 75 transcripts, that is 1,800
 monitor units per model. Request concurrency is 32, as in the completed run.
 
-Results append to `$ME/runs/baseline`. The existing 14B/32B cells remain in the
+Default serial submissions append to `$ME/runs/baseline`. The existing 14B/32B cells remain in the
 manifest; completed units are reused. No actor trajectories are generated here.
 
 ## Run on the cluster
+
+### Parallel retry of the unfinished models
+
+The Qwen3-4B baseline has completed. To retry Qwen3-1.7B and all four Gemma
+models in parallel, from the repository root run:
+
+```bash
+bash junlin/retry.sh
+```
+
+Use `--dry-run` to inspect its submissions. It excludes Qwen3-4B, retains the
+normal baseline settings, and does not enable the diagnostic/eager mode. Each
+GPU job waits only for its own weight preparation; Gemma jobs also wait for one
+shared CPU repair job. There is no chain between the five GPU jobs. Actual start
+times depend on Slurm GPU availability and account limits. GPU requests remain
+one H200 and six CPUs per model by default.
+
+Parallel outputs live at `$ME/runs/parallel/<model>/baseline/`, with separate
+locks, manifests, JSONL files, scoring outputs and model-specific server ports.
+Compatible finalized units are imported from the old `$ME/runs/baseline/`
+before inference starts, including their node records and attributable sessions.
+The original manifest is archived alongside the import, and original output
+files are retained. Qwen3-1.7B can therefore reuse its saved units. The import
+refuses to read a baseline that another job is still writing. The existing
+Qwen3-4B result remains in the old directory. `bash junlin/setup.sh --status`
+uses the receipts to report both locations correctly.
+
+The CPU repair addresses the observed TorchAudio shared-library failure. It
+checks native TorchAudio and Gemma processor imports, and, on failure,
+reinstalls the currently installed TorchAudio release from the PyTorch wheel
+index matching `torch.version.cuda`, using `--no-deps`. Torch and vLLM versions
+are checked before and after and must be unchanged. Native imports and package
+dependencies must pass before any Gemma GPU job can start. The repair holds an
+exclusive environment lock; the four Gemma jobs share a read lock while serving.
+It writes `$ME/logs/gemma-repair-*.json` and a Slurm log in the new submission
+directory. If repair fails, the Gemma jobs are cancelled; Qwen is independent.
+No model weights are downloaded by the repair.
+
+TorchAudio's native libraries must be compatible with the installed Torch build
+([TorchAudio installation guidance](https://docs.pytorch.org/audio/main/installation.html)).
+The Gemma launchers also disable image/audio profiling for these text-only
+monitoring requests, following the [vLLM Gemma recipe](https://docs.vllm.ai/projects/recipes/en/stable/Google/Gemma4.html#configuration-tips).
+That flag alone does not repair an incompatible audio-library import. Actual GPU
+model execution still needs the cluster run; offline tests exercise submission,
+repair selection, output isolation, and cache import rather than GPU inference.
 
 ### Automatic setup and commands after a new login
 
@@ -185,7 +230,7 @@ Each model gets two Slurm jobs:
    commit instead of `UNPINNED`. Verification does not mark the model's inference
    behavior as validated; `verified` retains its source value.
 
-GPU jobs are chained sequentially with `afterany` to keep one writer to the shared
+In default serial mode, GPU jobs are chained with `afterany` to keep one writer to the shared
 run directory; CPU preparation jobs can overlap. A failed monitor job allows the
 next model to run. Failed preparation cancels that model's GPU job, allowing the
 chain to advance. An additional file lock rejects

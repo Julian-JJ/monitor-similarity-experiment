@@ -1,6 +1,7 @@
 """The serving command for monitors: pure construction, no vLLM needed."""
 
 import tempfile
+import json
 import unittest
 from pathlib import Path
 
@@ -50,6 +51,7 @@ class CommandTests(unittest.TestCase):
                 self.assertEqual(self.flag(command, "--dtype"), "auto")
                 self.assertEqual(self.flag(command, "--served-model-name"), monitor.model_id)
                 self.assertEqual(self.flag(command, "--reasoning-parser"), "gemma4")
+                self.assertEqual(json.loads(self.flag(command, "--limit-mm-per-prompt")), {"image": 0, "audio": 0})
                 self.assertNotIn("--rope-scaling", command)
 
     def test_a_longer_context_needs_a_yarn_factor_and_a_shorter_one_is_refused(self):

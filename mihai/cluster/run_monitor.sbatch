@@ -15,6 +15,7 @@ TP="${TP:-1}"
 GPU_LABEL="${GPU_LABEL:-H200:$TP}"
 PORT="${PORT:-28474}"
 EXTRA_ARGS="${EXTRA_ARGS:-}"
+RUNS_DIR="${RUNS_DIR:-$ME/runs}"
 SCORE="${SCORE:-1}"
 score_flag=()
 [[ "$SCORE" == 1 ]] && score_flag=(--score)
@@ -48,15 +49,23 @@ trap 'exit 143' TERM
 trap 'exit 130' INT
 
 cd "$FRAMEWORK"
+if [[ -n "${GEMMA_ENV_LOCK:-}" ]]; then
+    exec 8> "$GEMMA_ENV_LOCK"
+    flock -s -n 8 || { echo 'The Gemma environment is being repaired; retry after repair completes' >&2; exit 1; }
+fi
 # A run directory has one manifest and JSONL streams. Separate processes must
 # not append to it simultaneously, even if another submitter bypassed the queue.
 run_name=$("$ANALYSIS_PY" -c 'import sys, tomllib; print(tomllib.load(open(sys.argv[1], "rb"))["name"])' "$EXPERIMENT")
 [[ "$run_name" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || { echo "Unsafe experiment name: $run_name" >&2; exit 1; }
-mkdir -p "$ME/runs/$run_name"
-exec 9> "$ME/runs/$run_name/.monitor-job.lock"
+mkdir -p "$RUNS_DIR/$run_name"
+exec 9> "$RUNS_DIR/$run_name/.monitor-job.lock"
 flock -n 9 || { echo "Another job is writing run $run_name" >&2; exit 1; }
+if [[ -n "${SEED_BASELINE:-}" ]]; then
+    "$ANALYSIS_PY" scripts/seed_monitor_run.py --source "$SEED_BASELINE" --target "$RUNS_DIR/$run_name" \
+        --monitor "$MONITOR" --experiment "$EXPERIMENT" "${registry_args[@]}"
+fi
 printf 'job=%s monitor=%s experiment=%s node=%s started_at=%s\n' "$JOB" "$MONITOR" "$EXPERIMENT" "$(hostname)" "$(date -u +%FT%TZ)" | tee -a "$STATUS"
-printf 'framework=%s results=%s analysis_python=%s serving_python=%s\n' "$FRAMEWORK" "$ME/runs/$run_name" "$ANALYSIS_PY" "$SERVING_PY" | tee -a "$STATUS"
+printf 'framework=%s results=%s analysis_python=%s serving_python=%s\n' "$FRAMEWORK" "$RUNS_DIR/$run_name" "$ANALYSIS_PY" "$SERVING_PY" | tee -a "$STATUS"
 printf 'enforce_eager=%s cuda_launch_blocking=%s\n' "${ENFORCE_EAGER:-0}" "${CUDA_LAUNCH_BLOCKING:-0}" | tee -a "$STATUS"
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv | tee -a "$STATUS"
 # A port is "taken" only if something is listening. Closed connections of a previous server linger in TIME_WAIT for a minute, so bind with SO_REUSEADDR as the server does.
@@ -77,6 +86,6 @@ printf 'server_ready_at=%s\n' "$(date -u +%FT%TZ)" >> "$STATUS"
 
 # shellcheck disable=SC2086   # EXTRA_ARGS is deliberately word-split
 "$ANALYSIS_PY" scripts/run_experiment.py "$EXPERIMENT" --monitor "$MONITOR" --base-url "http://127.0.0.1:$PORT/v1" \
-    --out "$ME/runs" --gpu "$GPU_LABEL" --job-id "$JOB" "${registry_args[@]}" "${score_flag[@]}" $EXTRA_ARGS 2>&1 | tee -a "$STATUS"
+    --out "$RUNS_DIR" --gpu "$GPU_LABEL" --job-id "$JOB" "${registry_args[@]}" "${score_flag[@]}" $EXTRA_ARGS 2>&1 | tee -a "$STATUS"
 # Always write the label-free summary (validity, reply lengths, plan sizes, latency): it is what the pilot is judged on.
-"$ANALYSIS_PY" scripts/pilot_summary.py "$ME/runs/$run_name" --monitor "$MONITOR" --json "$ME/runs/$run_name/pilot-summary-$MONITOR.json" 2>&1 | tee -a "$STATUS"
+"$ANALYSIS_PY" scripts/pilot_summary.py "$RUNS_DIR/$run_name" --monitor "$MONITOR" --json "$RUNS_DIR/$run_name/pilot-summary-$MONITOR.json" 2>&1 | tee -a "$STATUS"
