@@ -58,6 +58,13 @@ It writes `$ME/logs/gemma-repair-*.json` and a Slurm log in the new submission
 directory. If repair fails, the Gemma jobs are cancelled; Qwen is independent.
 No model weights are downloaded by the repair.
 
+To retry just Gemma with the shared repair prerequisite, use
+`bash junlin/retry.sh gemma`. It submits one CPU repair/check and four parallel
+GPU jobs, retaining both Qwen results and any ongoing Qwen diagnostic. The CPU
+job now also ensures that the Gemma environment's `ninja` executable works and
+checks the matching CUDA toolkit before the GPU jobs become eligible. A failed
+CPU check cancels the dependent Gemma jobs before GPU allocation.
+
 TorchAudio's native libraries must be compatible with the installed Torch build
 ([TorchAudio installation guidance](https://docs.pytorch.org/audio/main/installation.html)).
 The Gemma launchers also disable image/audio profiling for these text-only
@@ -173,6 +180,28 @@ must match that CUDA major/minor version. `CUDA_HOME`, `CUDA_PATH`, `CUDACXX` an
 `PATH` are then set to the detected toolkit. The job status file records the
 Torch CUDA version, compiler version, toolkit path and loaded modules. Qwen jobs
 retain their existing environment.
+
+The serving environment's `bin` directory is also added to `PATH`. Merely
+calling its Python by absolute path does not expose commands such as `ninja`.
+Both `nvcc` and `ninja --version` are checked. Full setup installs Ninja; the
+Gemma repair prerequisite installs/reinstalls only Ninja when that executable
+is missing or broken, using `--no-deps`, and preserves Torch/vLLM versions.
+
+Gemma's serving entry point repeats toolkit setup immediately before executing
+vLLM through `serve_with_cuda.sh`, so a previously submitted batch script still
+benefits after its checkout is updated. The serving manifest records the
+launcher command plus `cuda_environment` with the actual server's compiler,
+Ninja paths/versions and CUDA/module settings. It does not record the complete
+process environment. `--print-command` continues to print the vLLM arguments
+without loading a toolkit or starting inference.
+
+The warning about missing `flashinfer-cubin` and `nvcc` or `ninja` means at least
+one JIT tool cannot be found; the optional cubin package is not required when
+the compiler and Ninja are available. See [vLLM's availability check](https://github.com/vllm-project/vllm/blob/main/vllm/utils/flashinfer.py).
+The supplied Bouchet module `CUDA/12.9.1` matches a Torch CUDA 12.9 build. It does
+not satisfy a build requiring CUDA 13.0. The diagnostic below prints the
+configured serving Python's actual `torch.version.cuda`; toolkit selection is
+based on that value, regardless of the installation recipe's index URLs.
 
 After pulling this change, retry just the four Gemmas concurrently:
 

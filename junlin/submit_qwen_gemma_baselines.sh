@@ -153,7 +153,7 @@ if [[ "$dry_run" == 0 ]]; then
         serving="$SERVING_PY"
         if [[ "$monitor" == gemma4-* ]]; then
             serving="$GEMMA_SERVING_PY"
-            if [[ ! -r "$FRAMEWORK/mihai/cluster/cuda_toolkit.sh" || ! -r "$FRAMEWORK/mihai/cluster/run_monitor.sbatch" ]] ||
+            if [[ ! -r "$FRAMEWORK/mihai/cluster/cuda_toolkit.sh" || ! -r "$FRAMEWORK/mihai/cluster/serve_with_cuda.sh" || ! -r "$FRAMEWORK/mihai/cluster/run_monitor.sbatch" ]] ||
                 [[ "$(< "$FRAMEWORK/mihai/cluster/run_monitor.sbatch")" != *configure_monitor_cuda* ]]; then
                 echo "Gemma CUDA setup is missing from FRAMEWORK=$FRAMEWORK. Update that checkout, or run 'bash junlin/setup.sh' from the updated checkout to save its path, then submit fresh jobs." >&2
                 exit 1

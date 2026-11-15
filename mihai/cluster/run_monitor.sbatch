@@ -71,8 +71,9 @@ nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv | tee -a "$
 if [[ "$MONITOR" == gemma4-* ]]; then
     source "$FRAMEWORK/mihai/cluster/cuda_toolkit.sh"
     configure_monitor_cuda
-    printf 'torch_cuda=%s nvcc_version=%s cuda_home=%s cuda_module=%s loaded_modules=%s\n' \
-        "$MONITOR_TORCH_CUDA" "$MONITOR_NVCC_VERSION" "$CUDA_HOME" "$MONITOR_CUDA_MODULE" "${LOADEDMODULES:-}" | tee -a "$STATUS"
+    printf 'torch_cuda=%s nvcc_version=%s cuda_home=%s cuda_module=%s loaded_modules=%s ninja=%s ninja_version=%s\n' \
+        "$MONITOR_TORCH_CUDA" "$MONITOR_NVCC_VERSION" "$CUDA_HOME" "$MONITOR_CUDA_MODULE" "${LOADEDMODULES:-}" \
+        "$MONITOR_NINJA_PATH" "$MONITOR_NINJA_VERSION" | tee -a "$STATUS"
 fi
 # A port is "taken" only if something is listening. Closed connections of a previous server linger in TIME_WAIT for a minute, so bind with SO_REUSEADDR as the server does.
 "$ANALYSIS_PY" -c 'import socket,sys; s=socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); s.bind(("127.0.0.1", int(sys.argv[1]))); s.close()' "$PORT"

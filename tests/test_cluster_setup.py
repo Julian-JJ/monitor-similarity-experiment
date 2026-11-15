@@ -144,6 +144,7 @@ class SetupTests(unittest.TestCase):
             self.assertIn(values["GEMMA_SERVING_PY"], vllm)
             self.assertEqual(vllm[vllm.index("--default-index") + 1], "https://pypi.org/simple")
             self.assertIn("unsafe-best-match", vllm)
+            self.assertIn("ninja", vllm)
             self.assertIn([values["ANALYSIS_PY"], "-m", "pip", "check"], commands)
             self.assertTrue(any(c[-4:] == ["pip", "check", "--python", values["GEMMA_SERVING_PY"]] for c in commands))
             self.assertFalse(any("download_monitor.py" in str(c) or "sbatch" in c for c in commands))
@@ -289,6 +290,40 @@ class AutoConfig:
             self.assertEqual(report["before"]["torch"], report["after"]["torch"])
             self.assertEqual(report["before"]["vllm"], report["after"]["vllm"])
             self.assertEqual(checks[0], 2)
+
+    def test_gemma_repair_installs_missing_ninja_without_changing_torch_or_vllm(self):
+        for changed in (False, True):
+            with self.subTest(changed=changed), TempDir() as directory:
+                _, _, values = self.fixture(directory)
+                before = {"torch": "2.14.0+cu129", "cuda": "12.9", "torchaudio": "2.11.1+cu129", "vllm": "0.33.0"}
+                commands, ninja_checks, queries = [], [0], [0]
+
+                def runner(command, *, capture=False):
+                    command = [str(p) for p in command]
+                    commands.append(command)
+                    if Path(command[0]).name == "ninja":
+                        ninja_checks[0] += 1
+                        if ninja_checks[0] == 1:
+                            raise FileNotFoundError("ninja is missing")
+                        return "1.13.0"
+                    if "-c" in command:
+                        if command[-1] == setup.NATIVE_AUDIO_CHECK:
+                            return "native imports OK"
+                        queries[0] += 1
+                        return json.dumps({**before, "torch": "different"} if changed and queries[0] > 1 else before)
+
+                if changed:
+                    with self.assertRaisesRegex(setup.SetupError, "Torch or vLLM changed during Ninja repair"):
+                        setup.repair_gemma(values, runner)
+                else:
+                    report = setup.repair_gemma(values, runner)
+                    self.assertTrue(report["ninja_installed"])
+                    self.assertEqual(report["before"], report["after"])
+                installs = [c for c in commands if "install" in c]
+                self.assertEqual(len(installs), 1)
+                self.assertEqual(installs[0][-1], "ninja")
+                self.assertIn("--no-deps", installs[0])
+                self.assertEqual(ninja_checks[0], 2)
 
 
 class HealthTests(unittest.TestCase):

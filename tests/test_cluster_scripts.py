@@ -10,6 +10,7 @@ SCRIPTS = {name: ROOT / "mihai/cluster" / name for name in ("setup_cluster.sh", 
 SCRIPTS["submit_qwen_gemma_baselines.sh"] = ROOT / "junlin/submit_qwen_gemma_baselines.sh"
 for name in ("setup.sh", "setup.sbatch", "run.sh", "retry.sh", "repair_gemma.sbatch"):
     SCRIPTS[name] = ROOT / "junlin" / name
+SCRIPTS["serve_with_cuda.sh"] = ROOT / "mihai/cluster/serve_with_cuda.sh"
 WRITES = re.compile(r"(?:>>?\s*|\bmkdir(?:\s+-p)?\s+|\bln\s+-s\s+\S+\s+|\bcp\s+\S+\s+|\btee(?:\s+-a)?\s+|--out(?:put)?\s+|--cache-dir\s+)\"?\$SHARED")
 
 
@@ -34,7 +35,7 @@ class ScriptTests(unittest.TestCase):
 
     def test_the_default_output_directory_is_the_users_own_not_the_teammates(self):
         for name, path in SCRIPTS.items():
-            if name in ("setup.sh", "setup.sbatch", "run.sh", "retry.sh", "repair_gemma.sbatch"):
+            if name in ("setup.sh", "setup.sbatch", "run.sh", "retry.sh", "repair_gemma.sbatch", "serve_with_cuda.sh"):
                 continue  # The helper discovers the current account and saves it; wrappers load that configuration.
             defaults = re.findall(r'ME="\$\{ME:-([^}]+)\}"', path.read_text())
             self.assertEqual(defaults, ["/nfs/roberts/project/cpsc4880/cpsc4880_as4833"], name)

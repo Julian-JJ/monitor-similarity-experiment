@@ -1,9 +1,12 @@
 """Exercise toolkit discovery in fresh batch shells without CUDA, Torch or Lmod."""
 
 import os
+import json
 from pathlib import Path
 import shutil
+import shlex
 import subprocess
+import sys
 import unittest
 
 from tests.support import TempDir
@@ -38,6 +41,9 @@ class CudaToolkitTests(unittest.TestCase):
         python = directory / "serving python"
         python.write_text('#!/bin/sh\nprintf "%s\\n" "$TEST_TORCH_CUDA"\n')
         python.chmod(0o755)
+        ninja = directory / "ninja"
+        ninja.write_text("#!/bin/sh\necho 1.13.0\n")
+        ninja.chmod(0o755)
         return {**os.environ, "PATH": str(old / "bin") + os.pathsep + os.environ["PATH"],
                 "SERVING_PY": str(python), "CUDA_HOME": "", "CUDA_PATH": "", "CUDA_MODULE": "",
                 "TEST_TORCH_CUDA": "12.9", "TEST_CUDA_ROOT": str(matching),
@@ -131,6 +137,51 @@ class CudaToolkitTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("no recognizable CUDA runtime", result.stderr)
             self.assertFalse(Path(env["TEST_MODULE_LOG"]).exists())
+
+    def test_ninja_in_serving_environment_is_added_to_path(self):
+        with TempDir() as directory:
+            env = self.environment(directory)
+            self.assertNotIn(str(directory), env["PATH"].split(os.pathsep))
+            command = COMMAND + 'printf "%s\\n" "$MONITOR_NINJA_PATH" "$MONITOR_NINJA_VERSION"\n'
+            result = subprocess.run(["bash", "-c", command, "bash", str(HELPER)], env=env, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.splitlines()[-2:], [str(directory / "ninja"), "1.13.0"])
+
+    def test_missing_ninja_stops_before_launching_server(self):
+        with TempDir() as directory:
+            env = self.environment(directory)
+            (directory / "ninja").unlink()
+            tools = directory / "tools"
+            tools.mkdir()
+            for command in ("bash", "dirname", "readlink"):
+                (tools / command).symlink_to(shutil.which(command))
+            env["PATH"] = str(tools)
+            env["CUDA_HOME"] = env["TEST_CUDA_ROOT"]
+            result = self.run_helper(env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("FlashInfer needs ninja on PATH", result.stderr)
+
+    def test_server_wrapper_sets_actual_child_environment_and_records_provenance(self):
+        from monitor_experiment.monitor_serving import cuda_launch_command
+        with TempDir() as directory:
+            env = self.environment(directory)
+            env["CUDA_HOME"] = env["TEST_CUDA_ROOT"]
+            python = Path(env["SERVING_PY"])
+            python.write_text('#!/bin/sh\nif [ "$1" = "-c" ] && [ "$2" = "import torch; print(torch.version.cuda)" ]; then\n'
+                              'printf "%s\\n" "$TEST_TORCH_CUDA"\nelse\nexec ' + shlex.quote(sys.executable) + ' "$@"\nfi\n')
+            manifest = directory / "serving.json"
+            manifest.write_text(json.dumps({"monitor": "gemma4-e2b", "command": ["original"]}))
+            code = "import json,os,shutil; print(json.dumps({'cuda_home':os.environ['CUDA_HOME'],'ninja':shutil.which('ninja'),'nvcc':shutil.which('nvcc')}))"
+            command = cuda_launch_command([str(python), "-c", code], ROOT, manifest)
+            result = subprocess.run(command, env=env, text=True, capture_output=True, cwd=directory)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            child = json.loads(result.stdout.splitlines()[-1])
+            record = json.loads(manifest.read_text())
+            self.assertEqual(record["command"], ["original"])
+            self.assertEqual(record["cuda_environment"]["cuda_home"], child["cuda_home"])
+            self.assertEqual(record["cuda_environment"]["nvcc"], child["nvcc"])
+            self.assertEqual(child["ninja"], str(directory / "ninja"))
+            self.assertEqual(record["cuda_environment"]["ninja_version"], "1.13.0")
 
 
 if __name__ == "__main__":

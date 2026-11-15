@@ -13,7 +13,7 @@ Usage: bash junlin/setup.sh [--install | --check | --status | --repair-gemma | -
   --install                Create/repair analysis and Gemma serving environments.
   --check                  Read-only verification; no installs, downloads or writes.
   --status                 Report job exits, progress and scoring for the new batch.
-  --repair-gemma           Repair the native TorchAudio wheel without upgrading Torch/vLLM.
+  --repair-gemma           Ensure Ninja and repair native TorchAudio without upgrading Torch/vLLM.
   --diagnose-gemma         Read-only check of checkout paths, newest job and submitted CUDA setup.
   --project-dir DIR        Your writable project directory (default: cluster account).
   --shared-dir DIR         Existing shared data/Qwen environment (default: cpsc4880_mae73).

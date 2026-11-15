@@ -9,8 +9,11 @@ monitor_nvcc_version() {
 }
 
 configure_monitor_cuda() {
-    local nvcc= current= module_name= module_init resolved_nvcc
+    local nvcc= current= module_name= module_init resolved_nvcc serving_bin
     local module_initializers=(/etc/profile.d/lmod.sh /etc/profile.d/modules.sh)
+    serving_bin=$(dirname -- "$(command -v -- "$SERVING_PY")") || return 1
+    # Using an absolute venv Python does not activate its command-line tools.
+    export PATH="$serving_bin:$PATH"
     MONITOR_TORCH_CUDA=$("$SERVING_PY" -c 'import torch; print(torch.version.cuda)') || return 1
     [[ "$MONITOR_TORCH_CUDA" =~ ^[0-9]+\.[0-9]+$ ]] || {
         echo "Serving Python has no recognizable CUDA runtime: $MONITOR_TORCH_CUDA" >&2
@@ -54,6 +57,11 @@ configure_monitor_cuda() {
     CUDA_HOME=$(dirname -- "$(dirname -- "$resolved_nvcc")") || return 1
     export CUDA_HOME
     export CUDA_PATH="$CUDA_HOME" CUDACXX="$CUDA_HOME/bin/nvcc"
-    export PATH="$CUDA_HOME/bin:$PATH"
+    export PATH="$CUDA_HOME/bin:$serving_bin:$PATH"
     MONITOR_NVCC_VERSION="$current"
+    MONITOR_NINJA_PATH=$(command -v ninja || true)
+    if [[ -z "$MONITOR_NINJA_PATH" ]] || ! MONITOR_NINJA_VERSION=$("$MONITOR_NINJA_PATH" --version); then
+        echo "FlashInfer needs ninja on PATH. Run the Gemma repair prerequisite to install it in the serving environment: bash junlin/retry.sh gemma" >&2
+        return 1
+    fi
 }

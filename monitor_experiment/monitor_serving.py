@@ -63,3 +63,9 @@ def provenance(monitor, command, vllm_version, model_dir):
     """What to record about this server alongside a run."""
     return {"schema_version": 1, "monitor": monitor.name, "monitor_identity": monitor.identity(),
             "model_dir": str(model_dir), "vllm_version": vllm_version, "command": command}
+
+
+def cuda_launch_command(command, root, manifest=None):
+    """Load the toolkit immediately before executing the Gemma vLLM process."""
+    return ["bash", str(Path(root) / "mihai/cluster/serve_with_cuda.sh"), command[0],
+            str(Path(manifest).resolve()) if manifest else "", *command]

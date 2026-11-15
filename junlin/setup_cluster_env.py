@@ -111,7 +111,7 @@ def install(values, runner=run):
     # Official Gemma 4 CUDA 12.9 recipe, with PyPI explicit to avoid index shadowing.
     # https://docs.vllm.ai/projects/recipes/en/stable/Google/Gemma4.html
     runner([gemma.parent / "uv", "--no-config", "pip", "install", "--python", gemma,
-            "--upgrade", "--pre", "vllm", "--default-index", "https://pypi.org/simple",
+            "--upgrade", "--pre", "vllm", "ninja", "--default-index", "https://pypi.org/simple",
             "--extra-index-url", "https://wheels.vllm.ai/nightly/cu129",
             "--extra-index-url", "https://download.pytorch.org/whl/cu129",
             "--index-strategy", "unsafe-best-match"])
@@ -210,8 +210,21 @@ print('TorchAudio and Gemma processor native imports OK')
 """
 
 
+def ensure_ninja(python, runner=run):
+    ninja = Path(python).parent / "ninja"
+    try:
+        runner([ninja, "--version"], capture=True)
+        return False
+    except (SetupError, OSError):
+        runner([python, "-m", "pip", "--isolated", "install", "--force-reinstall", "--no-deps",
+                "--only-binary=:all:", "--index-url", "https://pypi.org/simple", "ninja"])
+        runner([ninja, "--version"], capture=True)
+        runner([python, "-m", "pip", "check"])
+        return True
+
+
 def repair_gemma(values, runner=run):
-    """Repair only TorchAudio's binary build, preserving the installed Torch and vLLM."""
+    """Repair Ninja/TorchAudio while preserving the installed Torch and vLLM."""
     python = values["GEMMA_SERVING_PY"]
     writable_private(Path(python).absolute().parent.parent, values)
     info_code = """
@@ -221,11 +234,16 @@ print(json.dumps({'torch': version('torch'), 'cuda': torch.version.cuda,
                   'torchaudio': version('torchaudio'), 'vllm': version('vllm')}))
 """
     before = json.loads(runner([python, "-c", info_code], capture=True))
+    ninja_installed = ensure_ninja(python, runner)
     try:
         runner([python, "-c", NATIVE_AUDIO_CHECK], capture=True)
-        return {"before": before, "after": before, "repaired": False}
     except SetupError as error:
         print(f"Gemma native import failed; repairing TorchAudio: {error}", flush=True)
+    else:
+        after = json.loads(runner([python, "-c", info_code], capture=True)) if ninja_installed else before
+        if (before["torch"], before["vllm"]) != (after["torch"], after["vllm"]):
+            raise SetupError("Torch or vLLM changed during Ninja repair; refusing to launch inference")
+        return {"before": before, "after": after, "repaired": False, "ninja_installed": ninja_installed}
     if not before["cuda"]:
         raise SetupError("Gemma serving Torch has no CUDA runtime; use a CUDA-enabled vLLM environment")
     backend = "cu" + "".join(before["cuda"].split(".")[:2])
@@ -238,7 +256,7 @@ print(json.dumps({'torch': version('torch'), 'cuda': torch.version.cuda,
         raise SetupError("Torch or vLLM changed during audio repair; refusing to launch inference")
     runner([python, "-m", "pip", "check"])
     runner([python, "-c", NATIVE_AUDIO_CHECK], capture=True)
-    return {"before": before, "after": after, "repaired": True, "wheel_index": index}
+    return {"before": before, "after": after, "repaired": True, "wheel_index": index, "ninja_installed": ninja_installed}
 
 
 def verify(values, registry, root, runner=run):
@@ -252,6 +270,7 @@ def verify(values, registry, root, runner=run):
             report[label] = json.loads(runner([executable, "-c", code, *extra], capture=True))
             if label == "gemma":
                 runner([executable, "-c", NATIVE_AUDIO_CHECK], capture=True)
+                runner([Path(executable).parent / "ninja", "--version"], capture=True)
             print(f"OK {label}: {executable} {report[label]['packages']}", flush=True)
         except (SetupError, OSError, ValueError) as error:
             errors.append(f"{label} environment: {error}")
@@ -316,6 +335,8 @@ def diagnose_gemma(values, environ=None):
         print(f"{label}: {path} commit={commit or 'unknown'} CUDA_check={'present' if aware else 'ABSENT'}")
     if checkout != submission_checkout:
         print("CHECKOUT MISMATCH: the submitter is configured to use a different checkout.")
+    runtime = probe([values["GEMMA_SERVING_PY"], "-c", "import torch; print('torch_cuda=' + str(torch.version.cuda))"])
+    print(f"Configured Gemma runtime: {runtime or 'unavailable'} python={values['GEMMA_SERVING_PY']}")
 
     latest = None
     logs = Path(values["ME"]) / "logs"

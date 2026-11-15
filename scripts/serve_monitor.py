@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from monitor_experiment.artifacts import write_json  # noqa: E402
-from monitor_experiment.monitor_serving import ServingError, build_command, check_model_dir, provenance  # noqa: E402
+from monitor_experiment.monitor_serving import ServingError, build_command, check_model_dir, provenance, cuda_launch_command  # noqa: E402
 from monitor_experiment import monitor_download  # noqa: E402
 from monitor_experiment.registry import Registry, RegistryError  # noqa: E402
 
@@ -53,10 +53,14 @@ def main():
         version = importlib.metadata.version("vllm")
     except importlib.metadata.PackageNotFoundError:
         sys.exit("ERROR: vllm is not installed in this Python; use the GPU serving environment")
+    launch_command = cuda_launch_command(command, ROOT, args.manifest) if monitor.family == "gemma4" else command
     if args.manifest:
-        write_json(args.manifest, provenance(monitor, command, version, model_dir.resolve()))
+        record = provenance(monitor, command, version, model_dir.resolve())
+        if monitor.family == "gemma4":
+            record["launcher_command"] = launch_command
+        write_json(args.manifest, record)
     print(json.dumps(command), flush=True)
-    sys.exit(subprocess.run(command).returncode)
+    sys.exit(subprocess.run(launch_command).returncode)
 
 
 if __name__ == "__main__":

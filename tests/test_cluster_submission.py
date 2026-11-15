@@ -29,7 +29,7 @@ class SubmissionTests(unittest.TestCase):
         for filename in ("qwen-gemma-baseline.toml", "cuda-debug-qwen3-1.7b.toml"):
             shutil.copy(ROOT / "configs/experiments" / filename, root / "configs/experiments")
         (root / "mihai/cluster").mkdir(parents=True)
-        for filename in ("run_monitor.sbatch", "cuda_toolkit.sh"):
+        for filename in ("run_monitor.sbatch", "cuda_toolkit.sh", "serve_with_cuda.sh"):
             shutil.copy(ROOT / "mihai/cluster" / filename, root / "mihai/cluster")
         tokenizer = root / "cache/tokenizer/tokenizer.json"
         tokenizer.parent.mkdir(parents=True)
@@ -131,11 +131,11 @@ print(str(1000 + len(rows)) + ';test-cluster')
             self.assertEqual(records[1]["env"]["CUDA_MODULE"], "CUDA/12.9.1")
 
     def test_gemma_selection_rejects_checkout_without_cuda_setup_before_queuing_jobs(self):
-        for filename in ("cuda_toolkit.sh", "run_monitor.sbatch"):
+        for filename in ("cuda_toolkit.sh", "serve_with_cuda.sh", "run_monitor.sbatch"):
             with self.subTest(filename=filename), TempDir() as temporary:
                 env = self.environment(temporary)
                 path = Path(env["FRAMEWORK"]) / "mihai/cluster" / filename
-                if filename == "cuda_toolkit.sh":
+                if filename != "run_monitor.sbatch":
                     path.unlink()
                 else:
                     path.write_text("#!/bin/bash\n# Older monitor launcher\n")
@@ -216,6 +216,21 @@ print(str(1000 + len(rows)) + ';test-cluster')
             with receipt.open() as stream:
                 rows = list(csv.DictReader(stream, delimiter="\t"))
             self.assertTrue(all(row["run_dir"].endswith("/baseline") for row in rows if row["stage"] == "monitor"))
+
+    def test_gemma_retry_has_one_cpu_repair_and_four_independent_gpu_jobs(self):
+        with TempDir() as temporary:
+            env = self.environment(temporary)
+            result = subprocess.run(["bash", str(ROOT / "junlin/retry.sh"), "gemma"], env=env, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            records = [json.loads(line) for line in Path(env["CAPTURE"]).read_text().splitlines()]
+            self.assertEqual(len(records), 9)
+            gpus = [r for r in records if any(a.startswith("--gpus=") for a in r["args"])]
+            self.assertEqual([r["env"]["MONITOR"] for r in gpus], list(MODELS[2:]))
+            for gpu in gpus:
+                dependency = next(a for a in gpu["args"] if a.startswith("--dependency="))
+                self.assertIn(",afterok:1000", dependency)
+                self.assertNotIn("afterany", dependency)
+                self.assertIn("--kill-on-invalid-dep=yes", gpu["args"])
 
     def test_preparations_gate_each_gpu_and_gpu_jobs_are_serialized(self):
         with TempDir() as temporary:
