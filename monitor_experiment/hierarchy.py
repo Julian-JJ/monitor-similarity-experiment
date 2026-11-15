@@ -71,7 +71,12 @@ def load_prompts():
                "notice": (ROOT / "prompts/monitor_chunk_notice.txt").read_text(),
                "reduce": (ROOT / "prompts/monitor_reduce.txt").read_text(),
                "plan": (ROOT / "prompts/monitor_plan.txt").read_text(),
-               "plan_section": (ROOT / "prompts/monitor_plan_section.txt").read_text()}
+               "plan_section": (ROOT / "prompts/monitor_plan_section.txt").read_text(),
+               "execute_agent": (ROOT / "prompts/monitor_execute_agent.txt").read_text(),
+               "execute_summary": (ROOT / "prompts/monitor_execute_summary.txt").read_text(),
+               "execute_section": (ROOT / "prompts/monitor_execute_section.txt").read_text(),
+               "plan_compare": (ROOT / "prompts/monitor_plan_compare.txt").read_text(),
+               "plan_compare_section": (ROOT / "prompts/monitor_plan_compare_section.txt").read_text()}
     for scope in SCOPES:
         if upstream[scope].count(TRANSCRIPT_MARKER) != 1:
             raise HierarchyError(f"Upstream {scope} template must contain the transcript marker exactly once")
@@ -287,25 +292,26 @@ def pack_chunks(parts, budget, count):
 
 # --- prompts and verdicts ----------------------------------------------------
 
-def with_plan_section(template, prompts, plan_text):
-    """Insert the reference-plan block before the hidden objective, leaving ``{plan}`` to be formatted.
+def with_plan_section(template, prompts, plan_text, section_key="plan_section"):
+    """Insert the reference-plan/execution/comparison block before the hidden objective, leaving ``{plan}`` to be formatted.
 
     The block is added to the *template* and the plan text is supplied afterwards as a
     ``format`` argument, so braces inside a plan can never be read as placeholders.
     """
     if plan_text is None:
         return template
-    return template.replace(OBJECTIVE_MARKER, prompts["plan_section"] + OBJECTIVE_MARKER)
+    section = prompts.get(section_key, prompts["plan_section"])
+    return template.replace(OBJECTIVE_MARKER, section + OBJECTIVE_MARKER)
 
 
-def chunk_prompt(prompts, scope, task, objective, text, index, total, plan_text=None):
+def chunk_prompt(prompts, scope, task, objective, text, index, total, plan_text=None, section_key="plan_section"):
     """The upstream prompt, plus our part notice when the transcript spans several chunks,
     plus the reference-plan block when ``plan_text`` is given."""
     template = prompts["upstream"][scope]
     if total > 1:
         notice = prompts["notice"].format(part=index + 1, parts=total)
         template = template.replace(TRANSCRIPT_MARKER, notice + TRANSCRIPT_MARKER)
-    template = with_plan_section(template, prompts, plan_text)
+    template = with_plan_section(template, prompts, plan_text, section_key)
     # str.format reads placeholders from the template only, never from substituted text.
     return template.format(input=task, task=objective, action=text, cot=text, plan=plan_text or "")
 
@@ -321,18 +327,18 @@ def neutralize(text):
     return ANSWER.sub(lambda m: f"[partial verdict: {m.group(1).upper()}]", text)
 
 
-def reduce_prompt(prompts, task, objective, reports, plan_text=None):
+def reduce_prompt(prompts, task, objective, reports, plan_text=None, section_key="plan_section"):
     """``reports`` is a list of ``(first_turn, last_turn, text)`` in transcript order."""
     body = "\n\n".join(
         f"PARTIAL ANALYSIS {i} of {len(reports)} (covers turns {first}-{last}):\n{neutralize(text).strip()}"
         for i, (first, last, text) in enumerate(reports, 1))
-    template = with_plan_section(prompts["reduce"], prompts, plan_text)
+    template = with_plan_section(prompts["reduce"], prompts, plan_text, section_key)
     return template.format(count=len(reports), input=task, task=objective, reports=body, plan=plan_text or "")
 
 
 # --- planning and execution --------------------------------------------------
 
-def plan(messages, params, count, prompts, objective=None, plan_text=None, turns_transform=None):
+def plan(messages, params, count, prompts, objective=None, plan_text=None, turns_transform=None, section_key="plan_section"):
     """Offline level-0 plan: chunks and their exact prompts for one rollout and scope.
 
     ``objective`` overrides the side-objective text otherwise read from the system message
@@ -352,7 +358,7 @@ def plan(messages, params, count, prompts, objective=None, plan_text=None, turns
     if not parts:
         raise HierarchyError(f"The {params['scope']} observation of this rollout is empty")
     # The prompt around a chunk has a fixed size for one rollout and scope.
-    probe = chunk_prompt(prompts, params["scope"], task, objective, "", 0, 2, plan_text)
+    probe = chunk_prompt(prompts, params["scope"], task, objective, "", 0, 2, plan_text, section_key)
     overhead = count(probe) + 16
     room = input_limit(params) - overhead
     if params["chunk_tokens"] > room:
@@ -364,21 +370,21 @@ def plan(messages, params, count, prompts, objective=None, plan_text=None, turns
         # Prefer the unmodified upstream prompt whenever the whole transcript fits it.
         whole, _ = segments(rollout_turns, {**params, "chunk_tokens": 10 ** 9}, count)
         text = "\n\n".join(piece["text"] for piece in whole)
-        if count(chunk_prompt(prompts, params["scope"], task, objective, text, 0, 1, plan_text)) <= input_limit(params):
+        if count(chunk_prompt(prompts, params["scope"], task, objective, text, 0, 1, plan_text, section_key)) <= input_limit(params):
             chunks = [{"segments": whole, "text": text, "tokens": count(text)}]
     if chunks is None:
         chunks = pack_chunks(parts, params["chunk_tokens"], count)
     for index, chunk in enumerate(chunks):
         chunk["index"] = index
         chunk["first_turn"], chunk["last_turn"] = chunk["segments"][0]["turn"], chunk["segments"][-1]["turn"]
-        chunk["prompt"] = chunk_prompt(prompts, params["scope"], task, objective, chunk["text"], index, len(chunks), plan_text)
+        chunk["prompt"] = chunk_prompt(prompts, params["scope"], task, objective, chunk["text"], index, len(chunks), plan_text, section_key)
         chunk["prompt_tokens"] = count(chunk["prompt"])
         if chunk["prompt_tokens"] > input_limit(params):
             raise HierarchyError(f"Chunk {index} prompt has {chunk['prompt_tokens']} tokens; limit {input_limit(params)}")
     return {"main_task": task, "objective": objective, "turn_count": len(rollout_turns),
             "truncated_tool_results": truncated, "chunks": chunks,
             "hierarchical": len(chunks) > 1, "partial_cot": transform_stats,
-            "plan_text": plan_text}
+            "plan_text": plan_text, "section_key": section_key}
 
 
 def estimate_tree(chunk_count, bin_size):
@@ -412,9 +418,9 @@ def estimate_tree_tokens(level0_prompt_tokens, chunk_count, bin_size, report_tok
     return total
 
 
-def make_bins(nodes, params, count, prompts, task, objective, plan_text=None):
+def make_bins(nodes, params, count, prompts, task, objective, plan_text=None, section_key="plan_section"):
     """Group consecutive nodes into bins of at most ``bin_size`` that fit the input limit."""
-    overhead = count(reduce_prompt(prompts, task, objective, [(1, 1, "")], plan_text)) + 16
+    overhead = count(reduce_prompt(prompts, task, objective, [(1, 1, "")], plan_text, section_key)) + 16
     limit = input_limit(params) - overhead
     bins, current, used = [], [], 0
     for node in nodes:
@@ -457,7 +463,7 @@ def call_node(prompt, complete, params, seed):
     return attempts, "invalid", None, attempts[-1]["text"]
 
 
-def run_tree(rollout_id, level0, params, count, prompts, task, objective, complete, seed=0, plan_text=None):
+def run_tree(rollout_id, level0, params, count, prompts, task, objective, complete, seed=0, plan_text=None, section_key="plan_section"):
     """Run chunk monitors, then combine bins level by level until one analysis remains.
 
     ``level0`` is ``plan(...)["chunks"]``. ``complete(prompt, seed)`` returns a
@@ -516,7 +522,7 @@ def run_tree(rollout_id, level0, params, count, prompts, task, objective, comple
             return finish("complete", current[0]["verdict"])
         level += 1
         try:
-            bins = make_bins(current, params, count, prompts, task, objective, plan_text)
+            bins = make_bins(current, params, count, prompts, task, objective, plan_text, section_key)
         except HierarchyError as error:
             return finish("error", None, str(error))
         if all(len(b) == 1 for b in bins):
@@ -528,6 +534,6 @@ def run_tree(rollout_id, level0, params, count, prompts, task, objective, comple
                 following.append(group[0])  # carried upward unchanged; no call
                 continue
             prompt = reduce_prompt(prompts, task, objective,
-                                   [(n["first_turn"], n["last_turn"], n["text"]) for n in group], plan_text)
+                                   [(n["first_turn"], n["last_turn"], n["text"]) for n in group], plan_text, section_key)
             following.append(make(level, index, "reduce", group, first, last, prompt))
         current = following

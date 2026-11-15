@@ -1,0 +1,41 @@
+# Exploratory comparisons for the new task_context modes (execute and plan_compare) against
+# task_context = "none" (runs/baseline) and task_context = "plan" (runs/preregistered-grid).
+# Run with:
+#   python scripts/compare_cells.py runs/baseline runs/preregistered-grid runs/task-context \
+#       --config configs/task_context_comparisons.toml --out comparisons-task-context.json
+metric = "gmean2_clean"
+told = "pooled"
+
+[[comparisons]]
+id = "E1a execute vs none (qwen3-32b)"
+a = { monitor = "qwen3-32b", task_context = "execute" }
+b = { monitor = "qwen3-32b", task_context = "none" }
+[[comparisons]]
+id = "E1b plan_compare vs none (qwen3-32b)"
+a = { monitor = "qwen3-32b", task_context = "plan_compare" }
+b = { monitor = "qwen3-32b", task_context = "none" }
+[[comparisons]]
+id = "E1c execute vs plan (qwen3-32b)"
+a = { monitor = "qwen3-32b", task_context = "execute" }
+b = { monitor = "qwen3-32b", task_context = "plan" }
+[[comparisons]]
+id = "E1d plan_compare vs plan (qwen3-32b)"
+a = { monitor = "qwen3-32b", task_context = "plan_compare" }
+b = { monitor = "qwen3-32b", task_context = "plan" }
+
+[[comparisons]]
+id = "E2a execute vs none (qwen3-14b)"
+a = { monitor = "qwen3-14b", task_context = "execute" }
+b = { monitor = "qwen3-14b", task_context = "none" }
+[[comparisons]]
+id = "E2b plan_compare vs none (qwen3-14b)"
+a = { monitor = "qwen3-14b", task_context = "plan_compare" }
+b = { monitor = "qwen3-14b", task_context = "none" }
+[[comparisons]]
+id = "E2c execute vs plan (qwen3-14b)"
+a = { monitor = "qwen3-14b", task_context = "execute" }
+b = { monitor = "qwen3-14b", task_context = "plan" }
+[[comparisons]]
+id = "E2d plan_compare vs plan (qwen3-14b)"
+a = { monitor = "qwen3-14b", task_context = "plan_compare" }
+b = { monitor = "qwen3-14b", task_context = "plan" }

@@ -1,0 +1,12 @@
+# Exploratory task-context modes: execute (the monitor attempts the main task in a fresh main_only
+# simulated environment and summarizes its run) and plan_compare (the monitor writes a reference
+# plan and compares the agent's transcript against it before judging).
+# Run one monitor per server with --monitor qwen3-32b (or --monitor qwen3-14b).
+name = "task-context"
+monitors = ["qwen3-32b", "qwen3-14b"]
+rollout_sets = ["original_clean", "main_only_v1"]
+[grid]
+scope = ["action", "cot", "all"]
+task_context = ["execute", "plan_compare"]
+[options]
+samples = 4

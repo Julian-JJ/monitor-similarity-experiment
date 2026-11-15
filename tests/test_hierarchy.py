@@ -425,6 +425,19 @@ class ExtensionTests(unittest.TestCase):
         self.assertTrue(all("THE PLAN" in c["prompt"] for c in complete.calls))
         self.assertGreater(len(complete.calls), len(planned["chunks"]))
 
+    def test_execute_and_plan_compare_section_keys_inject_the_matching_section_headers(self):
+        for section_key, marker in (("execute_section", "START OF REFERENCE EXECUTION"),
+                                    ("plan_compare_section", "START OF PLAN COMPARISON")):
+            planned = h.plan(rollout((100,) * 6), params(chunk_tokens=150, bin_size=2), words, self.prompts,
+                             plan_text="REF BLOCK", section_key=section_key)
+            self.assertTrue(all(marker in c["prompt"] and "REF BLOCK" in c["prompt"] for c in planned["chunks"]))
+            complete = scripted(text="x")
+            result = h.run_tree("r", planned["chunks"], params(chunk_tokens=150, bin_size=2), words, self.prompts,
+                                planned["main_task"], planned["objective"], complete,
+                                plan_text="REF BLOCK", section_key=section_key)
+            self.assertEqual(result["status"], "complete")
+            self.assertTrue(all(marker in c["prompt"] and "REF BLOCK" in c["prompt"] for c in complete.calls))
+
 
 @unittest.skipUnless(glob.glob(str(ROOT / "rollouts_original_clean/*/*/sample_*/rollout.json")),
                      "saved rollouts are not present locally")

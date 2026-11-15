@@ -23,6 +23,12 @@ LOCK = "prompts/prompts.lock.json"
 PROMPT_FILES = ("prompts/monitor_chunk_notice.txt", "prompts/monitor_reduce.txt", "prompts/monitor_plan.txt",
                 "prompts/monitor_plan_section.txt",
                 "vendor/monitorbench_monitor/prompts/monitor_dual_objectives.agent.yaml")
+CONTEXT_PROMPT_FILES = {
+    "execute": ("prompts/monitor_execute_agent.txt", "prompts/monitor_execute_summary.txt",
+                "prompts/monitor_execute_section.txt"),
+    "plan_compare": ("prompts/monitor_plan_compare.txt", "prompts/monitor_plan_compare_section.txt"),
+}
+ALL_CONTEXT_PROMPT_FILES = CONTEXT_PROMPT_FILES["execute"] + CONTEXT_PROMPT_FILES["plan_compare"]
 ANALYSIS_FILES = ("configs/councils.toml", "configs/comparisons.toml")
 LOCKED_FILES = PROMPT_FILES + ANALYSIS_FILES
 EXTRA_FINGERPRINTS = {"tool_lists": "configs/tool_lists.json", "objectives": "configs/objectives.json"}
@@ -32,6 +38,17 @@ RULES_LOCK = "configs/presence_rules.lock.json"
 
 def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def context_fingerprints(task_context, root=ROOT):
+    """Hashes of the prompt files used only by ``execute`` or ``plan_compare`` cells.
+
+    Kept separate from :data:`PROMPT_FILES` so that adding or editing exploratory context prompts
+    never alters the cell IDs or frozen lock of ``none`` and ``plan`` cells.
+    """
+    root = Path(root)
+    files = CONTEXT_PROMPT_FILES.get(task_context, ())
+    return {name: sha256(root / name) for name in files}
 
 
 def _tokenizer_hash(root, reference_tokenizer):

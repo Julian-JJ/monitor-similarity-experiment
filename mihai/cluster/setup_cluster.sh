@@ -39,6 +39,10 @@ say "2b. the framework copy reads the cached rollouts (read-only link) and the p
 if [[ ! -e "$FRAMEWORK/rollouts_original_clean" ]]; then ln -s "$SHARED/rollouts_original_clean" "$FRAMEWORK/rollouts_original_clean"; fi
 mkdir -p "$FRAMEWORK/cache/tokenizer"
 if [[ ! -e "$FRAMEWORK/cache/tokenizer/tokenizer.json" ]]; then ln -s "$ME/models/qwen3-14b/tokenizer.json" "$FRAMEWORK/cache/tokenizer/tokenizer.json"; fi
+if [[ ! -e "$FRAMEWORK/vendor/monitorbench_agent" && -d "$CHECKOUT/vendor/monitorbench_agent" ]]; then
+    mkdir -p "$FRAMEWORK/vendor"
+    ln -s "$CHECKOUT/vendor/monitorbench_agent" "$FRAMEWORK/vendor/monitorbench_agent"
+fi
 
 say "3. control rollout config (the cached batch's configuration, only variants and samples changed)"
 "$RESEARCH_PY" "$FRAMEWORK/scripts/prepare_controls.py" config --source "$FRAMEWORK/mihai/configs/rollouts-output-32768.toml" \

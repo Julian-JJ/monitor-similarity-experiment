@@ -113,13 +113,15 @@ def _check_keys(where, table, required, optional=()):
 
 
 class Registry:
-    def __init__(self, monitors, sets, actor, reference_tokenizer, objectives_table):
+    def __init__(self, monitors, sets, actor, reference_tokenizer, objectives_table, root=ROOT):
         self.monitors, self.sets, self.actor = monitors, sets, actor
         self.reference_tokenizer = reference_tokenizer
         self.objectives_table = objectives_table
+        self.root = Path(root)
 
     @classmethod
     def load(cls, config_dir=None, root=ROOT):
+        root = Path(root)
         config_dir = Path(config_dir) if config_dir else root / "configs"
         monitors_file, sets_file = _read(config_dir / "monitors.toml"), _read(config_dir / "rollout_sets.toml")
         _check_keys("monitors.toml", {k: 0 for k in monitors_file}, {"monitors", "reference_tokenizer"})
@@ -146,7 +148,7 @@ class Registry:
                 raise RegistryError(f"rollout_sets.toml [sets.{name}]: status must be 'available' or 'planned'")
             sets[name] = SetEntry(name, root / entry["root"], entry["manifest"], entry["status"], entry["description"])
         return cls(monitors, sets, actor, root / monitors_file["reference_tokenizer"],
-                   root / sets_file["objectives"]["table"])
+                   root / sets_file["objectives"]["table"], root=root)
 
     def monitor(self, name):
         try:

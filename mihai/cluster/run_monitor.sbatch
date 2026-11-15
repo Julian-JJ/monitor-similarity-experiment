@@ -40,6 +40,10 @@ trap 'exit 143' TERM
 trap 'exit 130' INT
 
 cd "$FRAMEWORK"
+if [[ ! -e "$FRAMEWORK/vendor/monitorbench_agent" && -d "$ME/monitor-similarity-experiment/vendor/monitorbench_agent" ]]; then
+    mkdir -p "$FRAMEWORK/vendor"
+    ln -s "$ME/monitor-similarity-experiment/vendor/monitorbench_agent" "$FRAMEWORK/vendor/monitorbench_agent"
+fi
 printf 'job=%s monitor=%s experiment=%s node=%s started_at=%s\n' "$JOB" "$MONITOR" "$EXPERIMENT" "$(hostname)" "$(date -u +%FT%TZ)" | tee -a "$STATUS"
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv | tee -a "$STATUS"
 # A port is "taken" only if something is listening. Closed connections of a previous server linger in TIME_WAIT for a minute, so bind with SO_REUSEADDR as the server does.

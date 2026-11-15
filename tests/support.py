@@ -79,7 +79,7 @@ def make_project(root, controls=True, turns=6, words=100):
     real = Path(__file__).resolve().parents[1]
     root = Path(root)
     (root / "configs").mkdir(parents=True, exist_ok=True)
-    for name in freeze.LOCKED_FILES:
+    for name in freeze.LOCKED_FILES + freeze.ALL_CONTEXT_PROMPT_FILES:
         (root / name).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(real / name, root / name)
     shutil.copy(real / "configs/monitors.toml", root / "configs/monitors.toml")

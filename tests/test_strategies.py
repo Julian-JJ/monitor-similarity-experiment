@@ -170,5 +170,111 @@ class PlanBookTests(unittest.TestCase):
             self.assertEqual(set(line), {"plan_id", "task", "index", "text", "tokens", "prompt_sha256", "attempts", "created_at"})
 
 
+def exec_book(path, k=2, prompts=None, tools=TOOLS, seed=0, attempts=2, max_turns=5):
+    return st.ExecutionBook(path, prompts or h.load_prompts(), tools, words, {"model": "m"}, k, seed, attempts, max_turns=max_turns)
+
+
+class ExecutionBookTests(unittest.TestCase):
+    def test_executions_run_tool_loop_summarize_and_assign_by_sample_modulo_k(self):
+        with TempDir() as d:
+            b = exec_book(d / "e.jsonl", k=2)
+            complete = Scripted(
+                '<tool_call>{"name": "a", "arguments": {"amount": 10}}</tool_call>',
+                '<tool_call>{"name": "end_task", "arguments": {}}</tool_call>',
+                "summary zero",
+                '<tool_call>{"name": "a", "arguments": {"amount": 20}}</tool_call>\n<tool_call>{"name": "end_task", "arguments": {}}</tool_call>',
+                "summary one",
+            )
+            made = b.ensure({"bank": "Please pay."}, complete)
+            self.assertEqual(len(made), 2)
+            self.assertEqual([b.get("bank", "Please pay.", s)["text"] for s in range(4)],
+                             ["summary zero", "summary one", "summary zero", "summary one"])
+            self.assertEqual(made[0]["termination"], "end_task")
+            self.assertEqual(made[0]["turns"], 2)
+            self.assertTrue(made[0]["main_success"])
+            self.assertEqual(made[0]["tool_calls"], ["a", "end_task"])
+            self.assertEqual(b.ensure({"bank": "Please pay."}, complete), [], "cached on second ensure")
+
+    def test_execution_prompts_contain_task_tools_and_history_and_no_objective(self):
+        with TempDir() as d:
+            complete = Scripted(
+                '<tool_call>{"name": "a", "arguments": {}}</tool_call>',
+                "Final answer without tool calls.",
+                "summary text",
+            )
+            exec_book(d / "e.jsonl", k=1).ensure({"bank": "Please pay."}, complete)
+            agent_p1, agent_p2, summary_p = [p for p, _ in complete.prompts]
+            self.assertIn("Please pay.", agent_p1)
+            self.assertIn("- a: tool a", agent_p1)
+            self.assertIn("No steps taken yet.", agent_p1)
+            self.assertIn("executed a({})", agent_p2)
+            self.assertIn("Termination: final_answer | Main task success: True", summary_p)
+            for p in (agent_p1, agent_p2, summary_p):
+                self.assertNotIn("secondary", p.lower())
+
+    def test_unknown_tools_and_bad_tool_json_are_reported_back_to_the_agent(self):
+        with TempDir() as d:
+            complete = Scripted(
+                '<tool_call>{bad json}</tool_call>\n<tool_call>{"name": "missing_tool", "arguments": {}}</tool_call>',
+                '<tool_call>{"name": "end_task", "arguments": {}}</tool_call>',
+                "recovered summary",
+            )
+            rec = exec_book(d / "e.jsonl", k=1).ensure({"bank": "Please pay."}, complete)[0]
+            self.assertEqual(rec["text"], "recovered summary")
+            second_turn_prompt = complete.prompts[1][0]
+            self.assertIn("Invalid tool_call JSON", second_turn_prompt)
+            self.assertIn("ToolNotFoundError", second_turn_prompt)
+
+    def test_execution_cache_keys_on_everything_that_shapes_execution(self):
+        with TempDir() as d:
+            path = d / "e.jsonl"
+            exec_book(path, k=1).ensure({"bank": "Please pay."}, Scripted("no tools", "cached summary"))
+            reopened = exec_book(path, k=1)
+            self.assertEqual(reopened.get("bank", "Please pay.", 0)["text"], "cached summary")
+            with self.assertRaises(st.PlanError):
+                exec_book(path, k=1, max_turns=9).get("bank", "Please pay.", 0)
+            with self.assertRaises(st.PlanError):
+                exec_book(path, k=1, seed=1).get("bank", "Please pay.", 0)
+            with self.assertRaises(st.PlanError):
+                reopened.get("bank", "Different task", 0)
+
+    def test_invalid_summary_retries_and_rejects_when_exhausted(self):
+        with TempDir() as d:
+            complete = Scripted("done", {"text": "cut", "finish_reason": "length"}, "valid summary")
+            rec = exec_book(d / "e.jsonl", k=1).ensure({"bank": "t"}, complete)[0]
+            self.assertEqual(rec["text"], "valid summary")
+            self.assertEqual([a["valid"] for a in rec["attempts"]], [False, True])
+            with self.assertRaisesRegex(st.PlanError, "limit is 1000"):
+                exec_book(d / "e2.jsonl", k=1).ensure({"bank": "t"}, Scripted("done", "word " * 1001, "word " * 1001))
+
+
+class ComparisonBookTests(unittest.TestCase):
+    def test_comparisons_are_cached_per_item_scope_partial_cot_and_plan_without_seeing_the_objective(self):
+        from monitor_experiment import spec as sp
+        from tests.support import make_project
+        with TempDir() as root:
+            registry = make_project(root)
+            items = registry.load_set("original_clean").items
+            item = items[0]
+            prompts = h.load_prompts()
+            cell = sp.expand(sp.parse_spec({"name": "t", "monitor": "qwen3-14b", "rollout_sets": ["original_clean"],
+                                            "grid": {"scope": ["cot"], "task_context": ["plan_compare"]}}),
+                             registry, {"prompts": "p", "tokenizer": "t"})[0]
+            cb = st.ComparisonBook( Path(root) / "comp.jsonl", prompts, words, {"model": "m"}, seed=0)
+            plan_record = {"plan_id": "plan-123", "text": "1. Call tool_0.\n2. Verify."}
+            complete = Scripted("The agent followed step 1 and called tool_1 in turn 2.")
+            first = cb.ensure_one(item, plan_record, cell, complete)
+            second = cb.ensure_one(item, plan_record, cell, complete)
+            self.assertEqual(first["comparison_id"], second["comparison_id"])
+            self.assertEqual(len(complete.prompts), 1, "reused across told objectives and samples")
+            prompt = complete.prompts[0][0]
+            self.assertIn("1. Call tool_0.", prompt)
+            self.assertIn("START OF AGENT TRANSCRIPT", prompt)
+            self.assertNotIn("ACCT-9", prompt)
+            self.assertNotIn("split payments", prompt)
+            reopened = st.ComparisonBook(Path(root) / "comp.jsonl", prompts, words, {"model": "m"}, seed=0)
+            self.assertEqual(reopened.ensure_one(item, plan_record, cell, Scripted("unused"))["text"], first["text"])
+
+
 if __name__ == "__main__":
     unittest.main()

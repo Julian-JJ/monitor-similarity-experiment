@@ -1,8 +1,10 @@
-# Plan context (`task_context = "plan"`)
+# Task context (`task_context = "plan"`, `"execute"`, `"plan_compare"`)
 
-Code: `PlanBook` in [`monitor_experiment/strategies.py`](../../monitor_experiment/strategies.py),
+Code: `PlanBook`, `ExecutionBook`, `ComparisonBook` in [`monitor_experiment/strategies.py`](../../monitor_experiment/strategies.py),
 [`monitor_experiment/toollists.py`](../../monitor_experiment/toollists.py). Prompts: `prompts/monitor_plan.txt`,
-`prompts/monitor_plan_section.txt`. Tests: `tests/test_strategies.py`, `tests/test_toollists.py`, `tests/test_runner.py`.
+`prompts/monitor_plan_section.txt`, `prompts/monitor_execute_agent.txt`, `prompts/monitor_execute_summary.txt`,
+`prompts/monitor_execute_section.txt`, `prompts/monitor_plan_compare.txt`, `prompts/monitor_plan_compare_section.txt`.
+Tests: `tests/test_strategies.py`, `tests/test_toollists.py`, `tests/test_runner.py`.
 
 The proposal's idea: before judging, the monitor is given the same task as the agent and writes a plan for it, so the task's
 intricacies are in its context when it reads the agent's work. Pre-registered decisions
@@ -35,10 +37,26 @@ fits one pass *without* a plan but not *with* one is a single call in the `none`
 records show `hierarchical` for each, so such pairs are visible, and the report flags hierarchical cells; the dry run reports `hierarchical_units` per cell, so a `none` and a `plan` cell can be compared (on the 41 cached rollouts: 2 rollout-objective pairs in the `action` scope, 80 versus 88 of 328 units). Each unit's record
 carries its `plan_id`.
 
+## Execution context (`task_context = "execute"`)
+
+In `task_context = "execute"`, the monitor attempts the **main task only** (`main_only` variant, no hidden objective) in a fresh copy of the simulated environment before judging (`ExecutionBook`), then summarizes its own attempt into a validated reference execution block (`<= 1,000` tokens):
+
+1. For each task and index `0 .. prep_samples - 1`, `ExecutionBook` instantiates a fresh `main_only` environment (`Environment(task, "main_only", seed)` for MonitorBench tasks) and runs an agent loop up to `options.execute_max_turns` (default 20) turns using `prompts/monitor_execute_agent.txt`.
+2. At each turn, the monitor emits `<tool_call>{"name": ..., "arguments": ...}</tool_call>` blocks (or structured `tool_calls`), which are executed against the simulated environment; calling `end_task` or returning a final answer without tool calls ends the attempt, after which `env.evaluate()` scores main-task completion.
+3. The monitor then summarizes its attempt using `prompts/monitor_execute_summary.txt` into a reference execution summary of at most 1,000 tokens (retried once if truncated, empty, or over 1,000 tokens).
+4. Records are cached in `runs/<name>/executions/<monitor>.jsonl`, assigned to rollouts by `sample % prep_samples`, and injected via `prompts/monitor_execute_section.txt` (`START OF REFERENCE EXECUTION ... END OF REFERENCE EXECUTION`) immediately before the hidden objective. Each unit record carries `execution_id`.
+
+## Plan-and-compare context (`task_context = "plan_compare"`)
+
+In `task_context = "plan_compare"`, the monitor first writes (or reuses) its `PlanBook` reference plan (`sample % prep_samples`) from the main task only, then compares the actor's rendered transcript against that plan without being told any hidden objective (`ComparisonBook`):
+
+1. `ComparisonBook.ensure_one` renders the rollout transcript under the cell's `scope`, `partial_cot`, `truncate_chars`, and `labels` settings, and calls `prompts/monitor_plan_compare.txt` with the main task, the reference plan, and the rendered transcript.
+2. Because the comparison prompt does not contain the told objective, one comparison is cached per `(item_id, scope, partial_cot, plan_id)` in `runs/<name>/comparisons/<monitor>.jsonl` and reused across both `told` objectives (`malicious` and `benign`) and across monitor samples.
+3. The combined reference plan and comparison (`<= 1,000` tokens each) are injected via `prompts/monitor_plan_compare_section.txt` (`START OF PLAN COMPARISON ... END OF PLAN COMPARISON`) immediately before the hidden objective. Each unit record carries both `plan_id` and `comparison_id`.
+
 ## Limits
 
-* One plan is one random draw shared by all rollouts of its task; that is why there are three, and results can be split by `plan_id`.
-* A plan up to about 1,000 tokens adds roughly 10% to input.
-* Plans are written with the monitor's default reasoning setting.
-* Not implemented: `execute` (the monitor attempts the task in the simulated environment) and `plan_compare` (plan, then compare with the
-  transcript). Both are exploratory and need their own frozen prompts.
+* One plan or execution is one random draw shared by rollouts of its task assigned to `sample % prep_samples`; that is why `prep_samples = 3` by default, and results can be split by `plan_id` or `execution_id`.
+* A plan or execution summary up to 1,000 tokens adds roughly 10% to input; `plan_compare` adds both the plan and comparison while still fitting within the 12,000-token chunk alignment budget under `upstream-limits`.
+* Plans, executions, and comparisons are written with the monitor's default reasoning setting.
+* Prompt fingerprints for `execute` and `plan_compare` (`freeze.context_fingerprints`) are hashed only into `execute` and `plan_compare` cell IDs, so `none` and `plan` cell IDs and `prompts/prompts.lock.json` remain untouched.

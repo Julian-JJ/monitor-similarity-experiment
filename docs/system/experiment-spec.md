@@ -21,7 +21,7 @@ samples = 4
 | Axis | Values now | Default | Named in the plan, not implemented |
 | --- | --- | --- | --- |
 | `scope` | `action`, `cot`, `all` | none: required | |
-| `task_context` | `none`, `plan` | `none` | `execute`, `plan_compare` |
+| `task_context` | `none`, `plan`, `execute`, `plan_compare` | `none` | |
 | `hierarchy` | `upstream-limits` (32,768 context, 16,768 reply reserve, 12,000-token chunks), `long-context` (131,072 / 16,768 / 100,000) | `upstream-limits` | |
 | `partial_cot` | `off`, `turns:<p>`, `tokens:<p>` with 0 < p ≤ 1 | `off` | |
 | `followup_visibility` | `none` | `none` | `answer`, `cot`, `all` |
@@ -48,7 +48,8 @@ the hierarchy parameters must pass `hierarchy.check_params`.
 | `labels` | true | yes | turn labels in the rendered transcript |
 | `max_attempts` | 2 | yes | tries per node before it is invalid |
 | `single_pass_if_fits` | true | yes | one unmodified-prompt call when the whole transcript fits |
-| `prep_samples` | 3 | yes | independent plans per task for `task_context = "plan"` |
+| `prep_samples` | 3 | yes | independent plans or executions per task for `task_context in ("plan", "execute", "plan_compare")` |
+| `execute_max_turns` | 20 | yes (for `execute` cells) | maximum environment turns per monitor execution attempt when `task_context = "execute"` |
 | `concurrency` | 8 | no | simultaneous requests |
 | `keep_monitor_reasoning` | false | no | store the monitor's reasoning text (large) instead of its length |
 | `item_limit` | 0 | no | only the first N rollouts of each (origin, variant, task) group; 0 = all (the pilot uses 1) |

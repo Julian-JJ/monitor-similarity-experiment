@@ -13,6 +13,7 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
+from . import freeze
 from . import hierarchy as h
 from .artifacts import digest
 
@@ -28,7 +29,7 @@ HIERARCHY_PRESETS = {
 # axis -> (values accepted now, default, values named in the plan but not implemented)
 AXES = {
     "scope": (h.SCOPES, None, ()),
-    "task_context": (("none", "plan"), "none", ("execute", "plan_compare")),
+    "task_context": (("none", "plan", "execute", "plan_compare"), "none", ()),
     "hierarchy": (tuple(HIERARCHY_PRESETS), "upstream-limits", ()),
     "partial_cot": ("off", "off", ()),  # also "turns:<p>" and "tokens:<p>", 0 < p <= 1
     "followup_visibility": (("none",), "none", ("answer", "cot", "all")),
@@ -38,7 +39,7 @@ AXES = {
 TOLD = ("malicious", "benign")
 OPTION_DEFAULTS = {
     "samples": 4, "seed": 0, "bin_size": 6, "margin_tokens": 512, "truncate_chars": 2000, "labels": True,
-    "max_attempts": 2, "single_pass_if_fits": True, "prep_samples": 3, "concurrency": 8,
+    "max_attempts": 2, "single_pass_if_fits": True, "prep_samples": 3, "execute_max_turns": 20, "concurrency": 8,
     "keep_monitor_reasoning": False, "chunk_tokens": None, "item_limit": 0,
 }
 # Options that do not change what a single unit's result is (they only change how many units run, or how fast).
@@ -160,27 +161,29 @@ def parse_spec(raw):
     if extra:
         raise SpecError(f"Unknown options {sorted(extra)}; known: {sorted(OPTION_DEFAULTS)}")
     options.update(raw.get("options", {}))
-    if options["samples"] < 1 or options["concurrency"] < 1 or options["prep_samples"] < 1 or options["item_limit"] < 0:
-        raise SpecError("samples, concurrency and prep_samples must be at least 1 and item_limit at least 0")
+    if (options["samples"] < 1 or options["concurrency"] < 1 or options["prep_samples"] < 1
+            or options["execute_max_turns"] < 1 or options["item_limit"] < 0):
+        raise SpecError("samples, concurrency, prep_samples and execute_max_turns must be at least 1 and item_limit at least 0")
     return Spec(raw["name"], monitors, sets, told, axes, options, raw)
 
 
 def expand(spec, registry, fingerprints):
     """Cross product of monitors and axes. ``fingerprints`` holds prompt-file and tokenizer hashes."""
     cells = []
+    root = getattr(registry, "root", freeze.ROOT)
     for name in spec.monitors:
         monitor = registry.monitor(name)
         names = list(AXES)
         for combo in itertools.product(*(spec.axes[a] for a in names)):
             axes = dict(zip(names, combo))
-            cells.append(_make_cell(spec, monitor, axes, fingerprints))
+            cells.append(_make_cell(spec, monitor, axes, fingerprints, root=root))
     ids = [c.cell_id for c in cells]
     if len(ids) != len(set(ids)):
         raise SpecError("Two cells have identical settings")
     return cells
 
 
-def _make_cell(spec, monitor, axes, fingerprints):
+def _make_cell(spec, monitor, axes, fingerprints, root=freeze.ROOT):
     preset = dict(HIERARCHY_PRESETS[axes["hierarchy"]])
     if spec.options["chunk_tokens"] is not None:
         preset["chunk_tokens"] = spec.options["chunk_tokens"]
@@ -203,8 +206,13 @@ def _make_cell(spec, monitor, axes, fingerprints):
         h.check_params(params)
     except ValueError as error:
         raise SpecError(str(error)) from error
-    behavior = {k: v for k, v in spec.options.items() if k not in NON_IDENTITY_OPTIONS and k != "chunk_tokens"}
+    behavior = {k: v for k, v in spec.options.items()
+                if k not in NON_IDENTITY_OPTIONS and k != "chunk_tokens"
+                and (k != "execute_max_turns" or axes["task_context"] == "execute")}
+    cell_prints = dict(fingerprints)
+    if axes["task_context"] in ("execute", "plan_compare"):
+        cell_prints["context_files"] = freeze.context_fingerprints(axes["task_context"], root)
     label = {"monitor": monitor.name, **axes}
     identity = {"monitor": monitor.identity(), "axes": axes, "params": params, "options": behavior,
-                "fingerprints": fingerprints}
+                "fingerprints": cell_prints}
     return Cell(digest(identity), monitor.name, label, params, behavior, parse_partial_cot(axes["partial_cot"]))

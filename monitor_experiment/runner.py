@@ -25,7 +25,7 @@ from .artifacts import digest, read_json, write_json
 from .costs import compute_by_monitor, summarize
 from .data import ObjectiveTable, make_pairs
 from .registry import RegistryError
-from .strategies import JudgeStrategy, PlanBook
+from .strategies import ComparisonBook, ExecutionBook, JudgeStrategy, PlanBook, SECTION_KEYS, format_plan_comparison
 
 SCHEMA_VERSION = 1
 
@@ -161,20 +161,28 @@ def dry_run(spec, registry, *, count, prompts, root, report_tokens=1000, allow_m
     prints, cells, items, sets_info, objectives = prepare_context(spec, registry, root, allow_missing_sets)
     strategy = JudgeStrategy(prompts, count, objectives)
     plan_text = placeholder_plan(count)
+    compare_text = format_plan_comparison(plan_text, placeholder_plan(count, 400))
     tasks = sorted({i.task for i in items})
     rows, prepared = [], {}   # planning does not depend on the monitor, so identical settings are planned once
     for cell in cells:
         calls = level0 = tree_tokens = hierarchical = units = truncated = max_prompt = 0
-        text = plan_text if cell.label["task_context"] == "plan" else None
+        task_context = cell.label["task_context"]
+        if task_context == "none":
+            text = None
+        elif task_context == "plan_compare":
+            text = compare_text
+        else:
+            text = plan_text
+        section_key = SECTION_KEYS[task_context]
         for item in items:
             for told in spec.told:
-                key = (digest(cell.params), digest(cell.partial_cot), text is not None, item.item_id, told)
+                key = (digest(cell.params), digest(cell.partial_cot), task_context, item.item_id, told)
                 if key not in prepared:
                     prepared[key] = strategy.prepare(item, told, cell, text)
                 planned = prepared[key]
                 n = len(planned["chunks"])
                 tree_calls, levels = h.estimate_tree(n, cell.params["bin_size"])
-                overhead = count(h.reduce_prompt(prompts, planned["main_task"], planned["objective"], [(1, 1, "")], text))
+                overhead = count(h.reduce_prompt(prompts, planned["main_task"], planned["objective"], [(1, 1, "")], text, section_key))
                 tokens = sum(c["prompt_tokens"] for c in planned["chunks"])
                 samples = spec.options["samples"]
                 units += samples
@@ -184,15 +192,23 @@ def dry_run(spec, registry, *, count, prompts, root, report_tokens=1000, allow_m
                 hierarchical += int(planned["hierarchical"]) * samples
                 truncated += planned["truncated_tool_results"]
                 max_prompt = max(max_prompt, max(c["prompt_tokens"] for c in planned["chunks"]))
-        prep = len(tasks) * spec.options["prep_samples"] if cell.label["task_context"] == "plan" else 0
+        prep = len(tasks) * spec.options["prep_samples"] if task_context in ("plan", "plan_compare") else 0
+        exec_calls = len(tasks) * spec.options["prep_samples"] * 2 if task_context == "execute" else 0
+        comp_calls = len(items) if task_context == "plan_compare" else 0
         rows.append({"cell_id": cell.cell_id, "label": cell.label, "units": units, "model_calls": calls,
-                     "plan_calls": prep, "level0_input_tokens": level0, "input_tokens_estimate": tree_tokens,
+                     "plan_calls": prep, "execute_calls": exec_calls, "compare_calls": comp_calls,
+                     "level0_input_tokens": level0, "input_tokens_estimate": tree_tokens,
                      "hierarchical_units": hierarchical, "max_prompt_tokens": max_prompt,
                      "truncated_tool_results": truncated})
     totals = {k: sum(r[k] for r in rows) for k in ("units", "model_calls", "input_tokens_estimate")}
-    # Plans are written once per monitor, not per cell.
-    plan_monitors = {r["label"]["monitor"] for r in rows if r["label"]["task_context"] == "plan"}
+    # Plans and executions are written once per monitor, not per cell; comparisons are cached per (monitor, scope, partial_cot, item).
+    plan_monitors = {r["label"]["monitor"] for r in rows if r["label"]["task_context"] in ("plan", "plan_compare")}
+    exec_monitors = {r["label"]["monitor"] for r in rows if r["label"]["task_context"] == "execute"}
+    comp_groups = {(r["label"]["monitor"], r["label"]["scope"], r["label"]["partial_cot"])
+                   for r in rows if r["label"]["task_context"] == "plan_compare"}
     totals["plan_calls"] = len(plan_monitors) * len(tasks) * spec.options["prep_samples"]
+    totals["execute_calls"] = len(exec_monitors) * len(tasks) * spec.options["prep_samples"] * 2
+    totals["compare_calls"] = len(comp_groups) * len(items)
     return {"name": spec.name, "cells": rows, "totals": totals, "rollout_sets": sets_info, "items": len(items),
             "assumptions": {"report_tokens": report_tokens, "placeholder_plan_tokens": 800,
                             "note": "combining-level input and plan size are estimates; level-0 prompts are exact; "
@@ -207,13 +223,17 @@ def format_dry_run(report):
         lines.append(f"{label['monitor']:16s}{label['scope']:8s}{label['task_context']:8s}{label['hierarchy']:14s}"
                      f"{r['units']:8d}{r['model_calls']:9d}{r['input_tokens_estimate']:22,d}")
     t = report["totals"]
-    lines.append(f"{'total':16s}{'':30s}{t['units']:8d}{t['model_calls']:9d}{t['input_tokens_estimate']:22,d}"
-                 f"   + {t['plan_calls']} plan calls")
+    extra = f"   + {t['plan_calls']} plan calls"
+    if t.get("execute_calls"):
+        extra += f" + {t['execute_calls']} execute calls (min)"
+    if t.get("compare_calls"):
+        extra += f" + {t['compare_calls']} compare calls"
+    lines.append(f"{'total':16s}{'':30s}{t['units']:8d}{t['model_calls']:9d}{t['input_tokens_estimate']:22,d}" + extra)
     lines.append("assumptions: " + report["assumptions"]["note"])
     return "\n".join(lines)
 
 
-def record_for(unit, result, planned, plan_id, seed, keep_reasoning):
+def record_for(unit, result, planned, plan_id, seed, keep_reasoning, execution_id=None, comparison_id=None):
     attempts = [a for n in result["nodes"] for a in n.get("attempts", ())]
     status, verdict = result["status"], result["verdict"]
     record = {"schema_version": SCHEMA_VERSION, "unit_id": unit["id"], "cell_id": unit["cell"].cell_id,
@@ -226,7 +246,8 @@ def record_for(unit, result, planned, plan_id, seed, keep_reasoning):
               "max_prompt_tokens": max([(a.get("usage") or {}).get("prompt_tokens") or 0 for a in attempts], default=0),
               "latency_seconds": result["latency_seconds"], "critical_path_seconds": result["critical_path_seconds"],
               "call_latencies": [a["latency_seconds"] for a in attempts if a.get("latency_seconds") is not None],
-              "plan_id": plan_id, "partial_cot": planned.get("partial_cot"),
+              "plan_id": plan_id, "execution_id": execution_id, "comparison_id": comparison_id,
+              "partial_cot": planned.get("partial_cot"),
               "truncated_tool_results": planned["truncated_tool_results"], "finished_at": now()}
     if "error" in result:
         record["error"] = result["error"]
@@ -266,9 +287,11 @@ def run_experiment(spec, registry, out_root, *, make_complete, count, prompts, r
 
     for cell in cells:
         complete_for(cell.monitor, cell.label["reasoning"])
-    books = {}
-    plan_monitors = sorted({c.monitor for c in cells if c.label["task_context"] == "plan"})
-    if plan_monitors:
+    books, exec_books, comp_books = {}, {}, {}
+    plan_monitors = sorted({c.monitor for c in cells if c.label["task_context"] in ("plan", "plan_compare")})
+    exec_monitors = sorted({c.monitor for c in cells if c.label["task_context"] == "execute"})
+    comp_monitors = sorted({c.monitor for c in cells if c.label["task_context"] == "plan_compare"})
+    if plan_monitors or exec_monitors:
         tools, main_tasks = tool_lists_from(root), main_tasks_of(items)
         for monitor_name in plan_monitors:
             monitor = registry.monitor(monitor_name)
@@ -277,6 +300,22 @@ def run_experiment(spec, registry, out_root, *, make_complete, count, prompts, r
             before = len(books[monitor_name].plans)
             made = books[monitor_name].ensure(main_tasks, complete_for(monitor_name, "default"))
             progress(f"plans for {monitor_name}: {len(made)} written, {before} reused")
+        for monitor_name in exec_monitors:
+            monitor = registry.monitor(monitor_name)
+            exec_books[monitor_name] = ExecutionBook(
+                run_dir / "executions" / f"{monitor_name}.jsonl", prompts, tools, count,
+                monitor.identity(), spec.options["prep_samples"], spec.options["seed"],
+                max_turns=spec.options["execute_max_turns"], truncate_chars=spec.options["truncate_chars"]
+            )
+            before = len(exec_books[monitor_name].executions)
+            made = exec_books[monitor_name].ensure(main_tasks, complete_for(monitor_name, "default"))
+            progress(f"executions for {monitor_name}: {len(made)} written, {before} reused")
+    for monitor_name in comp_monitors:
+        monitor = registry.monitor(monitor_name)
+        comp_books[monitor_name] = ComparisonBook(
+            run_dir / "comparisons" / f"{monitor_name}.jsonl", prompts, count,
+            monitor.identity(), spec.options["seed"]
+        )
     manifest = {"schema_version": SCHEMA_VERSION, "name": spec.name, "spec": spec.raw, "spec_path": str(spec_path) if spec_path else None,
                 "cells": [{"cell_id": c.cell_id, "label": c.label, "params": c.params, "options": c.options,
                            "partial_cot": c.partial_cot,
@@ -313,23 +352,36 @@ def run_experiment(spec, registry, out_root, *, make_complete, count, prompts, r
     def planned_for(unit):
         key = (unit["cell"].cell_id, unit["item"].item_id, unit["told"])
         with cache_lock:
-            if key not in planned_cache:
-                book = books.get(unit["cell"].monitor)
-                plan_record = None
-                if unit["cell"].label["task_context"] == "plan":
-                    plan_record = book.get(unit["item"].task, unit["item"].observation().main_task, unit["item"].sample)
-                planned_cache[key] = (strategy.prepare(unit["item"], unit["told"], unit["cell"],
-                                                       plan_record["text"] if plan_record else None),
-                                      plan_record["plan_id"] if plan_record else None)
-            return planned_cache[key]
+            if key in planned_cache:
+                return planned_cache[key]
+        cell, item = unit["cell"], unit["item"]
+        task_context = cell.label["task_context"]
+        plan_text = plan_id = execution_id = comparison_id = None
+        if task_context == "plan":
+            plan_record = books[cell.monitor].get(item.task, item.observation().main_task, item.sample)
+            plan_text, plan_id = plan_record["text"], plan_record["plan_id"]
+        elif task_context == "execute":
+            exec_record = exec_books[cell.monitor].get(item.task, item.observation().main_task, item.sample)
+            plan_text, execution_id = exec_record["text"], exec_record["execution_id"]
+        elif task_context == "plan_compare":
+            plan_record = books[cell.monitor].get(item.task, item.observation().main_task, item.sample)
+            comp_record = comp_books[cell.monitor].ensure_one(
+                item, plan_record, cell, completes[(cell.monitor, "default")]
+            )
+            plan_text = format_plan_comparison(plan_record["text"], comp_record["text"])
+            plan_id, comparison_id = plan_record["plan_id"], comp_record["comparison_id"]
+        prepared = strategy.prepare(item, unit["told"], cell, plan_text)
+        with cache_lock:
+            return planned_cache.setdefault(key, (prepared, plan_id, execution_id, comparison_id))
 
     def work(unit):
         try:
-            planned, plan_id = planned_for(unit)
+            planned, plan_id, execution_id, comparison_id = planned_for(unit)
             seed = unit_seed(spec.options["seed"], unit["item"].item_id, unit["told"], unit["sample"])
             result = strategy.run(unit["item"], unit["told"], planned, unit["cell"],
                                   completes[(unit["cell"].monitor, unit["cell"].label["reasoning"])], seed)
-            record, nodes = record_for(unit, result, planned, plan_id, seed, spec.options["keep_monitor_reasoning"])
+            record, nodes = record_for(unit, result, planned, plan_id, seed, spec.options["keep_monitor_reasoning"],
+                                       execution_id=execution_id, comparison_id=comparison_id)
             for node in nodes:
                 nodes_writer.append(node)
             items_writer.append(record)

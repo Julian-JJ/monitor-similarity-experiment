@@ -86,10 +86,10 @@ class SpecParsingTests(unittest.TestCase):
                  ({"grid": {"scope": ["cot"], "colour": ["red"]}}, "Unknown grid axes"),
                  ({"grid": {"scope": ["thoughts"]}}, "not one of"),
                  ({"grid": {"scope": ["cot", "cot"]}}, "twice"),
-                 ({"grid": {"scope": ["cot"], "task_context": ["execute"]}}, "not implemented"),
                  ({"grid": {"scope": ["cot"], "followup_visibility": ["all"]}}, "not implemented"),
                  ({"options": {"sample": 4}}, "Unknown options"),
                  ({"options": {"samples": 0}}, "at least 1"),
+                 ({"options": {"execute_max_turns": 0}}, "at least 1"),
                  ({"told": ["both"]}, "told must be"),
                  ({"grid": {"scope": ["cot"], "partial_cot": ["half"]}}, "partial_cot"),
                  ({"grid": {"scope": ["cot"], "partial_cot": ["turns:1.5"]}}, "0 < p <= 1")]
@@ -142,12 +142,19 @@ class ExpansionTests(unittest.TestCase):
     def test_cell_ids_are_stable_and_depend_on_everything_that_matters(self):
         a = self.cells()[0]
         self.assertEqual(a.cell_id, self.cells()[0].cell_id)
-        self.assertEqual(a.cell_id, self.cells(options={"samples": 9, "concurrency": 2, "item_limit": 3})[0].cell_id,
-                         "samples, concurrency and item_limit do not change a unit's result")
+        self.assertEqual(a.cell_id, self.cells(options={"samples": 9, "concurrency": 2, "item_limit": 3, "execute_max_turns": 5})[0].cell_id,
+                         "samples, concurrency, item_limit, and execute_max_turns (on non-execute cells) do not change a unit's result")
         for change in ({"options": {"seed": 1}}, {"options": {"bin_size": 4}}, {"options": {"chunk_tokens": 8000}},
                        {"grid": {"scope": ["action"]}}, {"grid": {"scope": ["cot"], "task_context": ["plan"]}},
+                       {"grid": {"scope": ["cot"], "task_context": ["execute"]}},
+                       {"grid": {"scope": ["cot"], "task_context": ["plan_compare"]}},
                        {"grid": {"scope": ["cot"], "partial_cot": ["turns:0.5"]}}, {"monitor": "qwen3-4b"}):
             self.assertNotEqual(a.cell_id, self.cells(**change)[0].cell_id, change)
+        exec_cell = self.cells(grid={"scope": ["cot"], "task_context": ["execute"]})[0]
+        exec_cell_other = self.cells(grid={"scope": ["cot"], "task_context": ["execute"]},
+                                     options={"execute_max_turns": 5})[0]
+        self.assertNotEqual(exec_cell.cell_id, exec_cell_other.cell_id,
+                            "execute_max_turns changes execute cell_id")
         other = sp.expand(sp.parse_spec(base()), self.registry, {"prompts": "changed", "tokenizer": "t"})[0]
         self.assertNotEqual(a.cell_id, other.cell_id, "editing a prompt file changes every cell")
 

@@ -7,10 +7,14 @@ cd "$(dirname "$0")/../.."
 ME="${ME:-/nfs/roberts/project/cpsc4880/cpsc4880_as4833}"
 HOST="${HOST:-cpsc4880_as4833@bouchet.ycrc.yale.edu}"
 DEST="${DEST:-$ME/monitor-framework/}"
-dirty=false
-[[ -n "$(git status --porcelain)" ]] && dirty=true
-printf '{"commit": "%s", "branch": "%s", "dirty": %s, "synced_at": "%s"}\n' "$(git rev-parse HEAD)" "$(git branch --show-current)" "$dirty" "$(date -u +%FT%TZ)" > .sync-commit.json
-[[ "$dirty" == false ]] || echo "WARNING: the working tree has uncommitted changes; the manifest will say dirty=true" >&2
+if git rev-parse HEAD >/dev/null 2>&1; then
+    dirty=false
+    [[ -n "$(git status --porcelain)" ]] && dirty=true
+    printf '{"commit": "%s", "branch": "%s", "dirty": %s, "synced_at": "%s"}\n' "$(git rev-parse HEAD)" "$(git branch --show-current)" "$dirty" "$(date -u +%FT%TZ)" > .sync-commit.json
+    [[ "$dirty" == false ]] || echo "WARNING: the working tree has uncommitted changes; the manifest will say dirty=true" >&2
+elif [[ ! -f .sync-commit.json ]]; then
+    printf '{"commit": "local-archive", "branch": "monitor-framework", "dirty": true, "synced_at": "%s"}\n' "$(date -u +%FT%TZ)" > .sync-commit.json
+fi
 rsync -a --stats --exclude .git --exclude .venv --exclude cache --exclude rollouts_original_clean --exclude rollouts_main_only_clean \
     --exclude runs --exclude presence --exclude vendor/monitorbench_agent --exclude mihai/test_rollouts_2 --exclude __pycache__ \
     -e "ssh -o BatchMode=yes -o ControlPath=$HOME/.ssh/cm-%r@%h:%p" ./ "$HOST:$DEST" | grep -E "files transferred|Total transferred"
