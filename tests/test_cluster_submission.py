@@ -42,7 +42,7 @@ path = Path(os.environ['CAPTURE'])
 rows = path.read_text().splitlines() if path.exists() else []
 fields = ('MONITOR', 'FRAMEWORK', 'OUT', 'MODEL_DIR', 'PIN_REGISTRY_DIR', 'REGISTRY_DIR',
           'SERVING_PY', 'ANALYSIS_PY', 'EXPERIMENT', 'GPU_LABEL', 'TP', 'SCORE', 'EXTRA_ARGS',
-          'ENFORCE_EAGER', 'CUDA_LAUNCH_BLOCKING', 'PORT', 'RUNS_DIR', 'SEED_BASELINE', 'GEMMA_ENV_LOCK')
+          'ENFORCE_EAGER', 'CUDA_LAUNCH_BLOCKING', 'PORT', 'RUNS_DIR', 'SEED_BASELINE', 'GEMMA_ENV_LOCK', 'CUDA_MODULE')
 record = {'args': sys.argv[1:], 'env': {k: os.environ.get(k) for k in fields}}
 with path.open('a') as stream:
     stream.write(json.dumps(record) + '\\n')
@@ -111,19 +111,21 @@ print(str(1000 + len(rows)) + ';test-cluster')
         from junlin.setup_cluster_env import save_settings
         with TempDir() as temporary:
             env = self.environment(temporary)
+            env["CUDA_MODULE"] = "CUDA/12.9.1"
             root = Path(env["FRAMEWORK"])
             (root / "junlin").mkdir()
             script = root / "junlin" / SCRIPT.name
             shutil.copy(SCRIPT, script)
             save_settings(root / ".env.cluster", {key: env[key] for key in (
-                "ME", "FRAMEWORK", "SUBMIT_PY", "ANALYSIS_PY", "SERVING_PY", "GEMMA_SERVING_PY")})
+                "ME", "FRAMEWORK", "SUBMIT_PY", "ANALYSIS_PY", "SERVING_PY", "GEMMA_SERVING_PY", "CUDA_MODULE")})
             clean = {key: value for key, value in env.items() if key not in (
-                "ME", "FRAMEWORK", "SUBMIT_PY", "ANALYSIS_PY", "SERVING_PY", "GEMMA_SERVING_PY")}
+                "ME", "FRAMEWORK", "SUBMIT_PY", "ANALYSIS_PY", "SERVING_PY", "GEMMA_SERVING_PY", "CUDA_MODULE")}
             result = subprocess.run(["bash", str(script), "gemma4-e2b"], env=clean, text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             records = [json.loads(line) for line in Path(env["CAPTURE"]).read_text().splitlines()]
             self.assertEqual(records[1]["env"]["SERVING_PY"], env["GEMMA_SERVING_PY"])
             self.assertEqual(records[1]["env"]["FRAMEWORK"], str(root))
+            self.assertEqual(records[1]["env"]["CUDA_MODULE"], "CUDA/12.9.1")
 
     def test_short_gemma_and_qwen_commands_select_only_the_requested_family(self):
         for family, names in (("gemma", MODELS[2:]), ("qwen", MODELS[:2])):

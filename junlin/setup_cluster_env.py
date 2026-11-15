@@ -59,6 +59,7 @@ def settings(root, args, environ):
         "SERVING_PY": environ.get("SERVING_PY", str(qwen) if qwen.is_file() else gemma),
         "SUBMIT_PY": sys.executable, "SYSTEM_PYTHON": sys.executable,
         "HF_HOME": str(project / "cache/huggingface"), "ACCOUNT": environ.get("ACCOUNT", "cpsc4880"),
+        "CUDA_MODULE": environ.get("CUDA_MODULE", ""),
     }
 
 

@@ -36,9 +36,10 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(values["ME"], "/nfs/roberts/project/cpsc4880/cpsc4880_jjj49")
         self.assertEqual(values["SERVING_PY"], values["GEMMA_SERVING_PY"])
         values = setup.settings(Path("/nfs/roberts/project/cpsc4880/cpsc4880_jjj49/repo"), args,
-                                {"USER": "alias", "GEMMA_SERVING_PY": "/custom/bin/python"})
+                                {"USER": "alias", "GEMMA_SERVING_PY": "/custom/bin/python", "CUDA_MODULE": "CUDA/12.9.1"})
         self.assertTrue(values["ME"].endswith("cpsc4880_jjj49"))
         self.assertEqual(values["GEMMA_SERVING_PY"], "/custom/bin/python")
+        self.assertEqual(values["CUDA_MODULE"], "CUDA/12.9.1")
 
     def test_saved_defaults_survive_new_shells_without_executing_path_contents(self):
         with TempDir() as directory:

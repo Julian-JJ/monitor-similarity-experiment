@@ -158,6 +158,36 @@ For a subsequent full Qwen3-1.7B retry with eager execution, use
 records the changed server command; eager execution can change performance, so
 retain that provenance when interpreting runtime comparisons.
 
+### Gemma startup cannot find nvcc
+
+`Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist`
+means FlashInfer cannot find the CUDA compiler toolkit for runtime kernel
+compilation. Installing CUDA-enabled Torch wheels alone does not provide that
+toolkit. See the [FlashInfer toolkit lookup](https://github.com/flashinfer-ai/flashinfer/blob/main/flashinfer/jit/cpp_ext.py)
+and [Yale's CUDA module instructions](https://docs.ycrc.yale.edu/ai/pythonpackages/#flash-attention).
+
+Every Gemma GPU job now checks the serving Python's actual `torch.version.cuda`
+before starting vLLM. It reuses a matching toolkit from `CUDA_HOME`, `CUDA_PATH`
+or `PATH`; otherwise it loads `CUDA/<major.minor>` inside the job. The compiler
+must match that CUDA major/minor version. `CUDA_HOME`, `CUDA_PATH`, `CUDACXX` and
+`PATH` are then set to the detected toolkit. The job status file records the
+Torch CUDA version, compiler version, toolkit path and loaded modules. Qwen jobs
+retain their existing environment.
+
+After pulling this change, retry just the four Gemmas concurrently:
+
+```bash
+bash junlin/run.sh gemma --parallel
+```
+
+No package reinstall or result deletion is needed for this discovery fix. A
+matching toolkit must exist on the cluster. If module loading fails, the job
+stops before loading weights and recommends `module spider CUDA` to inspect the
+available versions. `CUDA_MODULE` can select a particular module; it is restored
+from `.env.cluster` when saved with `bash junlin/setup.sh`. Matching toolkits in
+custom locations can instead be supplied through `CUDA_HOME`. This addresses
+the missing compiler error; GPU inference still needs to succeed on the cluster.
+
 Transformers configuration support is checked by constructing `gemma4` and
 `gemma4_unified` configurations through `AutoConfig.for_model`, with no model
 weights or network access. This works when newer Transformers versions import

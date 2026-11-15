@@ -26,6 +26,7 @@ For the five unfinished models use: bash junlin/retry.sh
 
 Environment overrides:
   ME, FRAMEWORK, MODELS_DIR, ANALYSIS_PY, SERVING_PY, GEMMA_SERVING_PY, SUBMIT_PY
+  CUDA_MODULE (optional Gemma toolkit module; default matches torch.version.cuda)
   ACCOUNT=cpsc4880 CPU_PARTITION=day GPU_PARTITION=gpu_h200
   CPU_TIME=04:00:00 GPU_TIME=08:00:00 GPU_COUNT=1 GPU_MEM=96G
   DEPENDENCY_JOB_ID=<existing monitor job> (serialize after an already queued run)
@@ -248,6 +249,7 @@ PY
         TP="$GPU_COUNT" GPU_LABEL="H200:$GPU_COUNT" SCORE="$score" EXTRA_ARGS="" \
         ENFORCE_EAGER="$enforce_eager" CUDA_LAUNCH_BLOCKING="$launch_blocking" \
         RUNS_DIR="$runs_dir" SEED_BASELINE="$seed_baseline" GEMMA_ENV_LOCK="$env_lock" PORT="$port" \
+        CUDA_MODULE="${CUDA_MODULE:-}" \
         sbatch --parsable --account="$ACCOUNT" --partition="$GPU_PARTITION" --nodes=1 --ntasks=1 \
         --gpus="h200:$GPU_COUNT" --cpus-per-task="$((6 * GPU_COUNT))" --mem="$GPU_MEM" --time="$GPU_TIME" \
         --job-name="$run_prefix-$monitor" --dependency="$dependency" --kill-on-invalid-dep=yes \

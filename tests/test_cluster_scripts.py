@@ -61,6 +61,9 @@ class ScriptTests(unittest.TestCase):
         self.assertIn('flock -n 9', text)
         self.assertEqual(text.count('"${registry_args[@]}"'), 3,
                          "cache import, server and runner must use the same pinned registry")
+        self.assertIn('if [[ "$MONITOR" == gemma4-* ]]; then', text)
+        self.assertLess(text.index('    configure_monitor_cuda'), text.index('setsid "$SERVING_PY"'))
+        self.assertIn('"$MONITOR_NVCC_VERSION" "$CUDA_HOME"', text)
 
     def test_the_port_precheck_tolerates_time_wait_sockets_from_a_previous_server(self):
         """A job submitted right after another ended on the same node failed because the check bound without SO_REUSEADDR."""
