@@ -1,4 +1,4 @@
-# Sourced by the GPU job: FlashInfer may compile kernels during server startup.
+# Experiment-specific toolkit setup; sourced by Junlin's GPU and repair jobs.
 # Loading a module here keeps this independent of the submitter's login shell.
 
 monitor_nvcc_version() {

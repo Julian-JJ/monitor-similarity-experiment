@@ -153,8 +153,8 @@ if [[ "$dry_run" == 0 ]]; then
         serving="$SERVING_PY"
         if [[ "$monitor" == gemma4-* ]]; then
             serving="$GEMMA_SERVING_PY"
-            if [[ ! -r "$FRAMEWORK/mihai/cluster/cuda_toolkit.sh" || ! -r "$FRAMEWORK/mihai/cluster/serve_with_cuda.sh" || ! -r "$FRAMEWORK/mihai/cluster/run_monitor.sbatch" ]] ||
-                [[ "$(< "$FRAMEWORK/mihai/cluster/run_monitor.sbatch")" != *configure_monitor_cuda* ]]; then
+            if [[ ! -r "$FRAMEWORK/junlin/cuda_toolkit.sh" || ! -r "$FRAMEWORK/junlin/serve_with_cuda.sh" || ! -r "$FRAMEWORK/junlin/run_monitor.sbatch" ]] ||
+                [[ "$(< "$FRAMEWORK/junlin/run_monitor.sbatch")" != *configure_monitor_cuda* ]]; then
                 echo "Gemma CUDA setup is missing from FRAMEWORK=$FRAMEWORK. Update that checkout, or run 'bash junlin/setup.sh' from the updated checkout to save its path, then submit fresh jobs." >&2
                 exit 1
             fi
@@ -236,7 +236,7 @@ PY
         sbatch --parsable --account="$ACCOUNT" --partition="$CPU_PARTITION" --nodes=1 --ntasks=1 \
         --cpus-per-task=4 --mem=16G --time="$CPU_TIME" --job-name="prepare-$monitor" \
         --output="$batch_dir/prepare-$monitor-%j.out" --export=ALL \
-        "$FRAMEWORK/mihai/cluster/download_monitor.sbatch")
+        "$FRAMEWORK/junlin/download_monitor.sbatch")
     if [[ "$dry_run" == 0 ]]; then
         printf 'prepare\t%s\t%s\t-\t%s\t%s/%s\n' "$monitor" "$download_job" "$registry_dir" "$runs_dir" "$run_name" >> "$receipt"
         printf '%s: preparation=%s\n' "$monitor" "$download_job"
@@ -261,7 +261,7 @@ PY
         --gpus="h200:$GPU_COUNT" --cpus-per-task="$((6 * GPU_COUNT))" --mem="$GPU_MEM" --time="$GPU_TIME" \
         --job-name="$run_prefix-$monitor" --dependency="$dependency" --kill-on-invalid-dep=yes \
         --output="$batch_dir/$run_prefix-$monitor-%j.out" --export=ALL \
-        "$FRAMEWORK/mihai/cluster/run_monitor.sbatch")
+        "$FRAMEWORK/junlin/run_monitor.sbatch")
     [[ "$parallel" == 1 ]] || previous="$monitor_job"
     printf '%s: preparation=%s monitor=%s\n' "$monitor" "$download_job" "$monitor_job"
     if [[ "$dry_run" == 0 ]]; then

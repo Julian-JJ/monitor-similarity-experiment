@@ -57,7 +57,7 @@ class SetupTests(unittest.TestCase):
     def test_gemma_diagnostic_identifies_old_submitted_script_and_checkout_mismatch(self):
         with TempDir() as directory:
             root, _, values = self.fixture(directory)
-            launcher = root / "mihai/cluster/run_monitor.sbatch"
+            launcher = root / "junlin/run_monitor.sbatch"
             launcher.parent.mkdir(parents=True)
             launcher.write_text("configure_monitor_cuda\n")
             other = directory / "other checkout"

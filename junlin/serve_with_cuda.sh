@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Configure the actual server process, including when its sbatch snapshot is old.
 set -euo pipefail
-cuda_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
+cuda_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 export SERVING_PY="${1:?serving Python required}"
 cuda_manifest="${2-}"
 shift 2
-source "$cuda_root/mihai/cluster/cuda_toolkit.sh"
+source "$cuda_root/junlin/cuda_toolkit.sh"
 configure_monitor_cuda
 "$SERVING_PY" - "$cuda_root" "$cuda_manifest" "$MONITOR_TORCH_CUDA" "$MONITOR_NVCC_VERSION" "$MONITOR_CUDA_MODULE" "$MONITOR_NINJA_VERSION" <<'PY'
 import json, os, shutil, sys

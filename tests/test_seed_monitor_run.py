@@ -5,7 +5,7 @@ import unittest
 
 from monitor_experiment.artifacts import lock
 from monitor_experiment import spec
-from scripts.seed_monitor_run import seed
+from junlin.seed_monitor_run import seed
 from tests.support import TempDir, make_project
 from tests.test_runner import FakeMonitor, run, lines
 

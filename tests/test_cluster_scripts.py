@@ -8,9 +8,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = {name: ROOT / "mihai/cluster" / name for name in ("setup_cluster.sh", "run_controls.sbatch", "run_monitor.sbatch", "sync_to_cluster.sh", "download_monitor.sbatch")}
 SCRIPTS["submit_qwen_gemma_baselines.sh"] = ROOT / "junlin/submit_qwen_gemma_baselines.sh"
-for name in ("setup.sh", "setup.sbatch", "run.sh", "retry.sh", "repair_gemma.sbatch"):
+for name in ("setup.sh", "setup.sbatch", "run.sh", "retry.sh", "repair_gemma.sbatch", "run_monitor.sbatch", "download_monitor.sbatch"):
     SCRIPTS[name] = ROOT / "junlin" / name
-SCRIPTS["serve_with_cuda.sh"] = ROOT / "mihai/cluster/serve_with_cuda.sh"
+SCRIPTS["serve_with_cuda.sh"] = ROOT / "junlin/serve_with_cuda.sh"
 WRITES = re.compile(r"(?:>>?\s*|\bmkdir(?:\s+-p)?\s+|\bln\s+-s\s+\S+\s+|\bcp\s+\S+\s+|\btee(?:\s+-a)?\s+|--out(?:put)?\s+|--cache-dir\s+)\"?\$SHARED")
 
 

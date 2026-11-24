@@ -4,11 +4,6 @@ Scripts: `mihai/cluster/setup_cluster.sh`, `sync_to_cluster.sh`, `run_controls.s
 `scripts/serve_monitor.py`, `scripts/build_collection.py`, `scripts/download_monitor.py`. Code: `monitor_experiment/{control_setup,monitor_serving,monitor_download,collection_builder}.py`.
 Tests: `tests/test_control_setup.py`, `test_monitor_serving.py`, `test_monitor_download.py`, `test_collection_builder.py`, `test_cluster_scripts.py`.
 
-For the remaining Qwen/Gemma baselines, use
-[`submit_qwen_gemma_baselines.sh`](../../junlin/submit_qwen_gemma_baselines.sh).
-The [submission guide](qwen-gemma-jobs.md) covers model selection, CPU preparation,
-pinned job registries, sequential GPU jobs, resource overrides, and dry runs.
-
 **Status (2026-10-20, updated): B1 to B3 are done; the control rollouts exist (`main_only_v1`, 34 pairs); Qwen3-32B is downloaded; the baseline is done (`reports/baseline.md`).** Sections below mark what has been *verified by running it* and what has not.
 The SSH connection must be opened by you (passphrase and MFA) and expires; the assistant cannot supply those.
 
@@ -28,8 +23,8 @@ Verified by reading the existing scripts or by earlier commands in this project:
 * The shared Python environments (`$SHARED/envs/monitor-research`, `monitor-vllm`) and the shared weights were readable and executable by your account in earlier commands.
 * The project filesystem is slow (copying 8 MB took about 15 minutes); the scheduler limit noted in the repository is six hours.
 
-**Slurm settings:** account `cpsc4880`, QOS `normal`. Earlier records (2026-10-19, jobs 30068171 and 30068179) used eight CPUs per GPU; the current submission limit reported on 2026-11-13 is **six CPUs per GPU**.
-For current jobs use `--account=cpsc4880 --partition=gpu_h200 --nodes=1 --ntasks=1 --gpus=h200:1 --cpus-per-task=6 --mem=96G --no-requeue`, with a time limit chosen per job. The Qwen/Gemma wrapper scales CPUs at six per GPU.
+**Slurm settings (learned on 2026-10-19):** account `cpsc4880`, QOS `normal`; partition `gpu_h200` accepts all accounts and has no maximum time; the flags that work (from the teammate's readable submission
+records and confirmed by jobs 30068171 and 30068179) are `--account=cpsc4880 --partition=gpu_h200 --nodes=1 --ntasks=1 --gpus=h200:1 --cpus-per-task=8 --mem=96G --no-requeue`, with a time limit chosen per job.
 The earlier H200 job needed about 2¼ hours for 30 pairs; the A40 pair (`gpu_devel`, 2×a40) hit its 6-hour limit. Other GPU partitions exist (`gpu_h100`, `gpu_b200`, `gpu_rtx6000`, `gpu`); they have not been used.
 `sbatch --test-only` reports a start time exactly one year ahead for every GPU partition: that is the end of a 365-day `EmergencyMaintenance` reservation on other nodes, not a real wait. The queues are long
 (hundreds pending per partition) but jobs submitted to `gpu_h200` started within seconds because GPUs were free. Check `sinfo`/`scontrol show node` for free GPUs, and read `squeue --me` after submitting.
@@ -117,7 +112,7 @@ pre-registered rule allows wording changes only for format failures, and this is
 
 ## Not verified yet
 
-* Reasoning extraction and thinking for Gemma 4 (registered 2026-11-13 with the documented `--reasoning-parser gemma4`; not cluster-tested), the parser for GPT-OSS (left unset), and `--dtype auto` for these families. * That the server accepts `reasoning_effort` for GPT-OSS. * Throughput for monitors larger than 32B.
+* The `--reasoning-parser` name for GPT-OSS and Gemma (left unset), and `--dtype auto` for them. * That the server accepts `reasoning_effort` for GPT-OSS. * Throughput for monitors larger than 32B.
 
 ## Verified by the baseline (2026-10-20)
 

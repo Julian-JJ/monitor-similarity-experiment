@@ -330,7 +330,7 @@ def diagnose_gemma(values, environ=None):
     submission_checkout = Path(environ.get("FRAMEWORK") or values["FRAMEWORK"]).resolve()
     for label, path in (("Current checkout", checkout), ("Submission checkout", submission_checkout)):
         commit = probe(["git", "-C", str(path), "rev-parse", "--short", "HEAD"])
-        launcher = path / "mihai/cluster/run_monitor.sbatch"
+        launcher = path / "junlin/run_monitor.sbatch"
         aware = launcher.is_file() and "configure_monitor_cuda" in launcher.read_text()
         print(f"{label}: {path} commit={commit or 'unknown'} CUDA_check={'present' if aware else 'ABSENT'}")
     if checkout != submission_checkout:

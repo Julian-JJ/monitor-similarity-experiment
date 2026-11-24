@@ -12,7 +12,7 @@ import unittest
 from tests.support import TempDir
 
 ROOT = Path(__file__).resolve().parents[1]
-HELPER = ROOT / "mihai/cluster/cuda_toolkit.sh"
+HELPER = ROOT / "junlin/cuda_toolkit.sh"
 MODULE = r'''module() {
     printf '%s\n' "$*" >> "$TEST_MODULE_LOG"
     [[ "$1" == load && "$2" == "$TEST_EXPECT_MODULE" && "${TEST_LOAD_FAIL:-0}" == 0 ]] || return 1

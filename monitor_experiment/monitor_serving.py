@@ -67,5 +67,5 @@ def provenance(monitor, command, vllm_version, model_dir):
 
 def cuda_launch_command(command, root, manifest=None):
     """Load the toolkit immediately before executing the Gemma vLLM process."""
-    return ["bash", str(Path(root) / "mihai/cluster/serve_with_cuda.sh"), command[0],
+    return ["bash", str(Path(root) / "junlin/serve_with_cuda.sh"), command[0],
             str(Path(manifest).resolve()) if manifest else "", *command]

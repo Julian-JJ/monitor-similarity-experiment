@@ -28,9 +28,9 @@ class SubmissionTests(unittest.TestCase):
         (root / "configs/experiments").mkdir()
         for filename in ("qwen-gemma-baseline.toml", "cuda-debug-qwen3-1.7b.toml"):
             shutil.copy(ROOT / "configs/experiments" / filename, root / "configs/experiments")
-        (root / "mihai/cluster").mkdir(parents=True)
+        (root / "junlin").mkdir(parents=True)
         for filename in ("run_monitor.sbatch", "cuda_toolkit.sh", "serve_with_cuda.sh"):
-            shutil.copy(ROOT / "mihai/cluster" / filename, root / "mihai/cluster")
+            shutil.copy(ROOT / "junlin" / filename, root / "junlin")
         tokenizer = root / "cache/tokenizer/tokenizer.json"
         tokenizer.parent.mkdir(parents=True)
         tokenizer.write_text("{}")
@@ -116,7 +116,7 @@ print(str(1000 + len(rows)) + ';test-cluster')
             env = self.environment(temporary)
             env["CUDA_MODULE"] = "CUDA/12.9.1"
             root = Path(env["FRAMEWORK"])
-            (root / "junlin").mkdir()
+            (root / "junlin").mkdir(exist_ok=True)
             script = root / "junlin" / SCRIPT.name
             shutil.copy(SCRIPT, script)
             save_settings(root / ".env.cluster", {key: env[key] for key in (
@@ -134,7 +134,7 @@ print(str(1000 + len(rows)) + ';test-cluster')
         for filename in ("cuda_toolkit.sh", "serve_with_cuda.sh", "run_monitor.sbatch"):
             with self.subTest(filename=filename), TempDir() as temporary:
                 env = self.environment(temporary)
-                path = Path(env["FRAMEWORK"]) / "mihai/cluster" / filename
+                path = Path(env["FRAMEWORK"]) / "junlin" / filename
                 if filename != "run_monitor.sbatch":
                     path.unlink()
                 else:
