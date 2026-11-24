@@ -1,6 +1,7 @@
 """The serving command for monitors: pure construction, no vLLM needed."""
 
 import tempfile
+import json
 import unittest
 from pathlib import Path
 
@@ -27,12 +28,31 @@ class CommandTests(unittest.TestCase):
                          ("9001", "2", "32768"))
         self.assertNotIn("--enable-auto-tool-choice", command, "monitors do not call tools")
         self.assertNotIn("--rope-scaling", command)
+        self.assertNotIn("--enforce-eager", command)
         self.assertEqual(self.flag(command, "--generation-config"), "vllm")
 
-    def test_other_families_get_dtype_auto_and_no_assumed_reasoning_parser(self):
+    def test_eager_execution_is_explicit_and_recorded_in_server_provenance(self):
+        monitor = self.registry.monitor("qwen3-1.7b")
+        command = ms.build_command(monitor, "/m", enforce_eager=True)
+        self.assertIn("--enforce-eager", command)
+        record = ms.provenance(monitor, command, "0.11.0", "/m")
+        self.assertIn("--enforce-eager", record["command"])
+        self.assertEqual(record["monitor_identity"], monitor.identity())
+
+    def test_other_families_get_dtype_auto_and_their_configured_reasoning_parser(self):
         command = ms.build_command(self.registry.monitor("gpt-oss-120b"), "/m/gpt-oss")
         self.assertEqual(self.flag(command, "--dtype"), "auto")
         self.assertNotIn("--reasoning-parser", command)
+
+        for name in ("gemma4-e2b", "gemma4-e4b", "gemma4-12b", "gemma4-31b"):
+            with self.subTest(monitor=name):
+                monitor = self.registry.monitor(name)
+                command = ms.build_command(monitor, "/m/" + name)
+                self.assertEqual(self.flag(command, "--dtype"), "auto")
+                self.assertEqual(self.flag(command, "--served-model-name"), monitor.model_id)
+                self.assertEqual(self.flag(command, "--reasoning-parser"), "gemma4")
+                self.assertEqual(json.loads(self.flag(command, "--limit-mm-per-prompt")), {"image": 0, "audio": 0})
+                self.assertNotIn("--rope-scaling", command)
 
     def test_a_longer_context_needs_a_yarn_factor_and_a_shorter_one_is_refused(self):
         monitor = self.registry.monitor("qwen3-32b")

@@ -1,0 +1,28 @@
+# Append new monitors to the same baseline run, preserving the completed 14B/32B cells.
+# Submit one monitor at a time with junlin/submit_qwen_gemma_baselines.sh.
+name = "baseline"
+monitors = ["qwen3-1.7b", "qwen3-4b", "qwen3-30b-a3b", "gemma4-e2b", "gemma4-e4b", "gemma4-12b", "gemma4-31b"]
+rollout_sets = ["original_clean", "main_only_v1"]
+told = ["malicious", "benign"]
+
+[grid]
+scope = ["action", "cot", "all"]
+task_context = ["none"]
+hierarchy = ["upstream-limits"]
+partial_cot = ["off"]
+followup_visibility = ["none"]
+prompt = ["upstream_ad"]
+reasoning = ["default"]
+
+[options]
+samples = 4
+seed = 0
+bin_size = 6
+margin_tokens = 512
+truncate_chars = 2000
+labels = true
+max_attempts = 2
+single_pass_if_fits = true
+concurrency = 32
+keep_monitor_reasoning = false
+item_limit = 0

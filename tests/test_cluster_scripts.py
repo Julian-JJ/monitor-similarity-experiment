@@ -7,6 +7,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = {name: ROOT / "mihai/cluster" / name for name in ("setup_cluster.sh", "run_controls.sbatch", "run_monitor.sbatch", "sync_to_cluster.sh", "download_monitor.sbatch")}
+SCRIPTS["submit_qwen_gemma_baselines.sh"] = ROOT / "junlin/submit_qwen_gemma_baselines.sh"
+for name in ("setup.sh", "setup.sbatch", "run.sh", "retry.sh", "repair_gemma.sbatch", "run_monitor.sbatch", "download_monitor.sbatch"):
+    SCRIPTS[name] = ROOT / "junlin" / name
+SCRIPTS["serve_with_cuda.sh"] = ROOT / "junlin/serve_with_cuda.sh"
 WRITES = re.compile(r"(?:>>?\s*|\bmkdir(?:\s+-p)?\s+|\bln\s+-s\s+\S+\s+|\bcp\s+\S+\s+|\btee(?:\s+-a)?\s+|--out(?:put)?\s+|--cache-dir\s+)\"?\$SHARED")
 
 
@@ -31,6 +35,8 @@ class ScriptTests(unittest.TestCase):
 
     def test_the_default_output_directory_is_the_users_own_not_the_teammates(self):
         for name, path in SCRIPTS.items():
+            if name in ("setup.sh", "setup.sbatch", "run.sh", "retry.sh", "repair_gemma.sbatch", "serve_with_cuda.sh"):
+                continue  # The helper discovers the current account and saves it; wrappers load that configuration.
             defaults = re.findall(r'ME="\$\{ME:-([^}]+)\}"', path.read_text())
             self.assertEqual(defaults, ["/nfs/roberts/project/cpsc4880/cpsc4880_as4833"], name)
 
@@ -53,6 +59,12 @@ class ScriptTests(unittest.TestCase):
         for needle in ("--monitor \"$MONITOR\"", "--base-url", "--gpu \"$GPU_LABEL\"", "--job-id \"$JOB\"", "--score", "serve_monitor.py",
                        ': "${MONITOR:?', "trap cleanup EXIT"):
             self.assertIn(needle, text)
+        self.assertIn('flock -n 9', text)
+        self.assertEqual(text.count('"${registry_args[@]}"'), 3,
+                         "cache import, server and runner must use the same pinned registry")
+        self.assertIn('if [[ "$MONITOR" == gemma4-* ]]; then', text)
+        self.assertLess(text.index('    configure_monitor_cuda'), text.index('setsid "$SERVING_PY"'))
+        self.assertIn('"$MONITOR_NVCC_VERSION" "$CUDA_HOME"', text)
 
     def test_the_port_precheck_tolerates_time_wait_sockets_from_a_previous_server(self):
         """A job submitted right after another ended on the same node failed because the check bound without SO_REUSEADDR."""

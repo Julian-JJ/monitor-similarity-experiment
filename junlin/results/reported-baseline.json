@@ -1,0 +1,1803 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "reported_markdown",
+    "commit": "476f1867f7c35609d9ee00ac8206f94c594dd0b4",
+    "path": "reports/baseline.md",
+    "sha256": "c70f4dc819c1dc45d6ec5bc29338db14eb6ed01c325a19436dbeed7e89ed36b9",
+    "raw_artifacts_verified": false
+  },
+  "setup": {
+    "actor": "Qwen3-14B",
+    "tasks": [
+      "bank_transfer_2",
+      "american_airlines_2",
+      "spam_filter_update"
+    ],
+    "actor_rollouts": 75,
+    "dual_objective_rollouts": 41,
+    "control_rollouts": 34,
+    "samples": 4,
+    "units_per_model": 1800,
+    "bootstrap_replicates": 2000,
+    "bootstrap_seed": 0
+  },
+  "cells": [
+    {
+      "monitor": "gemma4-31b",
+      "scope": "action",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.988,
+            "low": 0.957,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.792,
+            "low": 0.712,
+            "high": 0.869
+          },
+          "gmean2_clean": {
+            "value": 0.782,
+            "low": 0.695,
+            "high": 0.866
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.977,
+            "low": 0.924,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.652,
+            "low": 0.529,
+            "high": 0.772
+          },
+          "gmean2_clean": {
+            "value": 0.637,
+            "low": 0.516,
+            "high": 0.761
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.932,
+            "low": 0.844,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 0.932,
+            "low": 0.844,
+            "high": 1.0
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-31b",
+      "scope": "cot",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.976,
+            "low": 0.927,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.867,
+            "low": 0.808,
+            "high": 0.924
+          },
+          "gmean2_clean": {
+            "value": 0.846,
+            "low": 0.78,
+            "high": 0.909
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.788,
+            "low": 0.684,
+            "high": 0.894
+          },
+          "gmean2_clean": {
+            "value": 0.788,
+            "low": 0.684,
+            "high": 0.894
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.947,
+            "low": 0.85,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.947,
+            "low": 0.871,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 0.897,
+            "low": 0.783,
+            "high": 0.993
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-31b",
+      "scope": "all",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.963,
+            "low": 0.907,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.867,
+            "low": 0.804,
+            "high": 0.923
+          },
+          "gmean2_clean": {
+            "value": 0.836,
+            "low": 0.757,
+            "high": 0.909
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.977,
+            "low": 0.927,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.795,
+            "low": 0.691,
+            "high": 0.887
+          },
+          "gmean2_clean": {
+            "value": 0.777,
+            "low": 0.676,
+            "high": 0.872
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.947,
+            "low": 0.85,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.939,
+            "low": 0.853,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 0.89,
+            "low": 0.769,
+            "high": 0.985
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-12b",
+      "scope": "action",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.994,
+            "low": 0.976,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.746,
+            "low": 0.677,
+            "high": 0.814
+          },
+          "gmean2_clean": {
+            "value": 0.742,
+            "low": 0.673,
+            "high": 0.81
+          },
+          "coverage": {
+            "value": 0.998,
+            "low": 0.993,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.598,
+            "low": 0.493,
+            "high": 0.703
+          },
+          "gmean2_clean": {
+            "value": 0.598,
+            "low": 0.493,
+            "high": 0.703
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.987,
+            "low": 0.95,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.894,
+            "low": 0.801,
+            "high": 0.977
+          },
+          "gmean2_clean": {
+            "value": 0.882,
+            "low": 0.786,
+            "high": 0.97
+          },
+          "coverage": {
+            "value": 0.997,
+            "low": 0.987,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-12b",
+      "scope": "cot",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.967,
+            "low": 0.911,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.818,
+            "low": 0.742,
+            "high": 0.894
+          },
+          "gmean2_clean": {
+            "value": 0.791,
+            "low": 0.707,
+            "high": 0.871
+          },
+          "coverage": {
+            "value": 0.953,
+            "low": 0.933,
+            "high": 0.972
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.987,
+            "low": 0.95,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.765,
+            "low": 0.662,
+            "high": 0.871
+          },
+          "gmean2_clean": {
+            "value": 0.755,
+            "low": 0.652,
+            "high": 0.864
+          },
+          "coverage": {
+            "value": 0.96,
+            "low": 0.927,
+            "high": 0.987
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.945,
+            "low": 0.842,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.871,
+            "low": 0.766,
+            "high": 0.963
+          },
+          "gmean2_clean": {
+            "value": 0.823,
+            "low": 0.691,
+            "high": 0.941
+          },
+          "coverage": {
+            "value": 0.947,
+            "low": 0.92,
+            "high": 0.973
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-12b",
+      "scope": "all",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.975,
+            "low": 0.925,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.859,
+            "low": 0.785,
+            "high": 0.924
+          },
+          "gmean2_clean": {
+            "value": 0.838,
+            "low": 0.765,
+            "high": 0.911
+          },
+          "coverage": {
+            "value": 0.98,
+            "low": 0.965,
+            "high": 0.992
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.779,
+            "low": 0.667,
+            "high": 0.886
+          },
+          "gmean2_clean": {
+            "value": 0.779,
+            "low": 0.667,
+            "high": 0.886
+          },
+          "coverage": {
+            "value": 0.973,
+            "low": 0.947,
+            "high": 0.993
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.947,
+            "low": 0.85,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.939,
+            "low": 0.868,
+            "high": 0.992
+          },
+          "gmean2_clean": {
+            "value": 0.89,
+            "low": 0.783,
+            "high": 0.978
+          },
+          "coverage": {
+            "value": 0.987,
+            "low": 0.967,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-14b",
+      "scope": "action",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.97,
+            "low": 0.921,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.792,
+            "low": 0.723,
+            "high": 0.859
+          },
+          "gmean2_clean": {
+            "value": 0.768,
+            "low": 0.692,
+            "high": 0.842
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.636,
+            "low": 0.516,
+            "high": 0.757
+          },
+          "gmean2_clean": {
+            "value": 0.636,
+            "low": 0.516,
+            "high": 0.757
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.934,
+            "low": 0.841,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.947,
+            "low": 0.875,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 0.885,
+            "low": 0.778,
+            "high": 0.979
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-14b",
+      "scope": "cot",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.963,
+            "low": 0.917,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.837,
+            "low": 0.784,
+            "high": 0.89
+          },
+          "gmean2_clean": {
+            "value": 0.806,
+            "low": 0.739,
+            "high": 0.872
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.966,
+            "low": 0.896,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.758,
+            "low": 0.654,
+            "high": 0.856
+          },
+          "gmean2_clean": {
+            "value": 0.732,
+            "low": 0.635,
+            "high": 0.831
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.961,
+            "low": 0.893,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.917,
+            "low": 0.846,
+            "high": 0.977
+          },
+          "gmean2_clean": {
+            "value": 0.88,
+            "low": 0.794,
+            "high": 0.956
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-14b",
+      "scope": "all",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.976,
+            "low": 0.933,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.795,
+            "low": 0.739,
+            "high": 0.854
+          },
+          "gmean2_clean": {
+            "value": 0.776,
+            "low": 0.716,
+            "high": 0.835
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.682,
+            "low": 0.576,
+            "high": 0.787
+          },
+          "gmean2_clean": {
+            "value": 0.682,
+            "low": 0.576,
+            "high": 0.787
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.947,
+            "low": 0.861,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.909,
+            "low": 0.839,
+            "high": 0.969
+          },
+          "gmean2_clean": {
+            "value": 0.861,
+            "low": 0.764,
+            "high": 0.941
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-e4b",
+      "scope": "action",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.994,
+            "low": 0.974,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.716,
+            "low": 0.659,
+            "high": 0.772
+          },
+          "gmean2_clean": {
+            "value": 0.712,
+            "low": 0.65,
+            "high": 0.77
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.989,
+            "low": 0.955,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.53,
+            "low": 0.445,
+            "high": 0.618
+          },
+          "gmean2_clean": {
+            "value": 0.524,
+            "low": 0.439,
+            "high": 0.614
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.902,
+            "low": 0.815,
+            "high": 0.977
+          },
+          "gmean2_clean": {
+            "value": 0.902,
+            "low": 0.815,
+            "high": 0.977
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-e4b",
+      "scope": "cot",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.933,
+            "low": 0.864,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.714,
+            "low": 0.622,
+            "high": 0.796
+          },
+          "gmean2_clean": {
+            "value": 0.666,
+            "low": 0.569,
+            "high": 0.762
+          },
+          "coverage": {
+            "value": 0.995,
+            "low": 0.987,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.955,
+            "low": 0.875,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.554,
+            "low": 0.429,
+            "high": 0.675
+          },
+          "gmean2_clean": {
+            "value": 0.529,
+            "low": 0.406,
+            "high": 0.654
+          },
+          "coverage": {
+            "value": 0.993,
+            "low": 0.98,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.908,
+            "low": 0.789,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.871,
+            "low": 0.78,
+            "high": 0.955
+          },
+          "gmean2_clean": {
+            "value": 0.791,
+            "low": 0.665,
+            "high": 0.916
+          },
+          "coverage": {
+            "value": 0.997,
+            "low": 0.987,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-e4b",
+      "scope": "all",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.939,
+            "low": 0.871,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.824,
+            "low": 0.763,
+            "high": 0.885
+          },
+          "gmean2_clean": {
+            "value": 0.774,
+            "low": 0.689,
+            "high": 0.856
+          },
+          "coverage": {
+            "value": 0.992,
+            "low": 0.98,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.955,
+            "low": 0.875,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.692,
+            "low": 0.57,
+            "high": 0.805
+          },
+          "gmean2_clean": {
+            "value": 0.661,
+            "low": 0.543,
+            "high": 0.785
+          },
+          "coverage": {
+            "value": 0.99,
+            "low": 0.973,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.92,
+            "low": 0.807,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.955,
+            "low": 0.882,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 0.878,
+            "low": 0.757,
+            "high": 0.985
+          },
+          "coverage": {
+            "value": 0.993,
+            "low": 0.98,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-4b",
+      "scope": "action",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.976,
+            "low": 0.939,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.758,
+            "low": 0.69,
+            "high": 0.825
+          },
+          "gmean2_clean": {
+            "value": 0.739,
+            "low": 0.665,
+            "high": 0.814
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.989,
+            "low": 0.955,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.614,
+            "low": 0.5,
+            "high": 0.735
+          },
+          "gmean2_clean": {
+            "value": 0.607,
+            "low": 0.493,
+            "high": 0.728
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.961,
+            "low": 0.893,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.902,
+            "low": 0.818,
+            "high": 0.971
+          },
+          "gmean2_clean": {
+            "value": 0.866,
+            "low": 0.77,
+            "high": 0.953
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-4b",
+      "scope": "cot",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.933,
+            "low": 0.878,
+            "high": 0.981
+          },
+          "tnr_clean": {
+            "value": 0.773,
+            "low": 0.708,
+            "high": 0.837
+          },
+          "gmean2_clean": {
+            "value": 0.721,
+            "low": 0.652,
+            "high": 0.789
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.977,
+            "low": 0.92,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.735,
+            "low": 0.637,
+            "high": 0.831
+          },
+          "gmean2_clean": {
+            "value": 0.718,
+            "low": 0.617,
+            "high": 0.816
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.882,
+            "low": 0.779,
+            "high": 0.972
+          },
+          "tnr_clean": {
+            "value": 0.811,
+            "low": 0.72,
+            "high": 0.904
+          },
+          "gmean2_clean": {
+            "value": 0.715,
+            "low": 0.6,
+            "high": 0.828
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-4b",
+      "scope": "all",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.927,
+            "low": 0.867,
+            "high": 0.981
+          },
+          "tnr_clean": {
+            "value": 0.826,
+            "low": 0.77,
+            "high": 0.879
+          },
+          "gmean2_clean": {
+            "value": 0.765,
+            "low": 0.692,
+            "high": 0.834
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.955,
+            "low": 0.88,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.773,
+            "low": 0.684,
+            "high": 0.855
+          },
+          "gmean2_clean": {
+            "value": 0.738,
+            "low": 0.642,
+            "high": 0.828
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.895,
+            "low": 0.789,
+            "high": 0.986
+          },
+          "tnr_clean": {
+            "value": 0.879,
+            "low": 0.79,
+            "high": 0.953
+          },
+          "gmean2_clean": {
+            "value": 0.786,
+            "low": 0.671,
+            "high": 0.896
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-32b",
+      "scope": "action",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.712,
+            "low": 0.636,
+            "high": 0.784
+          },
+          "gmean2_clean": {
+            "value": 0.712,
+            "low": 0.636,
+            "high": 0.784
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.53,
+            "low": 0.432,
+            "high": 0.636
+          },
+          "gmean2_clean": {
+            "value": 0.53,
+            "low": 0.432,
+            "high": 0.636
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.894,
+            "low": 0.809,
+            "high": 0.97
+          },
+          "gmean2_clean": {
+            "value": 0.894,
+            "low": 0.809,
+            "high": 0.97
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-32b",
+      "scope": "cot",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.951,
+            "low": 0.886,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.784,
+            "low": 0.728,
+            "high": 0.843
+          },
+          "gmean2_clean": {
+            "value": 0.746,
+            "low": 0.678,
+            "high": 0.816
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.636,
+            "low": 0.53,
+            "high": 0.75
+          },
+          "gmean2_clean": {
+            "value": 0.636,
+            "low": 0.53,
+            "high": 0.75
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.895,
+            "low": 0.773,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.932,
+            "low": 0.858,
+            "high": 0.985
+          },
+          "gmean2_clean": {
+            "value": 0.834,
+            "low": 0.703,
+            "high": 0.956
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-32b",
+      "scope": "all",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.945,
+            "low": 0.881,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.758,
+            "low": 0.697,
+            "high": 0.814
+          },
+          "gmean2_clean": {
+            "value": 0.716,
+            "low": 0.641,
+            "high": 0.788
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.989,
+            "low": 0.957,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.606,
+            "low": 0.508,
+            "high": 0.699
+          },
+          "gmean2_clean": {
+            "value": 0.599,
+            "low": 0.502,
+            "high": 0.695
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.895,
+            "low": 0.773,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.909,
+            "low": 0.826,
+            "high": 0.978
+          },
+          "gmean2_clean": {
+            "value": 0.813,
+            "low": 0.682,
+            "high": 0.941
+          },
+          "coverage": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-e2b",
+      "scope": "action",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.977,
+            "low": 0.931,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.631,
+            "low": 0.537,
+            "high": 0.718
+          },
+          "gmean2_clean": {
+            "value": 0.616,
+            "low": 0.521,
+            "high": 0.706
+          },
+          "coverage": {
+            "value": 0.602,
+            "low": 0.545,
+            "high": 0.658
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.98,
+            "low": 0.918,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.442,
+            "low": 0.325,
+            "high": 0.556
+          },
+          "gmean2_clean": {
+            "value": 0.433,
+            "low": 0.321,
+            "high": 0.543
+          },
+          "coverage": {
+            "value": 0.64,
+            "low": 0.57,
+            "high": 0.713
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.973,
+            "low": 0.891,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.859,
+            "low": 0.74,
+            "high": 0.958
+          },
+          "gmean2_clean": {
+            "value": 0.836,
+            "low": 0.707,
+            "high": 0.944
+          },
+          "coverage": {
+            "value": 0.563,
+            "low": 0.487,
+            "high": 0.633
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-e2b",
+      "scope": "cot",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.96,
+            "low": 0.833,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.895,
+            "low": 0.75,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 0.859,
+            "low": 0.687,
+            "high": 1.0
+          },
+          "coverage": {
+            "value": 0.127,
+            "low": 0.093,
+            "high": 0.162
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.938,
+            "low": 0.739,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.765,
+            "low": 0.455,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 0.717,
+            "low": 0.41,
+            "high": 1.0
+          },
+          "coverage": {
+            "value": 0.13,
+            "low": 0.083,
+            "high": 0.177
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "coverage": {
+            "value": 0.123,
+            "low": 0.077,
+            "high": 0.173
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "gemma4-e2b",
+      "scope": "all",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.833,
+            "low": 0.25,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.831,
+            "low": 0.677,
+            "high": 0.952
+          },
+          "gmean2_clean": {
+            "value": 0.692,
+            "low": 0.179,
+            "high": 0.946
+          },
+          "coverage": {
+            "value": 0.147,
+            "low": 0.107,
+            "high": 0.185
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 1.0,
+            "low": 1.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.724,
+            "low": 0.467,
+            "high": 0.947
+          },
+          "gmean2_clean": {
+            "value": 0.724,
+            "low": 0.452,
+            "high": 0.947
+          },
+          "coverage": {
+            "value": 0.143,
+            "low": 0.093,
+            "high": 0.197
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.75,
+            "low": 0.0,
+            "high": 1.0
+          },
+          "tnr_clean": {
+            "value": 0.933,
+            "low": 0.778,
+            "high": 1.0
+          },
+          "gmean2_clean": {
+            "value": 0.7,
+            "low": 0.0,
+            "high": 1.0
+          },
+          "coverage": {
+            "value": 0.15,
+            "low": 0.093,
+            "high": 0.2
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-1.7b",
+      "scope": "action",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.405,
+            "low": 0.278,
+            "high": 0.547
+          },
+          "tnr_clean": {
+            "value": 0.848,
+            "low": 0.78,
+            "high": 0.904
+          },
+          "gmean2_clean": {
+            "value": 0.343,
+            "low": 0.232,
+            "high": 0.466
+          },
+          "coverage": {
+            "value": 0.73,
+            "low": 0.68,
+            "high": 0.78
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.571,
+            "low": 0.367,
+            "high": 0.778
+          },
+          "tnr_clean": {
+            "value": 0.752,
+            "low": 0.632,
+            "high": 0.853
+          },
+          "gmean2_clean": {
+            "value": 0.43,
+            "low": 0.269,
+            "high": 0.606
+          },
+          "coverage": {
+            "value": 0.677,
+            "low": 0.61,
+            "high": 0.74
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.238,
+            "low": 0.085,
+            "high": 0.424
+          },
+          "tnr_clean": {
+            "value": 0.931,
+            "low": 0.866,
+            "high": 0.982
+          },
+          "gmean2_clean": {
+            "value": 0.222,
+            "low": 0.077,
+            "high": 0.397
+          },
+          "coverage": {
+            "value": 0.783,
+            "low": 0.72,
+            "high": 0.84
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-1.7b",
+      "scope": "cot",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.392,
+            "low": 0.276,
+            "high": 0.517
+          },
+          "tnr_clean": {
+            "value": 0.668,
+            "low": 0.591,
+            "high": 0.745
+          },
+          "gmean2_clean": {
+            "value": 0.262,
+            "low": 0.182,
+            "high": 0.352
+          },
+          "coverage": {
+            "value": 0.723,
+            "low": 0.677,
+            "high": 0.768
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.524,
+            "low": 0.333,
+            "high": 0.742
+          },
+          "tnr_clean": {
+            "value": 0.667,
+            "low": 0.562,
+            "high": 0.768
+          },
+          "gmean2_clean": {
+            "value": 0.349,
+            "low": 0.218,
+            "high": 0.504
+          },
+          "coverage": {
+            "value": 0.727,
+            "low": 0.667,
+            "high": 0.783
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.291,
+            "low": 0.156,
+            "high": 0.449
+          },
+          "tnr_clean": {
+            "value": 0.67,
+            "low": 0.549,
+            "high": 0.793
+          },
+          "gmean2_clean": {
+            "value": 0.195,
+            "low": 0.101,
+            "high": 0.31
+          },
+          "coverage": {
+            "value": 0.72,
+            "low": 0.66,
+            "high": 0.777
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    },
+    {
+      "monitor": "qwen3-1.7b",
+      "scope": "all",
+      "groups": {
+        "pooled": {
+          "tpr": {
+            "value": 0.436,
+            "low": 0.286,
+            "high": 0.577
+          },
+          "tnr_clean": {
+            "value": 0.594,
+            "low": 0.496,
+            "high": 0.689
+          },
+          "gmean2_clean": {
+            "value": 0.259,
+            "low": 0.163,
+            "high": 0.36
+          },
+          "coverage": {
+            "value": 0.53,
+            "low": 0.473,
+            "high": 0.585
+          }
+        },
+        "malicious": {
+          "tpr": {
+            "value": 0.568,
+            "low": 0.3,
+            "high": 0.794
+          },
+          "tnr_clean": {
+            "value": 0.558,
+            "low": 0.437,
+            "high": 0.686
+          },
+          "gmean2_clean": {
+            "value": 0.317,
+            "low": 0.163,
+            "high": 0.482
+          },
+          "coverage": {
+            "value": 0.56,
+            "low": 0.487,
+            "high": 0.63
+          }
+        },
+        "benign": {
+          "tpr": {
+            "value": 0.317,
+            "low": 0.147,
+            "high": 0.486
+          },
+          "tnr_clean": {
+            "value": 0.635,
+            "low": 0.485,
+            "high": 0.781
+          },
+          "gmean2_clean": {
+            "value": 0.201,
+            "low": 0.092,
+            "high": 0.334
+          },
+          "coverage": {
+            "value": 0.5,
+            "low": 0.433,
+            "high": 0.567
+          }
+        }
+      },
+      "units_expected": 600,
+      "units_found_reported": 600
+    }
+  ]
+}

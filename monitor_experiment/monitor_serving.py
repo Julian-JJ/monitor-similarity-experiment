@@ -31,7 +31,7 @@ def check_model_dir(model_dir):
 
 
 def build_command(monitor, model_dir, *, python="python", host="127.0.0.1", port=8000, tensor_parallel=1,
-                  max_model_len=None, yarn_factor=None, gpu_memory_utilization=0.9):
+                  max_model_len=None, yarn_factor=None, gpu_memory_utilization=0.9, enforce_eager=False):
     monitor.runnable()
     max_model_len = max_model_len or monitor.context_tokens
     if max_model_len < monitor.context_tokens:
@@ -49,6 +49,10 @@ def build_command(monitor, model_dir, *, python="python", host="127.0.0.1", port
                "--generation-config", "vllm"]
     if monitor.reasoning_parser:
         command += ["--reasoning-parser", monitor.reasoning_parser]
+    if enforce_eager:
+        command += ["--enforce-eager"]
+    if monitor.family == "gemma4":
+        command += ["--limit-mm-per-prompt", json.dumps({"image": 0, "audio": 0})]
     if yarn_factor:
         command += ["--rope-scaling", json.dumps({"rope_type": "yarn", "factor": yarn_factor,
                                                   "original_max_position_embeddings": NATIVE_CONTEXT})]
@@ -59,3 +63,9 @@ def provenance(monitor, command, vllm_version, model_dir):
     """What to record about this server alongside a run."""
     return {"schema_version": 1, "monitor": monitor.name, "monitor_identity": monitor.identity(),
             "model_dir": str(model_dir), "vllm_version": vllm_version, "command": command}
+
+
+def cuda_launch_command(command, root, manifest=None):
+    """Load the toolkit immediately before executing the Gemma vLLM process."""
+    return ["bash", str(Path(root) / "junlin/serve_with_cuda.sh"), command[0],
+            str(Path(manifest).resolve()) if manifest else "", *command]

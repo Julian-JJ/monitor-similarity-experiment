@@ -30,7 +30,9 @@ class RegistryTests(unittest.TestCase):
     def test_relations_to_the_fixed_actor(self):
         want = {"qwen3-14b": "same_model", "qwen3-4b": "same_family_smaller", "qwen3-1.7b": "same_family_smaller",
                 "qwen3-32b": "same_family_larger", "qwen3-30b-a3b": "same_family_other_architecture",
-                "gpt-oss-120b": "different_family", "gemma-large": "different_family"}
+                "gpt-oss-120b": "different_family", "gemma-large": "different_family",
+                "gemma4-e2b": "different_family", "gemma4-e4b": "different_family",
+                "gemma4-12b": "different_family", "gemma4-31b": "different_family"}
         got = {n: m.relation_to(self.registry.actor) for n, m in self.registry.monitors.items()}
         self.assertEqual(got, want)
         self.assertTrue(set(got.values()) <= set(reg.RELATIONS))

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from monitor_experiment.artifacts import write_json  # noqa: E402
-from monitor_experiment.monitor_serving import ServingError, build_command, check_model_dir, provenance  # noqa: E402
+from monitor_experiment.monitor_serving import ServingError, build_command, check_model_dir, provenance, cuda_launch_command  # noqa: E402
 from monitor_experiment import monitor_download  # noqa: E402
 from monitor_experiment.registry import Registry, RegistryError  # noqa: E402
 
@@ -31,16 +31,19 @@ def main():
     parser.add_argument("--max-model-len", type=int)
     parser.add_argument("--yarn-factor", type=float)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.9)
+    parser.add_argument("--enforce-eager", action="store_true", help="disable CUDA graphs for diagnostics")
     parser.add_argument("--manifest", help="write what is being served (command, vLLM version, monitor identity) here")
+    parser.add_argument("--registry-dir", help="use a pinned job registry instead of configs/")
     parser.add_argument("--print-command", action="store_true")
     args = parser.parse_args()
     try:
-        monitor = Registry.load().monitor(args.monitor)
+        monitor = Registry.load(config_dir=args.registry_dir).monitor(args.monitor)
         model_dir = check_model_dir(args.model_dir)
         monitor_download.verify(model_dir, monitor)
         command = build_command(monitor, model_dir.resolve(), python=sys.executable, host=args.host, port=args.port,
                                 tensor_parallel=args.tensor_parallel_size, max_model_len=args.max_model_len,
-                                yarn_factor=args.yarn_factor, gpu_memory_utilization=args.gpu_memory_utilization)
+                                yarn_factor=args.yarn_factor, gpu_memory_utilization=args.gpu_memory_utilization,
+                                enforce_eager=args.enforce_eager)
     except (ServingError, RegistryError, monitor_download.DownloadError) as error:
         sys.exit(f"ERROR: {error}")
     if args.print_command:
@@ -50,10 +53,14 @@ def main():
         version = importlib.metadata.version("vllm")
     except importlib.metadata.PackageNotFoundError:
         sys.exit("ERROR: vllm is not installed in this Python; use the GPU serving environment")
+    launch_command = cuda_launch_command(command, ROOT, args.manifest) if monitor.family == "gemma4" else command
     if args.manifest:
-        write_json(args.manifest, provenance(monitor, command, version, model_dir.resolve()))
+        record = provenance(monitor, command, version, model_dir.resolve())
+        if monitor.family == "gemma4":
+            record["launcher_command"] = launch_command
+        write_json(args.manifest, record)
     print(json.dumps(command), flush=True)
-    sys.exit(subprocess.run(command).returncode)
+    sys.exit(subprocess.run(launch_command).returncode)
 
 
 if __name__ == "__main__":

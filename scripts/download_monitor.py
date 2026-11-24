@@ -18,6 +18,7 @@ def main():
     parser.add_argument("--revision", help="override the registry's pin (a branch or commit); default: the pin, or main if UNPINNED")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--verify-only", action="store_true", help="check an existing download against the registry and exit")
+    parser.add_argument("--pin-registry", help="write a private registry snapshot pinned to the downloaded revision")
     args = parser.parse_args()
     monitor = Registry.load().monitor(args.monitor)
     if args.verify_only:
@@ -26,9 +27,12 @@ def main():
         from importlib.metadata import version
         manifest = monitor_download.download(monitor, args.output_dir, revision=args.revision, workers=args.workers,
                                              hub_version=version("huggingface-hub"))
+    if args.pin_registry:
+        monitor_download.pin_registry(args.output_dir, args.monitor, args.pin_registry)
+        print("Pinned job registry:", args.pin_registry)
     total = sum(manifest["files"].values())
     print(f"{monitor.model_id}@{manifest['revision']}: {len(manifest['files'])} files, {total / 1e9:.1f} GB")
-    if monitor.revision == monitor_download.UNPINNED:
+    if monitor.revision == monitor_download.UNPINNED and not args.pin_registry:
         print(f'Pin it: set revision = "{manifest["revision"]}" in configs/monitors.toml for {args.monitor}')
 
 
