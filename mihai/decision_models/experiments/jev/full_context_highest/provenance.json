@@ -1,0 +1,42 @@
+{
+  "model": "jev",
+  "slug": "full_context_highest",
+  "title": "Jev 1.14 \u2014 full context, highest answer",
+  "purpose": "Measure whether Jev can detect the objective from the entire rendered transcript in one request.",
+  "method": "Send the same adapted state, instructions and A\u2013D choices used for GLiDE to jev-1.14.0. Take the highest-probability option; A is detection. Enable long-context mode for CoT and Combined.",
+  "notes": [
+    "All 450 requests completed. Hosted TypeSafe API; server hardware and memory are not exposed.",
+    "Largest accepted pilot inputs: 26,884 Actions, 216,646 CoT and 229,506 Combined Jev tokens.",
+    "Full-input production took 13:13. Mean recorded API latency: 0.19 s Actions, 0.96 s CoT, 1.08 s Combined.",
+    "API latency includes network effects and is not a controlled hardware speed comparison."
+  ],
+  "sources": {
+    "action": {
+      "records": "jev/results-completed-34426786/scores/action-full-greedy-records.json",
+      "metrics": "jev/results-completed-34426786/scores/action-full-greedy-metrics.json"
+    },
+    "cot": {
+      "records": "jev/results-completed-34426786/scores/cot-full-greedy-records.json",
+      "metrics": "jev/results-completed-34426786/scores/cot-full-greedy-metrics.json"
+    },
+    "all": {
+      "records": "jev/results-completed-34426786/scores/all-full-greedy-records.json",
+      "metrics": "jev/results-completed-34426786/scores/all-full-greedy-metrics.json"
+    }
+  },
+  "audits": [
+    "jev/results-completed-34426786/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/jev-variants-20261123/full/"
+  ],
+  "source_sha256": {
+    "jev/results-completed-34426786/audit.json": "600458df209ca115f9f525b8a646013748bec54044cda00b7b85bb36c3b96208",
+    "jev/results-completed-34426786/scores/action-full-greedy-metrics.json": "8cebcbe18db44f5f68c352031e1fb0b91064a3d34b044906a4050ec9f203fb18",
+    "jev/results-completed-34426786/scores/action-full-greedy-records.json": "9aec7cf53478b825ef94e79255f617286705190b358c10330af7236e1284352d",
+    "jev/results-completed-34426786/scores/all-full-greedy-metrics.json": "64ce3fe07ce6e0275316537d2e85e10c4d24c1e09e9525e764a7c55997af6660",
+    "jev/results-completed-34426786/scores/all-full-greedy-records.json": "7f7e53acb2fcd6ea4acccbcb379fa8dd6fa6c8c0cb027b17949f95c45859a42b",
+    "jev/results-completed-34426786/scores/cot-full-greedy-metrics.json": "870f85bd3860fad91b4b52279c0e98a576ae3e761374ef601bd43b2228053f71",
+    "jev/results-completed-34426786/scores/cot-full-greedy-records.json": "75a8a203dad4d4d5ff0a2d9e2e0bede3ef792fb95886b75d4680bcf34b6a5ac5"
+  }
+}

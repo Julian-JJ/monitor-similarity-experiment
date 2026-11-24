@@ -1,0 +1,31 @@
+{
+  "qwen3-32b-action": {
+    "complete": 600,
+    "counts_and_metrics_match": true
+  },
+  "qwen3-32b-cot": {
+    "complete": 600,
+    "counts_and_metrics_match": true
+  },
+  "qwen3-32b-all": {
+    "complete": 600,
+    "counts_and_metrics_match": true
+  },
+  "qwen3-14b-action": {
+    "complete": 600,
+    "counts_and_metrics_match": true
+  },
+  "qwen3-14b-cot": {
+    "complete": 600,
+    "counts_and_metrics_match": true
+  },
+  "qwen3-14b-all": {
+    "complete": 600,
+    "counts_and_metrics_match": true
+  },
+  "source_hashes": {
+    "items.jsonl": "5a0b35e1095fd07dc15cf361644fe4178e994d4a9685aaf7ec7808af52d8ae2c",
+    "metrics.json": "63d082ab93246c25f52ee4c9a7a235122407a2bc5d0b227499184790292ab538",
+    "manifest.json": "bd74c64b6e58b911cc3139a798325f23930847229144e1fbfa84a74e3af11cd8"
+  }
+}

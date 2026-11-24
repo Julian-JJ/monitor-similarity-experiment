@@ -1,0 +1,43 @@
+{
+  "status": "confirmed_rejected",
+  "intent": "add3242b-63eb-4732-82a1-eb055cfd834e",
+  "created_utc": "2026-11-23T14:55:20.165912+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=decision-variants-20261123-v2-qwen-smoke-cpu6",
+    "--comment=decision-variants:add3242b-63eb-4732-82a1-eb055cfd834e",
+    "--partition=gpu_h200",
+    "--gpus=h200:1",
+    "--cpus-per-task=6",
+    "--mem=96G",
+    "--account=cpsc4880",
+    "--nodes=1",
+    "--ntasks=1",
+    "--no-requeue",
+    "--time=02:00:00",
+    "--dependency=afterok:34326291",
+    "--kill-on-invalid-dep=yes",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/decision-variants-v2-qwen-smoke-cpu6-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-launcher-9d68d6231103ec24/run.sbatch",
+    "qwen",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b/config.json",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+    "smoke"
+  ],
+  "source_manifest_sha256": "d98ee84c398bee9b90f66132b15a8c5fd53476d97534a0d5a1f9569cbde0a616",
+  "prior_receipts": {
+    "decision-variants-20261123-glide-production.submission.json": "34327028",
+    "decision-variants-20261123-glide-smoke.submission.json": "34327026",
+    "decision-variants-20261123-glide-summaries.submission.json": "34327029",
+    "decision-variants-20261123-prepare.submission.json": "34326291",
+    "decision-variants-20261123-qwen-production.submission.json": "34327027",
+    "decision-variants-20261123-qwen-smoke-cpu6.submission.json": "34327025",
+    "decision-variants-20261123-score.submission.json": "34327030"
+  },
+  "queue_before": "",
+  "accounting_before": "34326291|decision-variants-20261123-prepare|COMPLETED|\n34327025|decision-variants-20261123-qwen-smoke-cpu6|FAILED|\n34327030|decision-variants-20261123-score|COMPLETED|\n",
+  "stdout": "",
+  "stderr": "sbatch: error: Batch job submission failed: Job dependency problem\n",
+  "reconciliation": "No matching Slurm name or UUID; expired completed-job dependency rejected before submission"
+}

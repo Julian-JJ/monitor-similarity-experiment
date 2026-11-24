@@ -1,0 +1,144 @@
+{
+  "config_sha256": "668086ca52c11241f106a6ac0ceaec28f29da880360a57021bf4882526f6d9a0",
+  "levels": [
+    {
+      "target": 2000,
+      "file": "inputs-2000.json",
+      "sha256": "3693bee0fd7e89980b586c73a87607cce73a0fde2feac727a4fe3740ba40cce9",
+      "actual_prompt_tokens": [
+        2000,
+        2000,
+        2000,
+        2000,
+        2000
+      ]
+    },
+    {
+      "target": 8000,
+      "file": "inputs-8000.json",
+      "sha256": "c572a601db8b4747c798c0d9ef1bd3c64d6a899ef740b874c37d7c4ab6fd6e72",
+      "actual_prompt_tokens": [
+        8000,
+        8000,
+        8000,
+        8000,
+        7999
+      ]
+    },
+    {
+      "target": 16000,
+      "file": "inputs-16000.json",
+      "sha256": "870965f6dbf7f04da8d362bf987db172b7b940f2f02c9ad137a737daf7791967",
+      "actual_prompt_tokens": [
+        16000,
+        16000,
+        16000,
+        16000,
+        16000
+      ]
+    },
+    {
+      "target": 32000,
+      "file": "inputs-32000.json",
+      "sha256": "cdb0b948a76be959902209daa1fa99a379c4f7d6bbcc0d6d991e7de0a33cb092",
+      "actual_prompt_tokens": [
+        32000,
+        32000,
+        32000,
+        32000,
+        32000
+      ]
+    },
+    {
+      "target": 40000,
+      "file": "inputs-40000.json",
+      "sha256": "c90df390d30716652132ef5bcee1cf5664473bc9d58ee89a4d5bbd7470b8b8b1",
+      "actual_prompt_tokens": [
+        40000,
+        40000,
+        40000,
+        40000,
+        40000
+      ]
+    },
+    {
+      "target": 64000,
+      "file": "inputs-64000.json",
+      "sha256": "5fa606cc355f3a389ae5e9d0719e38ec9287de35927f95cac7c9bed662e7157d",
+      "actual_prompt_tokens": [
+        64000,
+        64000,
+        64000,
+        64000,
+        64000
+      ]
+    },
+    {
+      "target": 96000,
+      "file": "inputs-96000.json",
+      "sha256": "ee57431079974ecff68657bde0484efebd9177b5a0751fe65f4810ffd246b5df",
+      "actual_prompt_tokens": [
+        96000,
+        96000,
+        96000,
+        96000,
+        96000
+      ]
+    },
+    {
+      "target": 128000,
+      "file": "inputs-128000.json",
+      "sha256": "33acd05177f6c199343272565c5693520cb7f5f102d99ab829cc064647e8d07c",
+      "actual_prompt_tokens": [
+        128000,
+        128000,
+        128000,
+        128000,
+        128000
+      ]
+    },
+    {
+      "target": 192000,
+      "file": "inputs-192000.json",
+      "sha256": "c2271585f754f8e47f4116dea1b4684d1b96275490e60ebee5af60d47e6fb404",
+      "actual_prompt_tokens": [
+        192000,
+        192000,
+        192000,
+        192000,
+        192000
+      ]
+    },
+    {
+      "target": 216463,
+      "file": "inputs-216463.json",
+      "sha256": "6b0e93b17c1e836d4dae79c9b677feb554f9d87f0b5b392a06201e724958a263",
+      "actual_prompt_tokens": [
+        216463,
+        216463,
+        216463,
+        216463,
+        216463
+      ]
+    }
+  ],
+  "source_manifest_sha256": "6dc9d33d8b6c6cd6e22d820f7858c2f60167f9732a01e2513e1c90d286dcc569",
+  "collection_hashes": {
+    "original_clean": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+    "main_only_v1": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+  },
+  "lengths": {
+    "rollouts": 75,
+    "objective_cases": 150,
+    "min": 22007,
+    "median": 68542.0,
+    "p95": 157782,
+    "max": 216463,
+    "over_default_40000": 118,
+    "model_position_limit": 262144,
+    "pilot_prompt_cap": 240000,
+    "selected_item_id": "american_airlines_2/malicious/sample_02",
+    "selected_told": "benign",
+    "selected_full_prompt_tokens": 216463
+  }
+}

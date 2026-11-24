@@ -1,0 +1,31 @@
+{
+  "verified_downloaded_files": 25,
+  "audit_job": "34426786|COMPLETED|0:0|00:00:26",
+  "hashes": {
+    "audit.json": "600458df209ca115f9f525b8a646013748bec54044cda00b7b85bb36c3b96208",
+    "scores/action-mean-metrics.json": "ba5523943806510f8b4581de9748d73f62072a7223e0faabe8d157be4c2358a3",
+    "scores/all-full-greedy-metrics.json": "64ce3fe07ce6e0275316537d2e85e10c4d24c1e09e9525e764a7c55997af6660",
+    "scores/cot-full-sampled-metrics.json": "410227ea81f64249b47718663c408dd22738c8b878f66180168a0a08e6c38788",
+    "scores/all-max-records.json": "5fdc6916726afaeafd5c5e9fec6fe4da65a602cc989c94d7414a93cc1631b40a",
+    "scores/action-full-sampled-records.json": "dbdfad7ee18183fc5ee85a0eb8b6e48fc9244923d33362dfd5a9cc42b8b2b489",
+    "scores/action-max-records.json": "d2d235acd5c3f9eb5ca8632ab9b5dafcf7bd6db2977cabb28fcb5cb3c8662ad7",
+    "scores/cot-mean-metrics.json": "52879635d396d38cc7de15a956ace927c3312b866c73bcb50e5ffa1beb7f071f",
+    "scores/action-full-greedy-metrics.json": "8cebcbe18db44f5f68c352031e1fb0b91064a3d34b044906a4050ec9f203fb18",
+    "scores/cot-full-greedy-metrics.json": "870f85bd3860fad91b4b52279c0e98a576ae3e761374ef601bd43b2228053f71",
+    "scores/cot-max-records.json": "c68b886063a67f6d2449ad41aa4290cb462d97d9a5081a2f9ac9257f2af77fa8",
+    "scores/all-mean-metrics.json": "785bd94b1f787b4bb377ecd7496b885e9f76aae64ed0046e7c01f2b2e825a183",
+    "scores/all-full-sampled-records.json": "d4575b5de79ec7e825669976699ef33c3f6c358850b8899525714532f7bdf5a5",
+    "scores/cot-full-greedy-records.json": "75a8a203dad4d4d5ff0a2d9e2e0bede3ef792fb95886b75d4680bcf34b6a5ac5",
+    "scores/action-full-greedy-records.json": "9aec7cf53478b825ef94e79255f617286705190b358c10330af7236e1284352d",
+    "scores/cot-max-metrics.json": "8ff6bf7e418d5b5e20e2f7ca528f9c38c5254b8e06616a13afa2f13c6d053851",
+    "scores/all-mean-records.json": "bfaa32728a41115f86cd0ff66cc620c68e607430b8b7637e6ed4e7d91a4d1479",
+    "scores/all-full-sampled-metrics.json": "570b88caf07e8b1928fabe98cd7e1325c577c84818f21dd7cddf1db41a13e587",
+    "scores/action-mean-records.json": "d2d235acd5c3f9eb5ca8632ab9b5dafcf7bd6db2977cabb28fcb5cb3c8662ad7",
+    "scores/all-full-greedy-records.json": "7f7e53acb2fcd6ea4acccbcb379fa8dd6fa6c8c0cb027b17949f95c45859a42b",
+    "scores/all-max-metrics.json": "08fd37b19bfa340fa9a36826482c6e310fbacfbe04188a359b2901bbe4dace23",
+    "scores/cot-full-sampled-records.json": "63c19d834ab666d6188f3ae44575dc625e8479b629e070a00f21567ee8efc03a",
+    "scores/action-full-sampled-metrics.json": "dccaf4f69bffa6e536f6fe81d3d56568a2e2d9d39ab196d5b5a235e94d79bd59",
+    "scores/action-max-metrics.json": "ba5523943806510f8b4581de9748d73f62072a7223e0faabe8d157be4c2358a3",
+    "scores/cot-mean-records.json": "e01c2d2df39dc3da0ad19aa5d46921fdaf0580d33c735599ece5318a4ddd249f"
+  }
+}

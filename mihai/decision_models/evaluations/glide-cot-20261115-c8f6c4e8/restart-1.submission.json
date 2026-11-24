@@ -1,0 +1,26 @@
+{
+  "status": "submitted",
+  "intent": "94f63b6c-25ab-45c9-a05f-0af64f29cbfe",
+  "created_utc": "2026-11-16T01:22:05.817686+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=glide-cot-resume",
+    "--comment=glide-cot-resume:94f63b6c-25ab-45c9-a05f-0af64f29cbfe",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-cot-resume-%j.log",
+    "--error=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-cot-resume-%j.err",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-resume-506bda596e25d7d7.sbatch",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8"
+  ],
+  "predecessor_job_id": "33509938",
+  "preserved_cases": 108,
+  "remaining_cases": 42,
+  "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+  "config_sha256": "46dcc1e02439ce6a971031ba5c8658ac616bca11b844c23bb9d88609000014e3",
+  "launcher_sha256": "506bda596e25d7d76752c063f41541753349766c6d3aa1f93fb395e3422bc30c",
+  "preflight_sha256": "80cc3747528d543d3d60ce4dfb69bef3c17b1afca82f10c4677f8184d2694970",
+  "job_id": "33512196",
+  "submitted_utc": "2026-11-16T01:22:05.833523+00:00",
+  "stderr": ""
+}

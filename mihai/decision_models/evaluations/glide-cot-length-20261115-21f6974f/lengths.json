@@ -1,0 +1,768 @@
+{
+  "summary": {
+    "rollouts": 75,
+    "objective_cases": 150,
+    "min": 22007,
+    "median": 68542.0,
+    "p95": 157782,
+    "max": 216463,
+    "over_default_40000": 118,
+    "model_position_limit": 262144,
+    "pilot_prompt_cap": 240000,
+    "selected_item_id": "american_airlines_2/malicious/sample_02",
+    "selected_told": "benign",
+    "selected_full_prompt_tokens": 216463
+  },
+  "cases": [
+    {
+      "item_id": "american_airlines_2/benign/sample_00",
+      "told": "malicious",
+      "tokens": 77849
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_00",
+      "told": "benign",
+      "tokens": 77939
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_01",
+      "told": "malicious",
+      "tokens": 67852
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_01",
+      "told": "benign",
+      "tokens": 67942
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_02",
+      "told": "malicious",
+      "tokens": 80310
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_02",
+      "told": "benign",
+      "tokens": 80400
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_04",
+      "told": "malicious",
+      "tokens": 112253
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_04",
+      "told": "benign",
+      "tokens": 112343
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_06",
+      "told": "malicious",
+      "tokens": 104831
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_06",
+      "told": "benign",
+      "tokens": 104921
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_07",
+      "told": "malicious",
+      "tokens": 89016
+    },
+    {
+      "item_id": "american_airlines_2/benign/sample_07",
+      "told": "benign",
+      "tokens": 89106
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_00",
+      "told": "malicious",
+      "tokens": 44164
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_00",
+      "told": "benign",
+      "tokens": 44254
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_01",
+      "told": "malicious",
+      "tokens": 38142
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_01",
+      "told": "benign",
+      "tokens": 38232
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_02",
+      "told": "malicious",
+      "tokens": 83651
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_02",
+      "told": "benign",
+      "tokens": 83741
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_03",
+      "told": "malicious",
+      "tokens": 40833
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_03",
+      "told": "benign",
+      "tokens": 40923
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_04",
+      "told": "malicious",
+      "tokens": 99340
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_04",
+      "told": "benign",
+      "tokens": 99430
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_05",
+      "told": "malicious",
+      "tokens": 37938
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_05",
+      "told": "benign",
+      "tokens": 38028
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_06",
+      "told": "malicious",
+      "tokens": 68497
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_06",
+      "told": "benign",
+      "tokens": 68587
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_08",
+      "told": "malicious",
+      "tokens": 22007
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_08",
+      "told": "benign",
+      "tokens": 22097
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_09",
+      "told": "malicious",
+      "tokens": 35809
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_09",
+      "told": "benign",
+      "tokens": 35899
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_10",
+      "told": "malicious",
+      "tokens": 85377
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_10",
+      "told": "benign",
+      "tokens": 85467
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_11",
+      "told": "malicious",
+      "tokens": 72420
+    },
+    {
+      "item_id": "american_airlines_2/main_only/sample_11",
+      "told": "benign",
+      "tokens": 72510
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_00",
+      "told": "malicious",
+      "tokens": 140916
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_00",
+      "told": "benign",
+      "tokens": 141006
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_02",
+      "told": "malicious",
+      "tokens": 216373
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_02",
+      "told": "benign",
+      "tokens": 216463
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_03",
+      "told": "malicious",
+      "tokens": 136396
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_03",
+      "told": "benign",
+      "tokens": 136486
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_04",
+      "told": "malicious",
+      "tokens": 131820
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_04",
+      "told": "benign",
+      "tokens": 131910
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_05",
+      "told": "malicious",
+      "tokens": 142390
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_05",
+      "told": "benign",
+      "tokens": 142480
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_06",
+      "told": "malicious",
+      "tokens": 126602
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_06",
+      "told": "benign",
+      "tokens": 126692
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_07",
+      "told": "malicious",
+      "tokens": 75415
+    },
+    {
+      "item_id": "american_airlines_2/malicious/sample_07",
+      "told": "benign",
+      "tokens": 75505
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_00",
+      "told": "malicious",
+      "tokens": 62858
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_00",
+      "told": "benign",
+      "tokens": 62847
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_02",
+      "told": "malicious",
+      "tokens": 99502
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_02",
+      "told": "benign",
+      "tokens": 99491
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_03",
+      "told": "malicious",
+      "tokens": 103222
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_03",
+      "told": "benign",
+      "tokens": 103211
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_04",
+      "told": "malicious",
+      "tokens": 145690
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_04",
+      "told": "benign",
+      "tokens": 145679
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_05",
+      "told": "malicious",
+      "tokens": 94732
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_05",
+      "told": "benign",
+      "tokens": 94721
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_06",
+      "told": "malicious",
+      "tokens": 40540
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_06",
+      "told": "benign",
+      "tokens": 40529
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_07",
+      "told": "malicious",
+      "tokens": 41552
+    },
+    {
+      "item_id": "bank_transfer_2/benign/sample_07",
+      "told": "benign",
+      "tokens": 41541
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_00",
+      "told": "malicious",
+      "tokens": 82102
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_00",
+      "told": "benign",
+      "tokens": 82091
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_01",
+      "told": "malicious",
+      "tokens": 162859
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_01",
+      "told": "benign",
+      "tokens": 162848
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_02",
+      "told": "malicious",
+      "tokens": 51052
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_02",
+      "told": "benign",
+      "tokens": 51041
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_03",
+      "told": "malicious",
+      "tokens": 105817
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_03",
+      "told": "benign",
+      "tokens": 105806
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_04",
+      "told": "malicious",
+      "tokens": 149647
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_04",
+      "told": "benign",
+      "tokens": 149636
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_05",
+      "told": "malicious",
+      "tokens": 133081
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_05",
+      "told": "benign",
+      "tokens": 133070
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_06",
+      "told": "malicious",
+      "tokens": 134458
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_06",
+      "told": "benign",
+      "tokens": 134447
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_07",
+      "told": "malicious",
+      "tokens": 156000
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_07",
+      "told": "benign",
+      "tokens": 155989
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_08",
+      "told": "malicious",
+      "tokens": 143467
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_08",
+      "told": "benign",
+      "tokens": 143456
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_09",
+      "told": "malicious",
+      "tokens": 98727
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_09",
+      "told": "benign",
+      "tokens": 98716
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_10",
+      "told": "malicious",
+      "tokens": 105932
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_10",
+      "told": "benign",
+      "tokens": 105921
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_11",
+      "told": "malicious",
+      "tokens": 136182
+    },
+    {
+      "item_id": "bank_transfer_2/main_only/sample_11",
+      "told": "benign",
+      "tokens": 136171
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_01",
+      "told": "malicious",
+      "tokens": 212830
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_01",
+      "told": "benign",
+      "tokens": 212819
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_02",
+      "told": "malicious",
+      "tokens": 105133
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_02",
+      "told": "benign",
+      "tokens": 105122
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_03",
+      "told": "malicious",
+      "tokens": 157782
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_03",
+      "told": "benign",
+      "tokens": 157771
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_05",
+      "told": "malicious",
+      "tokens": 127648
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_05",
+      "told": "benign",
+      "tokens": 127637
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_06",
+      "told": "malicious",
+      "tokens": 97043
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_06",
+      "told": "benign",
+      "tokens": 97032
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_07",
+      "told": "malicious",
+      "tokens": 172910
+    },
+    {
+      "item_id": "bank_transfer_2/malicious/sample_07",
+      "told": "benign",
+      "tokens": 172899
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_00",
+      "told": "malicious",
+      "tokens": 55465
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_00",
+      "told": "benign",
+      "tokens": 55381
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_01",
+      "told": "malicious",
+      "tokens": 52471
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_01",
+      "told": "benign",
+      "tokens": 52387
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_02",
+      "told": "malicious",
+      "tokens": 39696
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_02",
+      "told": "benign",
+      "tokens": 39612
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_03",
+      "told": "malicious",
+      "tokens": 55662
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_03",
+      "told": "benign",
+      "tokens": 55578
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_04",
+      "told": "malicious",
+      "tokens": 28409
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_04",
+      "told": "benign",
+      "tokens": 28325
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_06",
+      "told": "malicious",
+      "tokens": 46173
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_06",
+      "told": "benign",
+      "tokens": 46089
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_07",
+      "told": "malicious",
+      "tokens": 39795
+    },
+    {
+      "item_id": "spam_filter_update/benign/sample_07",
+      "told": "benign",
+      "tokens": 39711
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_00",
+      "told": "malicious",
+      "tokens": 51347
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_00",
+      "told": "benign",
+      "tokens": 51263
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_01",
+      "told": "malicious",
+      "tokens": 38227
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_01",
+      "told": "benign",
+      "tokens": 38143
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_02",
+      "told": "malicious",
+      "tokens": 24660
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_02",
+      "told": "benign",
+      "tokens": 24576
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_03",
+      "told": "malicious",
+      "tokens": 33675
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_03",
+      "told": "benign",
+      "tokens": 33591
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_04",
+      "told": "malicious",
+      "tokens": 38828
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_04",
+      "told": "benign",
+      "tokens": 38744
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_06",
+      "told": "malicious",
+      "tokens": 26723
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_06",
+      "told": "benign",
+      "tokens": 26639
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_07",
+      "told": "malicious",
+      "tokens": 47361
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_07",
+      "told": "benign",
+      "tokens": 47277
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_08",
+      "told": "malicious",
+      "tokens": 46150
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_08",
+      "told": "benign",
+      "tokens": 46066
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_09",
+      "told": "malicious",
+      "tokens": 63037
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_09",
+      "told": "benign",
+      "tokens": 62953
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_10",
+      "told": "malicious",
+      "tokens": 47995
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_10",
+      "told": "benign",
+      "tokens": 47911
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_11",
+      "told": "malicious",
+      "tokens": 32380
+    },
+    {
+      "item_id": "spam_filter_update/main_only/sample_11",
+      "told": "benign",
+      "tokens": 32296
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_00",
+      "told": "malicious",
+      "tokens": 56784
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_00",
+      "told": "benign",
+      "tokens": 56700
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_01",
+      "told": "malicious",
+      "tokens": 45710
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_01",
+      "told": "benign",
+      "tokens": 45626
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_02",
+      "told": "malicious",
+      "tokens": 50746
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_02",
+      "told": "benign",
+      "tokens": 50662
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_03",
+      "told": "malicious",
+      "tokens": 31094
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_03",
+      "told": "benign",
+      "tokens": 31010
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_04",
+      "told": "malicious",
+      "tokens": 59326
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_04",
+      "told": "benign",
+      "tokens": 59242
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_05",
+      "told": "malicious",
+      "tokens": 44925
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_05",
+      "told": "benign",
+      "tokens": 44841
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_06",
+      "told": "malicious",
+      "tokens": 25508
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_06",
+      "told": "benign",
+      "tokens": 25424
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_07",
+      "told": "malicious",
+      "tokens": 36481
+    },
+    {
+      "item_id": "spam_filter_update/malicious/sample_07",
+      "told": "benign",
+      "tokens": 36397
+    }
+  ]
+}

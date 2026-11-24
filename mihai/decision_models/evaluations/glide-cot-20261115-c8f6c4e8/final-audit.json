@@ -1,0 +1,57 @@
+{
+  "audited_utc": "2026-11-16T03:42:37.780702+00:00",
+  "job_id": "33512196",
+  "artifact_checks_passed": true,
+  "scheduler_accounting": "33509938|FAILED|1:0|00:27:13|2026-11-15T19:17:12|2026-11-15T19:44:25\n33512196|COMPLETED|0:0|00:39:00|2026-11-15T20:22:06|2026-11-15T21:01:06\n",
+  "restart_exit_status": "job=33512196 exit_code=0 ended_utc=2026-11-16T02:01:05Z",
+  "original_results_preserved": 108,
+  "new_results_from_restart": 42,
+  "allocation_warning_count": 6,
+  "memory": {
+    "max_allocated_GiB": 50.5292592048645,
+    "max_reserved_GiB": 93.1171875
+  },
+  "summary_sha256": "fd37b38864aa3065564f7eab5a6bcc5b6091199351c5363b582d3dd96ae8d7af",
+  "sampled_metrics_sha256": "f0c33ae221600522c104f9b26558a75d48846f8c13e05b874a756ae2ce7326f9",
+  "greedy_metrics_sha256": "a83c347a0a369554927bd90e4790cc3c257b01341c95905781b6e52331310834",
+  "summary": {
+    "cases": 150,
+    "complete": 150,
+    "failed": 0,
+    "sampled_judgments": 600,
+    "greedy_judgments": 150
+  },
+  "all_input_token_counts_match_preflight": true,
+  "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+  "hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "torch": "2.14.0+cu130",
+    "cuda": "13.0",
+    "job_id": "33512196"
+  },
+  "case_seconds": {
+    "total": 3901.516188375186,
+    "mean": 26.01010792250124,
+    "median": 18.769687578314915,
+    "min": 2.7016943390481174,
+    "max": 114.57773828785866
+  },
+  "greedy_choices": {
+    "B": 28,
+    "A": 46,
+    "C": 75,
+    "D": 1
+  },
+  "sampled_choices": {
+    "B": 159,
+    "C": 260,
+    "A": 149,
+    "D": 32
+  },
+  "cases_with_nonidentical_draws": 103,
+  "limitations": [
+    "Full CoT without hierarchy; four labels sampled from one GLiDE probability vector per case.",
+    "Qwen baseline elicitation and hierarchical processing differ; this is a system comparison.",
+    "Initial process exit remains unexplained; restart completed despite logged allocation warnings."
+  ]
+}

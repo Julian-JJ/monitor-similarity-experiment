@@ -1,0 +1,43 @@
+{
+  "model": "glide",
+  "slug": "chunks_max",
+  "title": "GLiDE-9B \u2014 chunks, maximum P(A)",
+  "purpose": "Test whether judging smaller pieces helps detection, using the strongest local signal.",
+  "method": "Use the baseline chunk planner (12,000-token budget, single-pass-if-fits shortcut). Classify each chunk with A\u2013D options and a partial-transcript notice. Take the maximum raw P(A) and flag at \u2265 0.5.",
+  "notes": [
+    "All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined.",
+    "Maximum and average reuse the same calls; averaging is not weighted by chunk length.",
+    "This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case.",
+    "Chunking and the final decision rule both differ from full-input highest-answer inference.",
+    "Shared chunk job duration: 2:02:25, also including the new full Combined evaluation."
+  ],
+  "sources": {
+    "action": {
+      "records": "variants/results-completed-34428767/scores/action-max-records.json",
+      "metrics": "variants/results-completed-34428767/scores/action-max-metrics.json"
+    },
+    "cot": {
+      "records": "variants/results-completed-34428767/scores/cot-max-records.json",
+      "metrics": "variants/results-completed-34428767/scores/cot-max-metrics.json"
+    },
+    "all": {
+      "records": "variants/results-completed-34428767/scores/all-max-records.json",
+      "metrics": "variants/results-completed-34428767/scores/all-max-metrics.json"
+    }
+  },
+  "audits": [
+    "variants/results-completed-34428767/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/decision-variants-20261123/glide-chunks/"
+  ],
+  "source_sha256": {
+    "variants/results-completed-34428767/audit.json": "59041a0fcb3211482537b8836f52c717642de15aa1290411190819b25b66dc0e",
+    "variants/results-completed-34428767/scores/action-max-metrics.json": "d512d1b56f76013b1b98a62cb93e3200b5522c28151ac87710f192a9344ef9fa",
+    "variants/results-completed-34428767/scores/action-max-records.json": "fb58aa4171beb07a61e4feb2cfebf906d71968b4745bdb11f72eefe2a5c93eb1",
+    "variants/results-completed-34428767/scores/all-max-metrics.json": "1c456d0e7141bfbbc6c9cab64594fdb133eeadb962e6f990743230624fb2f48b",
+    "variants/results-completed-34428767/scores/all-max-records.json": "3b75d4edc34155d6e35d1911532b6b0593bab1866029e9cbd6b0738f35a448f7",
+    "variants/results-completed-34428767/scores/cot-max-metrics.json": "5e35e99930b6e6524940f6f296f884a6e9a99648a6d71f0beb759c96f2f7f69d",
+    "variants/results-completed-34428767/scores/cot-max-records.json": "09c72d8f1910fd0a2a299124d9729642acd7eaf5a5d24489aa2a1c6130f42f65"
+  }
+}

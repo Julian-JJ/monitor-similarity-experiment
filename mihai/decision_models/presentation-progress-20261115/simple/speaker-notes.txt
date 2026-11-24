@@ -1,0 +1,14 @@
+Figure 1 — Monitor quality
+Same 75 rollouts; two target objectives per rollout, so 150 monitoring cases per input type. Primary scores pool 41 positive and 66 clean-control cases, with four answers per case for sampled methods. G-mean squared = detection rate times (1 - clean false-alarm rate). The other cross-objective and own-objective failure groups are scored separately.
+Actions: Qwen detection 100%, false alarms 28.8%; sampled GLiDE 94.5% and 23.5%; most-likely GLiDE 95.1% and 24.2%. Their overall scores are similar.
+CoT: Qwen detection 95.1%, false alarms 21.6%; sampled GLiDE 62.8% and 1.9%; most-likely GLiDE 78.0% and 0%. The last result represents 32/41 positives detected and 0/66 clean controls flagged; it does not guarantee zero false alarms on new data.
+Qwen generates four separate analyses; GLiDE samples four labels from one probability vector. Qwen uses hierarchy for long inputs, GLiDE full inputs. There is no matching most-likely Qwen run, so this does not establish that GLiDE is intrinsically better.
+Combined input was omitted from the simplified chart because GLiDE has not been tested on it. Qwen combined: G-mean squared 0.716, detection 94.5%, false alarms 24.2%.
+
+Figure 2 — Runtime
+Actions: GLiDE 5m04s, Qwen approximately 24m26s. CoT: GLiDE 66m13s, Qwen approximately 2h42m53s. GLiDE CoT includes a 27m13s failed process and a 39-minute continuation that retained the 108 previously completed cases and completed the remaining 42. The initial process exit remains unexplained; all 150 final case outputs were verified.
+GLiDE used one RTX PRO 6000 Blackwell and serial calls. Qwen used one H200 and up to 32 concurrent judgments. GLiDE's two answer rules share one inference run. Qwen generated four independent analyses and used hierarchy. Qwen per-scope times are approximate because the scopes shared sessions and overlapped. Timing definitions also differ: GLiDE scheduler allocation durations versus Qwen evaluation-session phases.
+The longest full GLiDE CoT prompt was 216,463 tokens. Peak GPU memory: 50.5 GiB allocated, 93.1 GiB reserved. These establish execution feasibility, not reliable use of every part of a long transcript.
+Combined Qwen time was about 2h43m13s; no matching GLiDE run exists.
+
+Source: audited saved evaluations from November 15, 2026. Full data and source hashes are in comparison.json in the parent directory. Original detailed figures and TA questions are preserved there.

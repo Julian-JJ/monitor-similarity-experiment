@@ -1,0 +1,4 @@
+{"stage": "full", "job_id": "34391865", "dependency": "afterok:34391510"}
+{"stage": "chunks", "job_id": "34391866", "dependency": "afterok:34391510,afterany:34391865"}
+{"stage": "summaries", "job_id": "34391867", "dependency": "afterok:34391510,afterany:34391866:34371577"}
+{"stage": "score", "job_id": "34391868", "dependency": "afterany:34391867"}

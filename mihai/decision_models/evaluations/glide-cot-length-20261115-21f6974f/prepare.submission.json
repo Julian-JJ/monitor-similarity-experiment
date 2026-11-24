@@ -1,0 +1,18 @@
+{
+  "status": "submitted",
+  "intent": "5ede7f73-1abf-4c0e-9727-f92d536a8fc8",
+  "created_utc": "2026-11-15T23:23:59.098425+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=glide-length-prep",
+    "--comment=glide-length:5ede7f73-1abf-4c0e-9727-f92d536a8fc8",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-length-prep-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-length-20261115-21f6974f/pilot.sbatch",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-length-20261115-21f6974f",
+    "prepare"
+  ],
+  "job_id": "33507043",
+  "submitted_utc": "2026-11-15T23:23:59.136635+00:00"
+}

@@ -1,0 +1,47 @@
+{
+  "action-qwen-greedy": {
+    "not_started": 150
+  },
+  "action-glide-full": {
+    "complete": 150
+  },
+  "action-glide-max": {
+    "not_started": 150
+  },
+  "action-glide-mean": {
+    "not_started": 150
+  },
+  "action-glide-summaries": {
+    "not_started": 150
+  },
+  "cot-qwen-greedy": {
+    "not_started": 150
+  },
+  "cot-glide-full": {
+    "complete": 150
+  },
+  "cot-glide-max": {
+    "not_started": 150
+  },
+  "cot-glide-mean": {
+    "not_started": 150
+  },
+  "cot-glide-summaries": {
+    "not_started": 150
+  },
+  "all-qwen-greedy": {
+    "not_started": 150
+  },
+  "all-glide-full": {
+    "not_started": 150
+  },
+  "all-glide-max": {
+    "not_started": 150
+  },
+  "all-glide-mean": {
+    "not_started": 150
+  },
+  "all-glide-summaries": {
+    "not_started": 150
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "model": "glide",
+  "slug": "full_context_sampled",
+  "title": "GLiDE-9B \u2014 full context, sampled answers",
+  "purpose": "Explore how sampling labels changes the same full-input classifier, alongside the sampled Qwen baseline.",
+  "method": "Reuse each full-input probability vector; apply temperature 0.6 and top-p 0.9, then draw four labels with seed 0. Count each draw separately; do not majority-vote. There are no additional model calls.",
+  "notes": [
+    "Actions and CoT were evaluated. Sampled full Combined was not run.",
+    "The four labels share one inference result; they are not four independent analyses."
+  ],
+  "sources": {
+    "action": {
+      "export": "glide-actions-sampled",
+      "metrics": "evaluations/glide-actions-20261115-60611f0f/sampled-metrics.json"
+    },
+    "cot": {
+      "records": "evaluations/glide-cot-20261115-c8f6c4e8/sampled-records.json",
+      "metrics": "evaluations/glide-cot-20261115-c8f6c4e8/sampled-metrics.json"
+    }
+  },
+  "audits": [
+    "evaluations/glide-actions-20261115-60611f0f/final-audit.json",
+    "evaluations/glide-cot-20261115-c8f6c4e8/final-audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/glide-actions-20261115-60611f0f/",
+    "$PROJECT/mihai/decision_models/runs/glide-cot-20261115-c8f6c4e8/"
+  ],
+  "source_sha256": {
+    "evaluations/glide-actions-20261115-60611f0f/final-audit.json": "92b214701ffdeea661dc4c86c31482fbff416ac98407f35368e17aa5f7d34e87",
+    "evaluations/glide-actions-20261115-60611f0f/sampled-metrics.json": "e5ac0b0076d7159ed5b1ae8f83c195d72e23c3095d9c755e51c6a3dfdf9ad09d",
+    "evaluations/glide-cot-20261115-c8f6c4e8/final-audit.json": "00b80f12f3c9953be22a39a9ab07d372e447125d1a2f26df3d864c6187ac55fb",
+    "evaluations/glide-cot-20261115-c8f6c4e8/sampled-metrics.json": "f0c33ae221600522c104f9b26558a75d48846f8c13e05b874a756ae2ce7326f9",
+    "evaluations/glide-cot-20261115-c8f6c4e8/sampled-records.json": "0d07b707147c4543192c0dc61bc92102fdc7362566d6d57f0f0aa368644a5b26",
+    "experiments/_sources/dataset-and-baselines.json": "f99615a4f02f949a0dfb0693671b2712407b0ddd5ee78a1497a317a74d0dcea5"
+  }
+}

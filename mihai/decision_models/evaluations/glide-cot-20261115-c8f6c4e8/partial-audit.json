@@ -1,0 +1,283 @@
+{
+  "checked_utc": "2026-11-16T01:07:44.378322+00:00",
+  "job_id": "33509938",
+  "scheduler": {
+    "state": "FAILED",
+    "exit_code": "1:0",
+    "elapsed": "00:27:13",
+    "time_limit": "02:00:00"
+  },
+  "saved_artifact_checks_passed": true,
+  "expected_cases": 150,
+  "verified_complete": 108,
+  "recorded_case_errors": 0,
+  "missing_results": 42,
+  "rollouts_with_both_objectives_complete": 53,
+  "rollouts_with_one_objective_complete": 2,
+  "rollouts_without_results": 20,
+  "missing_cases": [
+    {
+      "case": 6,
+      "item_id": "american_airlines_2/benign/sample_04",
+      "told": "malicious",
+      "prompt_tokens": 112253
+    },
+    {
+      "case": 7,
+      "item_id": "american_airlines_2/benign/sample_04",
+      "told": "benign",
+      "prompt_tokens": 112343
+    },
+    {
+      "case": 34,
+      "item_id": "american_airlines_2/malicious/sample_00",
+      "told": "malicious",
+      "prompt_tokens": 140916
+    },
+    {
+      "case": 35,
+      "item_id": "american_airlines_2/malicious/sample_00",
+      "told": "benign",
+      "prompt_tokens": 141006
+    },
+    {
+      "case": 36,
+      "item_id": "american_airlines_2/malicious/sample_02",
+      "told": "malicious",
+      "prompt_tokens": 216373
+    },
+    {
+      "case": 38,
+      "item_id": "american_airlines_2/malicious/sample_03",
+      "told": "malicious",
+      "prompt_tokens": 136396
+    },
+    {
+      "case": 39,
+      "item_id": "american_airlines_2/malicious/sample_03",
+      "told": "benign",
+      "prompt_tokens": 136486
+    },
+    {
+      "case": 40,
+      "item_id": "american_airlines_2/malicious/sample_04",
+      "told": "malicious",
+      "prompt_tokens": 131820
+    },
+    {
+      "case": 41,
+      "item_id": "american_airlines_2/malicious/sample_04",
+      "told": "benign",
+      "prompt_tokens": 131910
+    },
+    {
+      "case": 42,
+      "item_id": "american_airlines_2/malicious/sample_05",
+      "told": "malicious",
+      "prompt_tokens": 142390
+    },
+    {
+      "case": 43,
+      "item_id": "american_airlines_2/malicious/sample_05",
+      "told": "benign",
+      "prompt_tokens": 142480
+    },
+    {
+      "case": 44,
+      "item_id": "american_airlines_2/malicious/sample_06",
+      "told": "malicious",
+      "prompt_tokens": 126602
+    },
+    {
+      "case": 45,
+      "item_id": "american_airlines_2/malicious/sample_06",
+      "told": "benign",
+      "prompt_tokens": 126692
+    },
+    {
+      "case": 54,
+      "item_id": "bank_transfer_2/benign/sample_04",
+      "told": "malicious",
+      "prompt_tokens": 145690
+    },
+    {
+      "case": 55,
+      "item_id": "bank_transfer_2/benign/sample_04",
+      "told": "benign",
+      "prompt_tokens": 145679
+    },
+    {
+      "case": 64,
+      "item_id": "bank_transfer_2/main_only/sample_01",
+      "told": "malicious",
+      "prompt_tokens": 162859
+    },
+    {
+      "case": 65,
+      "item_id": "bank_transfer_2/main_only/sample_01",
+      "told": "benign",
+      "prompt_tokens": 162848
+    },
+    {
+      "case": 68,
+      "item_id": "bank_transfer_2/main_only/sample_03",
+      "told": "malicious",
+      "prompt_tokens": 105817
+    },
+    {
+      "case": 69,
+      "item_id": "bank_transfer_2/main_only/sample_03",
+      "told": "benign",
+      "prompt_tokens": 105806
+    },
+    {
+      "case": 70,
+      "item_id": "bank_transfer_2/main_only/sample_04",
+      "told": "malicious",
+      "prompt_tokens": 149647
+    },
+    {
+      "case": 71,
+      "item_id": "bank_transfer_2/main_only/sample_04",
+      "told": "benign",
+      "prompt_tokens": 149636
+    },
+    {
+      "case": 72,
+      "item_id": "bank_transfer_2/main_only/sample_05",
+      "told": "malicious",
+      "prompt_tokens": 133081
+    },
+    {
+      "case": 73,
+      "item_id": "bank_transfer_2/main_only/sample_05",
+      "told": "benign",
+      "prompt_tokens": 133070
+    },
+    {
+      "case": 74,
+      "item_id": "bank_transfer_2/main_only/sample_06",
+      "told": "malicious",
+      "prompt_tokens": 134458
+    },
+    {
+      "case": 75,
+      "item_id": "bank_transfer_2/main_only/sample_06",
+      "told": "benign",
+      "prompt_tokens": 134447
+    },
+    {
+      "case": 76,
+      "item_id": "bank_transfer_2/main_only/sample_07",
+      "told": "malicious",
+      "prompt_tokens": 156000
+    },
+    {
+      "case": 77,
+      "item_id": "bank_transfer_2/main_only/sample_07",
+      "told": "benign",
+      "prompt_tokens": 155989
+    },
+    {
+      "case": 78,
+      "item_id": "bank_transfer_2/main_only/sample_08",
+      "told": "malicious",
+      "prompt_tokens": 143467
+    },
+    {
+      "case": 79,
+      "item_id": "bank_transfer_2/main_only/sample_08",
+      "told": "benign",
+      "prompt_tokens": 143456
+    },
+    {
+      "case": 82,
+      "item_id": "bank_transfer_2/main_only/sample_10",
+      "told": "malicious",
+      "prompt_tokens": 105932
+    },
+    {
+      "case": 83,
+      "item_id": "bank_transfer_2/main_only/sample_10",
+      "told": "benign",
+      "prompt_tokens": 105921
+    },
+    {
+      "case": 84,
+      "item_id": "bank_transfer_2/main_only/sample_11",
+      "told": "malicious",
+      "prompt_tokens": 136182
+    },
+    {
+      "case": 85,
+      "item_id": "bank_transfer_2/main_only/sample_11",
+      "told": "benign",
+      "prompt_tokens": 136171
+    },
+    {
+      "case": 86,
+      "item_id": "bank_transfer_2/malicious/sample_01",
+      "told": "malicious",
+      "prompt_tokens": 212830
+    },
+    {
+      "case": 87,
+      "item_id": "bank_transfer_2/malicious/sample_01",
+      "told": "benign",
+      "prompt_tokens": 212819
+    },
+    {
+      "case": 88,
+      "item_id": "bank_transfer_2/malicious/sample_02",
+      "told": "malicious",
+      "prompt_tokens": 105133
+    },
+    {
+      "case": 90,
+      "item_id": "bank_transfer_2/malicious/sample_03",
+      "told": "malicious",
+      "prompt_tokens": 157782
+    },
+    {
+      "case": 91,
+      "item_id": "bank_transfer_2/malicious/sample_03",
+      "told": "benign",
+      "prompt_tokens": 157771
+    },
+    {
+      "case": 92,
+      "item_id": "bank_transfer_2/malicious/sample_05",
+      "told": "malicious",
+      "prompt_tokens": 127648
+    },
+    {
+      "case": 93,
+      "item_id": "bank_transfer_2/malicious/sample_05",
+      "told": "benign",
+      "prompt_tokens": 127637
+    },
+    {
+      "case": 96,
+      "item_id": "bank_transfer_2/malicious/sample_07",
+      "told": "malicious",
+      "prompt_tokens": 172910
+    },
+    {
+      "case": 97,
+      "item_id": "bank_transfer_2/malicious/sample_07",
+      "told": "benign",
+      "prompt_tokens": 172899
+    }
+  ],
+  "largest_completed_prompt": 216463,
+  "peak_allocated_GiB": 50.5292592048645,
+  "peak_reserved_GiB": 64.8203125,
+  "diagnosis": "Unexplained process exit 1. Log ends after a successful saved case, without a traceback or reported CUDA error. Scheduler does not report timeout or OOM. Full 216463-token prompt already completed. No final scoring outputs exist.",
+  "next_case_without_saved_result": {
+    "case": 88,
+    "item_id": "bank_transfer_2/malicious/sample_02",
+    "told": "malicious",
+    "prompt_tokens": 105133
+  },
+  "retry_submitted": false
+}

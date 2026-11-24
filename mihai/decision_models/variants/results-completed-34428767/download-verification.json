@@ -1,0 +1,26 @@
+{
+  "verified_downloaded_files": 20,
+  "audit_job": "34428767|COMPLETED|0:0|00:00:29",
+  "hashes": {
+    "artifact-hashes.json": "5a1cd5efda689f94fee72c1725452bde70fdba43600b1f3cece6f4bcaeefc2b1",
+    "audit.json": "59041a0fcb3211482537b8836f52c717642de15aa1290411190819b25b66dc0e",
+    "scores/action-mean-metrics.json": "dd38b1e46544c83031c6ee43dcf44a0980c4bb923f5124a08c9b5197749792e1",
+    "scores/all-max-records.json": "3b75d4edc34155d6e35d1911532b6b0593bab1866029e9cbd6b0738f35a448f7",
+    "scores/action-max-records.json": "fb58aa4171beb07a61e4feb2cfebf906d71968b4745bdb11f72eefe2a5c93eb1",
+    "scores/all-full-records.json": "d58a08c809aebe95ca2cbb20bf927adda4c9144dda1af77908c78d7bb8f9e573",
+    "scores/cot-mean-metrics.json": "fdab0a5dbc199f4528da97207c57964bc9ae66581db9bdf942e0677b28664b4c",
+    "scores/action-full-records.json": "944c4558d158103c7eef32af575875ba7f9922a245c35b3a4bffb8e46a5776db",
+    "scores/cot-max-records.json": "09c72d8f1910fd0a2a299124d9729642acd7eaf5a5d24489aa2a1c6130f42f65",
+    "scores/all-mean-metrics.json": "fdab0a5dbc199f4528da97207c57964bc9ae66581db9bdf942e0677b28664b4c",
+    "scores/cot-full-records.json": "879ca37ed1e61f68ad91180530fe67d566a7cf51ae7803f8a6c7dd1c80fb81f0",
+    "scores/action-full-metrics.json": "f335c1f60a7525b8a1578eedc59c34ba9b92f69e8121fc3adeece84a938ffcf1",
+    "scores/cot-max-metrics.json": "5e35e99930b6e6524940f6f296f884a6e9a99648a6d71f0beb759c96f2f7f69d",
+    "scores/all-mean-records.json": "6df089dc814980ec0da3c5d13b6df15dc4738fc2feffe336ba8df0da9ced929e",
+    "scores/cot-full-metrics.json": "a83c347a0a369554927bd90e4790cc3c257b01341c95905781b6e52331310834",
+    "scores/action-mean-records.json": "a78ea6ce89c3e8a8150ec8a4d280ec3db3e113ed0a9d5acb1da94c463640febd",
+    "scores/all-max-metrics.json": "1c456d0e7141bfbbc6c9cab64594fdb133eeadb962e6f990743230624fb2f48b",
+    "scores/action-max-metrics.json": "d512d1b56f76013b1b98a62cb93e3200b5522c28151ac87710f192a9344ef9fa",
+    "scores/all-full-metrics.json": "90d9725e9f2225474115edc568955fa0f81ef51bd43c7a9ddd3739fbf1b8a242",
+    "scores/cot-mean-records.json": "6df089dc814980ec0da3c5d13b6df15dc4738fc2feffe336ba8df0da9ced929e"
+  }
+}

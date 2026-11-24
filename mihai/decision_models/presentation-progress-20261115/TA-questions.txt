@@ -1,0 +1,25 @@
+Questions for the TA: decision-model monitoring
+
+Context: We evaluated GLiDE-9B on actions and full reasoning for the same 75 rollouts as Qwen32B. Each rollout is checked against two target objectives (150 cases per scope). GLiDE produces one probability vector per case; we report four sampled answers and the most likely answer. Qwen generates four independent analyses and uses hierarchy for long inputs. GLiDE combined inputs have not yet been evaluated.
+
+1. Which decision rule should be our primary comparison: sampling, the most likely answer, or a threshold on the probability of answer A? Should we also run a deterministic Qwen baseline before comparing it with deterministic GLiDE?
+
+2. Are four draws from one GLiDE probability vector a useful counterpart to Qwen's four generated analyses? Would using the probability of A directly give a cleaner estimate, without adding random sampling noise?
+
+3. Should our main comparison give each monitor the full original input when it fits, or enforce the same hierarchy and input budget? Would direct input versus hierarchy be better treated as a separate experiment?
+
+4. If GLiDE needs hierarchy, should we score chunks and combine their probabilities, or summarize chunks before classification? How should we combine evidence without increasing false alarms just because a rollout has more chunks?
+
+5. Is Qwen32B an acceptable summarizer for GLiDE? If so, should we call this a Qwen32B-plus-GLiDE system, use the same summaries for comparison models, and include summarization time and cost? How should we test whether summaries remove or distort evidence of the target behavior?
+
+6. How should we test whether GLiDE actually uses long inputs? Would matched examples with decisive evidence placed near the beginning, middle and end, plus full-input versus chunked comparisons, be convincing? Finishing a 216k-token input only establishes feasibility.
+
+7. Is G-mean squared the right primary metric for our goal, or should we prioritize recall at a fixed false-alarm rate and include probability-based measures such as ROC/PR curves? With only 75 rollouts across three tasks, what held-out split and uncertainty estimates are credible? We should choose thresholds and methods without optimizing them on the final test set.
+
+8. Which next experiment best answers the project question: GLiDE on combined actions and reasoning, a matched hierarchy comparison, or a second decision model such as Jev? For efficiency claims, should we rerun on the same GPU and report both latency and total pipeline cost?
+
+Suggested presentation wording
+
+Figure 1: On actions, GLiDE and Qwen32B have similar overall scores. On reasoning, sampled GLiDE misses more positives. Choosing GLiDE's most likely answer improves detection and produces no false alarms among the 66 clean controls, but there is no matching deterministic Qwen run.
+
+Figure 2: GLiDE completed the full reasoning evaluation, including a prompt of 216,463 tokens, after one continuation. This establishes that the workload can run; it does not show that long-context evidence is used reliably. Observed runtimes favor our GLiDE setup, but hardware and evaluation procedures differ.

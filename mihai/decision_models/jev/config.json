@@ -1,0 +1,9 @@
+{
+  "run_name": "jev-variants-20261123",
+  "glide_package": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b",
+  "glide_manifest_sha256": "d98ee84c398bee9b90f66132b15a8c5fd53476d97534a0d5a1f9569cbde0a616",
+  "inputs_sha256": "b80956c60284f02ee85cd245b053f7533e71105bed163af3efef76b981285cdd",
+  "output_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/jev-variants-20261123",
+  "timeout_seconds": 600,
+  "request_spacing_seconds": 1
+}

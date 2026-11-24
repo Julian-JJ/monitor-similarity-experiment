@@ -1,0 +1,42 @@
+{
+  "status": "submitted",
+  "intent": "bbff5b2d-3147-46f8-9c3b-808fd91b4788",
+  "created_utc": "2026-11-23T14:56:00.624408+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=decision-variants-20261123-v3-qwen-smoke-cpu6",
+    "--comment=decision-variants:bbff5b2d-3147-46f8-9c3b-808fd91b4788",
+    "--partition=gpu_h200",
+    "--gpus=h200:1",
+    "--cpus-per-task=6",
+    "--mem=96G",
+    "--account=cpsc4880",
+    "--nodes=1",
+    "--ntasks=1",
+    "--no-requeue",
+    "--time=02:00:00",
+    "--kill-on-invalid-dep=yes",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/decision-variants-v3-qwen-smoke-cpu6-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-launcher-9d68d6231103ec24/run.sbatch",
+    "qwen",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b/config.json",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+    "smoke"
+  ],
+  "source_manifest_sha256": "d98ee84c398bee9b90f66132b15a8c5fd53476d97534a0d5a1f9569cbde0a616",
+  "prior_receipts": {
+    "decision-variants-20261123-glide-production.submission.json": "34327028",
+    "decision-variants-20261123-glide-smoke.submission.json": "34327026",
+    "decision-variants-20261123-glide-summaries.submission.json": "34327029",
+    "decision-variants-20261123-prepare.submission.json": "34326291",
+    "decision-variants-20261123-qwen-production.submission.json": "34327027",
+    "decision-variants-20261123-qwen-smoke-cpu6.submission.json": "34327025",
+    "decision-variants-20261123-score.submission.json": "34327030"
+  },
+  "queue_before": "",
+  "accounting_before": "34326291|decision-variants-20261123-prepare|COMPLETED|\n34327025|decision-variants-20261123-qwen-smoke-cpu6|FAILED|\n34327030|decision-variants-20261123-score|COMPLETED|\n",
+  "job_id": "34371575",
+  "submitted_utc": "2026-11-23T14:56:00.656165+00:00",
+  "stderr": ""
+}

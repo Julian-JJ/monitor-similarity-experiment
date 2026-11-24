@@ -1,0 +1,42 @@
+{
+  "status": "submitted",
+  "intent": "f8e67189-8abe-475f-bbba-c03d947a0bce",
+  "created_utc": "2026-11-23T15:01:03.550776+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=decision-variants-20261123-jev-prepare",
+    "--comment=decision-variants:f8e67189-8abe-475f-bbba-c03d947a0bce",
+    "--partition=devel",
+    "--account=cpsc4880",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=48G",
+    "--time=01:00:00",
+    "--no-requeue",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/jev-prepare-%j.log",
+    "--wrap=set -e\nenv PYTHONDONTWRITEBYTECODE=1 /nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-research/bin/python -B -m unittest discover -s /nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/jev-variants-be3d294d8f0f616e -p 'test_*.py'\nbash /nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/jev-variants-be3d294d8f0f616e/run.sbatch prepare /nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/jev-variants-be3d294d8f0f616e/config.json /nfs/roberts/project/cpsc4880/cpsc4880_mae73\nenv PYTHONDONTWRITEBYTECODE=1 /nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-research/bin/python -B /nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/audit_baseline.py"
+  ],
+  "source_manifest_sha256": "be3d294d8f0f616e2b45287ecd471e0a3bd7e83aa6b88846a4fc78f705572518",
+  "prior_receipts": {
+    "decision-variants-20261123-glide-production.submission.json": "34327028",
+    "decision-variants-20261123-glide-smoke.submission.json": "34327026",
+    "decision-variants-20261123-glide-summaries.submission.json": "34327029",
+    "decision-variants-20261123-prepare.submission.json": "34326291",
+    "decision-variants-20261123-qwen-production.submission.json": "34327027",
+    "decision-variants-20261123-qwen-smoke-cpu6.submission.json": "34327025",
+    "decision-variants-20261123-score.submission.json": "34327030",
+    "decision-variants-20261123-v3-glide-production.submission.json": "34371578",
+    "decision-variants-20261123-v3-glide-smoke.submission.json": "34371576",
+    "decision-variants-20261123-v3-glide-summaries.submission.json": "34371590",
+    "decision-variants-20261123-v3-qwen-production.submission.json": "34371577",
+    "decision-variants-20261123-v3-qwen-smoke-cpu6.submission.json": "34371575",
+    "decision-variants-20261123-v3-score.submission.json": "34371591"
+  },
+  "queue_before": "34371591|decision-variants-20261123-v3-score|PENDING|decision-variants:9bb57848-11b1-44b0-bec2-54048cba75e6\n34371577|decision-variants-20261123-v3-qwen-production|PENDING|decision-variants:4434b83b-b3c4-4e6d-8ea5-9341dd85ba6e\n34371575|decision-variants-20261123-v3-qwen-smoke-cpu6|RUNNING|decision-variants:bbff5b2d-3147-46f8-9c3b-808fd91b4788\n34371590|decision-variants-20261123-v3-glide-summaries|PENDING|decision-variants:949e50fc-1996-48a1-abee-23139ea22627\n34371578|decision-variants-20261123-v3-glide-production|PENDING|decision-variants:cbf99a50-d892-4c08-89fe-187a6f5bc4ca\n34371576|decision-variants-20261123-v3-glide-smoke|PENDING|decision-variants:88d6190f-72aa-4646-a885-8390cfa78444\n",
+  "accounting_before": "34326291|decision-variants-20261123-prepare|COMPLETED|\n34327025|decision-variants-20261123-qwen-smoke-cpu6|FAILED|\n34327030|decision-variants-20261123-score|COMPLETED|\n34371575|decision-variants-20261123-v3-qwen-smoke-cpu6|RUNNING|\n",
+  "job_id": "34372138",
+  "submitted_utc": "2026-11-23T15:01:03.574606+00:00",
+  "stderr": ""
+}

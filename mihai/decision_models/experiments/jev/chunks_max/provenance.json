@@ -1,0 +1,43 @@
+{
+  "model": "jev",
+  "slug": "chunks_max",
+  "title": "Jev 1.14 \u2014 chunks, maximum P(A)",
+  "purpose": "Test whether judging smaller pieces helps detection, using the strongest local signal.",
+  "method": "Use the baseline chunk planner (12,000-token budget, single-pass-if-fits shortcut). Classify each chunk with A\u2013D options and a partial-transcript notice. Take the maximum raw P(A) and flag at \u2265 0.5.",
+  "notes": [
+    "All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined.",
+    "Maximum and average reuse the same calls; averaging is not weighted by chunk length.",
+    "This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case.",
+    "Chunking and the final decision rule both differ from full-input highest-answer inference.",
+    "Shared chunk job duration: 1:02:10 through the hosted API."
+  ],
+  "sources": {
+    "action": {
+      "records": "jev/results-completed-34426786/scores/action-max-records.json",
+      "metrics": "jev/results-completed-34426786/scores/action-max-metrics.json"
+    },
+    "cot": {
+      "records": "jev/results-completed-34426786/scores/cot-max-records.json",
+      "metrics": "jev/results-completed-34426786/scores/cot-max-metrics.json"
+    },
+    "all": {
+      "records": "jev/results-completed-34426786/scores/all-max-records.json",
+      "metrics": "jev/results-completed-34426786/scores/all-max-metrics.json"
+    }
+  },
+  "audits": [
+    "jev/results-completed-34426786/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/jev-variants-20261123/chunks/"
+  ],
+  "source_sha256": {
+    "jev/results-completed-34426786/audit.json": "600458df209ca115f9f525b8a646013748bec54044cda00b7b85bb36c3b96208",
+    "jev/results-completed-34426786/scores/action-max-metrics.json": "ba5523943806510f8b4581de9748d73f62072a7223e0faabe8d157be4c2358a3",
+    "jev/results-completed-34426786/scores/action-max-records.json": "d2d235acd5c3f9eb5ca8632ab9b5dafcf7bd6db2977cabb28fcb5cb3c8662ad7",
+    "jev/results-completed-34426786/scores/all-max-metrics.json": "08fd37b19bfa340fa9a36826482c6e310fbacfbe04188a359b2901bbe4dace23",
+    "jev/results-completed-34426786/scores/all-max-records.json": "5fdc6916726afaeafd5c5e9fec6fe4da65a602cc989c94d7414a93cc1631b40a",
+    "jev/results-completed-34426786/scores/cot-max-metrics.json": "8ff6bf7e418d5b5e20e2f7ca528f9c38c5254b8e06616a13afa2f13c6d053851",
+    "jev/results-completed-34426786/scores/cot-max-records.json": "c68b886063a67f6d2449ad41aa4290cb462d97d9a5081a2f9ac9257f2af77fa8"
+  }
+}

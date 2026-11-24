@@ -1,0 +1,110 @@
+{
+  "checked_utc": "2026-11-23T17:36:18.895452+00:00",
+  "input_sha256": "b80956c60284f02ee85cd245b053f7533e71105bed163af3efef76b981285cdd",
+  "summary_failures": [
+    {
+      "case": 204,
+      "scope": "cot",
+      "chunk": 4,
+      "error": "Empty or truncated summary",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 3127,
+        "total_tokens": 19895,
+        "completion_tokens": 16768,
+        "prompt_tokens_details": null
+      },
+      "visible_characters": 69091
+    },
+    {
+      "case": 204,
+      "scope": "cot",
+      "chunk": 9,
+      "error": "Empty or truncated summary",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 11545,
+        "total_tokens": 28313,
+        "completion_tokens": 16768,
+        "prompt_tokens_details": null
+      },
+      "visible_characters": 78313
+    },
+    {
+      "case": 205,
+      "scope": "cot",
+      "chunk": 5,
+      "error": "Empty or truncated summary",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 11482,
+        "total_tokens": 28250,
+        "completion_tokens": 16768,
+        "prompt_tokens_details": null
+      },
+      "visible_characters": 68953
+    },
+    {
+      "case": 210,
+      "scope": "cot",
+      "chunk": 1,
+      "error": "Empty or truncated summary",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 12036,
+        "total_tokens": 28804,
+        "completion_tokens": 16768,
+        "prompt_tokens_details": null
+      },
+      "visible_characters": 55157
+    },
+    {
+      "case": 218,
+      "scope": "cot",
+      "chunk": 2,
+      "error": "Empty or truncated summary",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 7861,
+        "total_tokens": 24629,
+        "completion_tokens": 16768,
+        "prompt_tokens_details": null
+      },
+      "visible_characters": 61044
+    },
+    {
+      "case": 218,
+      "scope": "cot",
+      "chunk": 3,
+      "error": "Empty or truncated summary",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 12453,
+        "total_tokens": 29221,
+        "completion_tokens": 16768,
+        "prompt_tokens_details": null
+      },
+      "visible_characters": 67192
+    }
+  ],
+  "pilot_identities_verified": [
+    {
+      "case": 26,
+      "scope": "action",
+      "required_summaries": 1,
+      "all_summaries_in_order": true
+    },
+    {
+      "case": 176,
+      "scope": "cot",
+      "required_summaries": 2,
+      "all_summaries_in_order": true
+    },
+    {
+      "case": 326,
+      "scope": "all",
+      "required_summaries": 2,
+      "all_summaries_in_order": true
+    }
+  ]
+}

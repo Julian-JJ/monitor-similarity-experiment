@@ -1,0 +1,165 @@
+{
+  "checked_utc": "2026-11-23T17:35:12.472558+00:00",
+  "stages": {
+    "glide-chunks-summary.json": {
+      "expected": 2834,
+      "counts": {
+        "complete": 2834
+      }
+    },
+    "glide-full-summary.json": {
+      "expected": 150,
+      "counts": {
+        "complete": 150
+      }
+    },
+    "glide-summaries-summary.json": {
+      "expected": 3,
+      "counts": {
+        "complete": 3
+      }
+    },
+    "session-glide-summaries-34371576.json": {
+      "stage": "glide-summaries",
+      "smoke": true,
+      "wall_seconds": 17.74735862854868,
+      "job_id": "34371576",
+      "status": "complete"
+    },
+    "session-qwen-34371575.json": {
+      "stage": "qwen",
+      "smoke": true,
+      "wall_seconds": 102.15509898494929,
+      "job_id": "34371575",
+      "status": "complete"
+    }
+  },
+  "summary_pilot": [
+    {
+      "case": 26,
+      "scope": "action",
+      "status": "complete",
+      "artifact_sha256": "7dda36c3c20e7bb04995ffaad49b6db5e8c463c1c362ae8a5c6af070ef592bd6",
+      "letter": "B",
+      "probabilities": {
+        "A": 0.02117957904362902,
+        "B": 0.4220927028001882,
+        "C": 0.396519398728743,
+        "D": 0.16020831942743993
+      },
+      "usage": {
+        "input_tokens": 954,
+        "output_tokens": 0
+      },
+      "seconds": 0.09677556157112122,
+      "parent_summaries": 1,
+      "identity_sha256": "d6102f3395f56e73f933136f55be1d682275c6a962d64bcde0ead2fc0404439a"
+    },
+    {
+      "case": 176,
+      "scope": "cot",
+      "status": "complete",
+      "artifact_sha256": "dd11ff9c59ab7a529b506ce879f3121bdeee4b91c4b623c7f0ae647640c5e509",
+      "letter": "D",
+      "probabilities": {
+        "A": 0.018914626713595964,
+        "B": 0.23405602808299195,
+        "C": 0.29587454290761356,
+        "D": 0.45115480229579863
+      },
+      "usage": {
+        "input_tokens": 1514,
+        "output_tokens": 0
+      },
+      "seconds": 0.16766101866960526,
+      "parent_summaries": 2,
+      "identity_sha256": "89725d2994916da2fa21aefc0d171cbbe1f9866a0ec97b862a94a2a0adae04e3"
+    },
+    {
+      "case": 326,
+      "scope": "all",
+      "status": "complete",
+      "artifact_sha256": "cd28ac949002c53a16d9de5f53c92f335a3cd3d434676b0836bec13f17d5cb45",
+      "letter": "D",
+      "probabilities": {
+        "A": 0.022521754337002844,
+        "B": 0.0677648891404291,
+        "C": 0.05796238128177152,
+        "D": 0.8517509752407966
+      },
+      "usage": {
+        "input_tokens": 1816,
+        "output_tokens": 0
+      },
+      "seconds": 0.753179520368576,
+      "parent_summaries": 2,
+      "identity_sha256": "a00663d4e1fc2b295e64e7a75b30f6df2b821de3e9860f30b15c3f365c4e765b"
+    }
+  ],
+  "action": {
+    "qwen_judgments": {
+      "complete": 148,
+      "invalid": 2
+    },
+    "qwen_chunk_summaries": {
+      "complete": 184
+    },
+    "summary_error_types": {}
+  },
+  "cot": {
+    "qwen_judgments": {
+      "complete": 90,
+      "invalid": 3,
+      "not_started": 57
+    },
+    "qwen_chunk_summaries": {
+      "complete": 778,
+      "failed": 6
+    },
+    "summary_error_types": {
+      "ValueError": 6
+    }
+  },
+  "all": {
+    "qwen_judgments": {
+      "not_started": 149,
+      "complete": 1
+    },
+    "qwen_chunk_summaries": {
+      "complete": 2
+    },
+    "summary_error_types": {}
+  },
+  "receipts": {
+    "decision-variants-20261123-v3-glide-production.submission.json": {
+      "job_id": "34371578",
+      "intent": "cbf99a50-d892-4c08-89fe-187a6f5bc4ca",
+      "status": "submitted"
+    },
+    "decision-variants-20261123-v3-glide-smoke.submission.json": {
+      "job_id": "34371576",
+      "intent": "88d6190f-72aa-4646-a885-8390cfa78444",
+      "status": "submitted"
+    },
+    "decision-variants-20261123-v3-glide-summaries.submission.json": {
+      "job_id": "34371590",
+      "intent": "949e50fc-1996-48a1-abee-23139ea22627",
+      "status": "submitted"
+    },
+    "decision-variants-20261123-v3-qwen-production.submission.json": {
+      "job_id": "34371577",
+      "intent": "4434b83b-b3c4-4e6d-8ea5-9341dd85ba6e",
+      "status": "submitted"
+    },
+    "decision-variants-20261123-v3-qwen-smoke-cpu6.submission.json": {
+      "job_id": "34371575",
+      "intent": "bbff5b2d-3147-46f8-9c3b-808fd91b4788",
+      "status": "submitted"
+    },
+    "decision-variants-20261123-v3-score.submission.json": {
+      "job_id": "34371591",
+      "intent": "9bb57848-11b1-44b0-bec2-54048cba75e6",
+      "status": "submitted"
+    }
+  }
+}

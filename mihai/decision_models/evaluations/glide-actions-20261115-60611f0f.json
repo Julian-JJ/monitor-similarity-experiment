@@ -1,0 +1,131 @@
+{
+  "run_name": "glide-actions-20261115-60611f0f",
+  "local_source": "/private/tmp/glide-actions-20261115-60611f0f",
+  "archive": "/private/tmp/glide-actions-20261115-60611f0f.tar.gz",
+  "archive_sha256": "857adb71e363844ec7a7b6d4f02ba55a3b02dadf366e5d7711e00d039454c299",
+  "remote_source": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-actions-20261115-60611f0f",
+  "source_manifest_sha256": "e9495b85a9d6f52ea00acb78d62313f5e9b02f6c630c07b6523311dead8c841f",
+  "status": "completed_verified",
+  "config": {
+    "run_name": "glide-actions-20261115-60611f0f",
+    "framework_commit": "6043ff7a875bf6d2d792cec7df603c5cd019c647",
+    "model": "fastino/GLiDE-9B",
+    "model_revision": "ab54df5acba0eebf7df45560ffdaacd64e32df3b",
+    "model_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/models/glide-9b-ab54df5a",
+    "scope": "action",
+    "truncate_chars": 2000,
+    "turn_labels": true,
+    "hierarchy": false,
+    "max_context": 40000,
+    "temperature": 0.6,
+    "top_p": 0.9,
+    "samples": 4,
+    "seed": 0,
+    "output_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/glide-actions-20261115-60611f0f",
+    "collections": {
+      "original_clean": {
+        "root": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/rollouts_original_clean",
+        "count": 41,
+        "sha256": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f"
+      },
+      "main_only_v1": {
+        "root": "/nfs/roberts/project/cpsc4880/cpsc4880_as4833/rollouts_main_only_clean",
+        "count": 34,
+        "sha256": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+      }
+    }
+  },
+  "preflight_job_id": "33492122",
+  "gpu_job_id": "33492538",
+  "submission": {
+    "intent": "9a1a860f-029f-41de-ade8-8ac9f5dfb9ae",
+    "created_utc": "2026-11-15T21:28:10.134308+00:00",
+    "status": "submitted",
+    "command": [
+      "sbatch",
+      "--parsable",
+      "--job-name=glide-actions",
+      "--partition=gpu_devel,gpu_rtx6000",
+      "--constraint=gpu:rtx_pro_6000_blackwell",
+      "--gpus=1",
+      "--mem=96G",
+      "--time=02:00:00",
+      "--comment=glide-eval:9a1a860f-029f-41de-ade8-8ac9f5dfb9ae",
+      "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-eval-%j.log",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-actions-20261115-60611f0f/mihai/decision_models/evaluate.sbatch",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-actions-20261115-60611f0f/mihai/decision_models/run_evaluation.py",
+      "run",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-actions-20261115-60611f0f/mihai/decision_models/evaluation.json",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73"
+    ],
+    "preflight_job_id": "33492122",
+    "ready": {
+      "config_sha256": "c3144b24c40e6248013200747d1e749096cbe3b7c16883b24c72acec39294286",
+      "rollouts": 75,
+      "cases": 150,
+      "source_manifest_sha256": "e9495b85a9d6f52ea00acb78d62313f5e9b02f6c630c07b6523311dead8c841f",
+      "min_prompt_tokens": 2157,
+      "max_prompt_tokens": 26275,
+      "over_limit": 0,
+      "collection_hashes": {
+        "original_clean": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+        "main_only_v1": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+      },
+      "inputs_sha256": "69240cc092509f5affe3f2ee749eb08a16c2454ba1cca0b4fff29d423fd51abf"
+    },
+    "job_id": "33492538",
+    "submitted_utc": "2026-11-15T21:28:10.169213+00:00",
+    "stderr": ""
+  },
+  "scheduler": {
+    "job_id": "33492538",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:05:04"
+  },
+  "final_audit": {
+    "audited_utc": "2026-11-15T21:34:29.626930+00:00",
+    "job_id": "33492538",
+    "artifact_checks_passed": true,
+    "summary": {
+      "cases": 150,
+      "complete": 150,
+      "failed": 0,
+      "sampled_judgments": 600,
+      "greedy_judgments": 150
+    },
+    "all_input_token_counts_match_preflight": true,
+    "source_manifest_sha256": "e9495b85a9d6f52ea00acb78d62313f5e9b02f6c630c07b6523311dead8c841f",
+    "hardware": {
+      "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "torch": "2.14.0+cu130",
+      "cuda": "13.0",
+      "job_id": "33492538"
+    },
+    "case_seconds": {
+      "total": 280.4961656900123,
+      "mean": 1.8699744379334151,
+      "median": 1.007207575486973,
+      "min": 0.18480325723066926,
+      "max": 13.673057795036584
+    },
+    "greedy_choices": {
+      "D": 19,
+      "A": 66,
+      "C": 55,
+      "B": 10
+    },
+    "sampled_choices": {
+      "A": 266,
+      "B": 83,
+      "D": 89,
+      "C": 162
+    },
+    "cases_with_nonidentical_draws": 82,
+    "limitations": [
+      "Actions-only; labels sampled from one GLiDE probability vector per case.",
+      "Qwen baseline elicitation and hierarchical processing differ; this is a system comparison."
+    ]
+  },
+  "compact_results_directory": "glide-actions-20261115-60611f0f"
+}

@@ -1,0 +1,36 @@
+{
+  "model": "qwen",
+  "slug": "qwen32b_sampled",
+  "title": "Qwen3-32B \u2014 sampled baseline",
+  "purpose": "Provide the original same-family generative-monitor reference for the decision-model experiments.",
+  "method": "Original MonitorBench prompt; thinking enabled; temperature 0.6, top-p 0.9. Four independently generated analyses and A\u2013D answers per case, pooled individually. The baseline hierarchy combines chunk analyses when the rendered input does not fit.",
+  "notes": [
+    "These are the original team baseline results, reused as reference conditions here.",
+    "Four Qwen analyses are different from drawing four labels from one decision-model probability vector.",
+    "Observed evaluation-session time on one H200: 5:50:32 across two sessions."
+  ],
+  "sources": {
+    "action": {
+      "export": "qwen3-32b/action",
+      "baseline_model": "qwen3-32b"
+    },
+    "cot": {
+      "export": "qwen3-32b/cot",
+      "baseline_model": "qwen3-32b"
+    },
+    "all": {
+      "export": "qwen3-32b/all",
+      "baseline_model": "qwen3-32b"
+    }
+  },
+  "audits": [
+    "comparisons/baseline-20261123/audit.json"
+  ],
+  "cluster_results": [
+    "$BASELINE_RUN (exact provenance in comparisons/baseline-20261123/manifest.json)"
+  ],
+  "source_sha256": {
+    "comparisons/baseline-20261123/audit.json": "fa6c33ec00228e36c77731b7f47c02ffa5f1cc10cd7bb21c6d425b0cbdc8aca5",
+    "experiments/_sources/dataset-and-baselines.json": "f99615a4f02f949a0dfb0693671b2712407b0ddd5ee78a1497a317a74d0dcea5"
+  }
+}

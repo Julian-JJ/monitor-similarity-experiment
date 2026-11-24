@@ -1,0 +1,13 @@
+{
+  "target": 40000,
+  "load_seconds": 10.11333286203444,
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "gpu_total_bytes": 101973819392,
+  "torch": "2.14.0+cu130",
+  "cuda": "13.0",
+  "pid": 3031711,
+  "job_id": "33507318",
+  "model_allocated_bytes": 15875486720,
+  "model_reserved_bytes": 17943232512,
+  "status": "complete"
+}

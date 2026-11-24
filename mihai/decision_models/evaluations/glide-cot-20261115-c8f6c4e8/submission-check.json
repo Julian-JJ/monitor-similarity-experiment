@@ -1,0 +1,21 @@
+{
+  "checked_utc": "2026-11-16T00:18:20.322079+00:00",
+  "full_input_checks_passed": true,
+  "cases": 150,
+  "longest_request_matches_pilot": true,
+  "accounting": "33509894|COMPLETED|0:0|00:00:44\n33509938|RUNNING|0:0|00:01:08\n",
+  "queue": "33509938|RUNNING|a1112u01n01|glide-cot:91e24da2-b7af-46b2-9e9d-9636dc396b75\n",
+  "resources": {
+    "JobId": "33509938",
+    "Account": "cpsc4880",
+    "JobState": "RUNNING",
+    "Dependency": "(null)",
+    "Requeue": "0",
+    "TimeLimit": "02:00:00",
+    "Partition": "gpu_devel",
+    "NumCPUs": "4",
+    "ReqTRES": "cpu=4,mem=96G,node=1,billing=15,gres/gpu=1",
+    "Features": "gpu:rtx_pro_6000_blackwell"
+  },
+  "completed_cases_so_far": 1
+}

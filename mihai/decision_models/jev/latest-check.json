@@ -1,0 +1,120 @@
+{
+  "checked_utc": "2026-11-23T19:35:51.176208+00:00",
+  "queue": "34391868|PENDING|0:00|(Dependency)\n34391867|PENDING|0:00|(Dependency)\n34371591|PENDING|0:00|(Dependency)\n34371577|RUNNING|4:25:04|a1126u11n01\n34371590|PENDING|0:00|(Dependency)",
+  "queue_error": "",
+  "accounting": "34371577|RUNNING|0:0|04:25:04|2026-11-23T10:10:47|Unknown\n34371590|PENDING|0:0|00:00:00|Unknown|Unknown\n34371591|PENDING|0:0|00:00:00|Unknown|Unknown\n34391865|COMPLETED|0:0|00:13:13|2026-11-23T13:12:28|2026-11-23T13:25:41\n34391866|COMPLETED|0:0|01:02:10|2026-11-23T13:25:44|2026-11-23T14:27:54\n34391867|PENDING|0:0|00:00:00|Unknown|Unknown\n34391868|PENDING|0:0|00:00:00|Unknown|Unknown",
+  "accounting_error": "",
+  "stages": {
+    "full": {
+      "counts": {
+        "complete": 450
+      },
+      "scopes": {
+        "action": {
+          "complete": 150
+        },
+        "cot": {
+          "complete": 150
+        },
+        "all": {
+          "complete": 150
+        }
+      }
+    },
+    "chunks": {
+      "counts": {
+        "complete": 2834
+      },
+      "scopes": {
+        "action": {
+          "complete": 184
+        },
+        "cot": {
+          "complete": 1256
+        },
+        "all": {
+          "complete": 1394
+        }
+      }
+    },
+    "summaries": {
+      "counts": {
+        "complete": 5,
+        "blocked": 1
+      },
+      "scopes": {
+        "action": {
+          "complete": 2
+        },
+        "cot": {
+          "complete": 2
+        },
+        "all": {
+          "complete": 1,
+          "blocked": 1
+        }
+      }
+    }
+  },
+  "failures": [],
+  "logs": {
+    "full": "{\"stage\": \"full\", \"case\": 444, \"status\": \"complete\"}\n{\"stage\": \"full\", \"case\": 445, \"status\": \"complete\"}\n{\"stage\": \"full\", \"case\": 446, \"status\": \"complete\"}\n{\"stage\": \"full\", \"case\": 447, \"status\": \"complete\"}\n{\"stage\": \"full\", \"case\": 448, \"status\": \"complete\"}\n{\"stage\": \"full\", \"case\": 449, \"status\": \"complete\"}",
+    "chunks": "{\"stage\": \"chunks\", \"case\": 444, \"status\": \"complete\"}\n{\"stage\": \"chunks\", \"case\": 445, \"status\": \"complete\"}\n{\"stage\": \"chunks\", \"case\": 446, \"status\": \"complete\"}\n{\"stage\": \"chunks\", \"case\": 447, \"status\": \"complete\"}\n{\"stage\": \"chunks\", \"case\": 448, \"status\": \"complete\"}\n{\"stage\": \"chunks\", \"case\": 449, \"status\": \"complete\"}"
+  },
+  "receipts": {
+    "full": {
+      "job_id": "34391865",
+      "intent": "9ddb5cae-ccd8-47f9-b8d9-e6c8692b4f85",
+      "matched": true
+    },
+    "chunks": {
+      "job_id": "34391866",
+      "intent": "5cb163ea-5960-4d90-9108-7585840b174a",
+      "matched": true
+    },
+    "summaries": {
+      "job_id": "34391867",
+      "intent": "79675e82-4d73-4218-ba6c-57adb67fce75",
+      "matched": true
+    },
+    "score": {
+      "job_id": "34391868",
+      "intent": "877364f4-f501-4293-8329-8b2797e55ee6",
+      "matched": true
+    }
+  },
+  "scores_present": [],
+  "summary": null,
+  "sessions": [
+    {
+      "stage": "chunks",
+      "smoke": true,
+      "wall_seconds": 68.56151277665049,
+      "hosting": "TypeSafe API; server GPU and memory are not exposed"
+    },
+    {
+      "stage": "chunks",
+      "smoke": false,
+      "wall_seconds": 3713.5194756109267,
+      "hosting": "TypeSafe API; server GPU and memory are not exposed"
+    },
+    {
+      "stage": "full",
+      "smoke": true,
+      "wall_seconds": 14.589840278960764,
+      "hosting": "TypeSafe API; server GPU and memory are not exposed"
+    },
+    {
+      "stage": "full",
+      "smoke": false,
+      "wall_seconds": 783.8279035449959,
+      "hosting": "TypeSafe API; server GPU and memory are not exposed"
+    },
+    {
+      "stage": "summaries",
+      "smoke": true,
+      "wall_seconds": 6.2629117192700505,
+      "hosting": "TypeSafe API; server GPU and memory are not exposed"
+    }
+  ]
+}

@@ -1,0 +1,450 @@
+{
+  "point_estimates": {
+    "malicious": {
+      "metrics": {
+        "tpr": [
+          0.9545454545454546,
+          null
+        ],
+        "monitorbench_score": [
+          0.9545454545454546,
+          null
+        ],
+        "tnr_clean": [
+          0.7878787878787878,
+          null
+        ],
+        "tnr_cross": [
+          0.8,
+          null
+        ],
+        "tnr_own": [
+          null,
+          "no valid verdicts on own-objective failures"
+        ],
+        "gmean2_clean": [
+          0.7520661157024794,
+          null
+        ],
+        "gmean2_cross": [
+          0.7636363636363637,
+          null
+        ],
+        "tpr_majority": [
+          0.9545454545454546,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.7878787878787878,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.7520661157024794,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 22,
+          "requested": 22,
+          "valid": 22,
+          "detected": 21,
+          "decided": 22,
+          "decided_detected": 21
+        },
+        "clean_negative": {
+          "pairs": 33,
+          "requested": 33,
+          "valid": 33,
+          "detected": 7,
+          "decided": 33,
+          "decided_detected": 7
+        },
+        "cross_negative": {
+          "pairs": 20,
+          "requested": 20,
+          "valid": 20,
+          "detected": 4,
+          "decided": 20,
+          "decided_detected": 4
+        },
+        "own_failure": {
+          "pairs": 0,
+          "requested": 0,
+          "valid": 0,
+          "detected": 0,
+          "decided": 0,
+          "decided_detected": 0
+        }
+      }
+    },
+    "benign": {
+      "metrics": {
+        "tpr": [
+          0.8947368421052632,
+          null
+        ],
+        "monitorbench_score": [
+          0.8947368421052632,
+          null
+        ],
+        "tnr_clean": [
+          1.0,
+          null
+        ],
+        "tnr_cross": [
+          0.95,
+          null
+        ],
+        "tnr_own": [
+          0.0,
+          null
+        ],
+        "gmean2_clean": [
+          0.8947368421052632,
+          null
+        ],
+        "gmean2_cross": [
+          0.85,
+          null
+        ],
+        "tpr_majority": [
+          0.8947368421052632,
+          null
+        ],
+        "tnr_clean_majority": [
+          1.0,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.8947368421052632,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 19,
+          "requested": 19,
+          "valid": 19,
+          "detected": 17,
+          "decided": 19,
+          "decided_detected": 17
+        },
+        "clean_negative": {
+          "pairs": 33,
+          "requested": 33,
+          "valid": 33,
+          "detected": 0,
+          "decided": 33,
+          "decided_detected": 0
+        },
+        "cross_negative": {
+          "pairs": 20,
+          "requested": 20,
+          "valid": 20,
+          "detected": 1,
+          "decided": 20,
+          "decided_detected": 1
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      }
+    },
+    "pooled": {
+      "metrics": {
+        "tpr": [
+          0.926829268292683,
+          null
+        ],
+        "monitorbench_score": [
+          0.926829268292683,
+          null
+        ],
+        "tnr_clean": [
+          0.8939393939393939,
+          null
+        ],
+        "tnr_cross": [
+          0.875,
+          null
+        ],
+        "tnr_own": [
+          0.0,
+          null
+        ],
+        "gmean2_clean": [
+          0.828529194382853,
+          null
+        ],
+        "gmean2_cross": [
+          0.8109756097560976,
+          null
+        ],
+        "tpr_majority": [
+          0.926829268292683,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.8939393939393939,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.828529194382853,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 38,
+          "decided": 41,
+          "decided_detected": 38
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 7,
+          "decided": 66,
+          "decided_detected": 7
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 5,
+          "decided": 40,
+          "decided_detected": 5
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      }
+    }
+  },
+  "intervals": {
+    "malicious": {
+      "tpr": {
+        "low": 0.875,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "monitorbench_score": {
+        "low": 0.875,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "tnr_clean": {
+        "low": 0.65625,
+        "high": 0.9090909090909091,
+        "defined": 2000
+      },
+      "gmean2_clean": {
+        "low": 0.6074380165289256,
+        "high": 0.8823529411764706,
+        "defined": 2000
+      },
+      "tnr_cross": {
+        "low": 0.7,
+        "high": 0.95,
+        "defined": 2000
+      },
+      "gmean2_cross": {
+        "low": 0.6391304347826087,
+        "high": 0.9,
+        "defined": 2000
+      },
+      "tnr_own": {
+        "low": null,
+        "high": null,
+        "defined": 0
+      },
+      "tpr_majority": {
+        "low": 0.875,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "tnr_clean_majority": {
+        "low": 0.65625,
+        "high": 0.9090909090909091,
+        "defined": 2000
+      },
+      "gmean2_clean_majority": {
+        "low": 0.6074380165289256,
+        "high": 0.8823529411764706,
+        "defined": 2000
+      },
+      "coverage": {
+        "low": 1.0,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "invalid_rate": {
+        "low": 0.0,
+        "high": 0.0,
+        "defined": 2000
+      }
+    },
+    "benign": {
+      "tpr": {
+        "low": 0.7727272727272727,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "monitorbench_score": {
+        "low": 0.7727272727272727,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "tnr_clean": {
+        "low": 1.0,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "gmean2_clean": {
+        "low": 0.7727272727272727,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "tnr_cross": {
+        "low": 0.85,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "gmean2_cross": {
+        "low": 0.7142857142857143,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "tnr_own": {
+        "low": 0.0,
+        "high": 0.0,
+        "defined": 1931
+      },
+      "tpr_majority": {
+        "low": 0.7727272727272727,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "tnr_clean_majority": {
+        "low": 1.0,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "gmean2_clean_majority": {
+        "low": 0.7727272727272727,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "coverage": {
+        "low": 1.0,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "invalid_rate": {
+        "low": 0.0,
+        "high": 0.0,
+        "defined": 2000
+      }
+    },
+    "pooled": {
+      "tpr": {
+        "low": 0.8478260869565217,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "monitorbench_score": {
+        "low": 0.8478260869565217,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "tnr_clean": {
+        "low": 0.8307692307692308,
+        "high": 0.9545454545454546,
+        "defined": 2000
+      },
+      "gmean2_clean": {
+        "low": 0.7456395348837209,
+        "high": 0.9090909090909091,
+        "defined": 2000
+      },
+      "tnr_cross": {
+        "low": 0.8,
+        "high": 0.95,
+        "defined": 2000
+      },
+      "gmean2_cross": {
+        "low": 0.7186991869918699,
+        "high": 0.9030644152595373,
+        "defined": 2000
+      },
+      "tnr_own": {
+        "low": 0.0,
+        "high": 0.0,
+        "defined": 1931
+      },
+      "tpr_majority": {
+        "low": 0.8478260869565217,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "tnr_clean_majority": {
+        "low": 0.8307692307692308,
+        "high": 0.9545454545454546,
+        "defined": 2000
+      },
+      "gmean2_clean_majority": {
+        "low": 0.7456395348837209,
+        "high": 0.9090909090909091,
+        "defined": 2000
+      },
+      "coverage": {
+        "low": 1.0,
+        "high": 1.0,
+        "defined": 2000
+      },
+      "invalid_rate": {
+        "low": 0.0,
+        "high": 0.0,
+        "defined": 2000
+      }
+    }
+  }
+}

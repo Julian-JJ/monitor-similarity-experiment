@@ -1,0 +1,25 @@
+{
+  "status": "submitted",
+  "intent": "d982a9dc-ac5e-4c50-8f78-ed0065831ac4",
+  "created_utc": "2026-11-15T23:30:17.333762+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=glide-length-gpu",
+    "--partition=gpu_devel,gpu_rtx6000",
+    "--constraint=gpu:rtx_pro_6000_blackwell",
+    "--gpus=1",
+    "--mem=96G",
+    "--time=02:00:00",
+    "--comment=glide-length:d982a9dc-ac5e-4c50-8f78-ed0065831ac4",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-length-gpu-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-length-20261115-21f6974f/pilot.sbatch",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-length-20261115-21f6974f",
+    "measure"
+  ],
+  "prepare_job_id": "33507043",
+  "source_manifest_sha256": "6dc9d33d8b6c6cd6e22d820f7858c2f60167f9732a01e2513e1c90d286dcc569",
+  "job_id": "33507318",
+  "submitted_utc": "2026-11-15T23:30:17.372480+00:00"
+}

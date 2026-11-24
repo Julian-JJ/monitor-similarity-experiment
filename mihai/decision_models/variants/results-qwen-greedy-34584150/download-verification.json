@@ -1,0 +1,10 @@
+{
+  "audit.json": "c3a0c8776574670459974442bf6ff759948f281728ca90fdf09330ea246831a3",
+  "artifact-hashes.json": "c7c2d2f6f33eb2f1711b3c65057050a8765ff8371203b3cd9672907a3d45c6f8",
+  "scores/action-qwen-greedy-metrics.json": "be280232c08545c8e1883fc2b6991600d6308157d5d26078aa0b080d199a8ba5",
+  "scores/action-qwen-greedy-records.json": "7b68505d5948ad24f188faacf8f677d2b8bfc89428aea5de8003c9285c8cf77c",
+  "scores/all-qwen-greedy-metrics.json": "c85aa6fc58bdd679b049caa022dec9d2bb08233afa3a63db83da6662bb07ce18",
+  "scores/all-qwen-greedy-records.json": "1163c63950ccaea6b701e7c215e3d687ff3d626fb8ddaf4caf6b18d17771af1a",
+  "scores/cot-qwen-greedy-metrics.json": "c4daa7e853ad4936bec1682212b1e57eac6a34aae7f88f671fcf81ddd005b90a",
+  "scores/cot-qwen-greedy-records.json": "d47db90064e09908b3b6e96925b384d2195d831ef4f66b5f77ab62925c387e8c"
+}

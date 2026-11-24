@@ -1,0 +1,1073 @@
+{
+  "date": "2026-11-23",
+  "baseline": "Qwen3-32B, four sampled analyses per case",
+  "dataset": "75 rollouts; 150 cases/view; primary metrics use 41 positive + 66 clean cases",
+  "bold_rule": "Best unrounded point estimate in each column within each input view; all exact ties bold",
+  "gmean_definition": "G-mean squared = TPR * (1 - clean FPR); no square root",
+  "excluded_pending": [
+    "Qwen32B greedy",
+    "Qwen summaries to GLiDE",
+    "Qwen summaries to Jev"
+  ],
+  "notes": [
+    "Qwen uses four generated analyses and its existing hierarchy when needed.",
+    "GLiDE/Jev full rows use one highest-probability answer. Chunk rows use a 0.5 threshold.",
+    "Rates are pooled across both told objectives. The other 43 cases are separate diagnostic groups.",
+    "Bolding is descriptive, not a claim of statistically significant superiority."
+  ],
+  "sources": {
+    "qwen": {
+      "path": "comparisons/baseline-20261123/metrics.json",
+      "sha256": "63d082ab93246c25f52ee4c9a7a235122407a2bc5d0b227499184790292ab538"
+    },
+    "qwen_audit": {
+      "path": "comparisons/baseline-20261123/audit.json",
+      "sha256": "fa6c33ec00228e36c77731b7f47c02ffa5f1cc10cd7bb21c6d425b0cbdc8aca5"
+    },
+    "glide": {
+      "path": "variants/results-completed-34428767/audit.json",
+      "sha256": "59041a0fcb3211482537b8836f52c717642de15aa1290411190819b25b66dc0e"
+    },
+    "jev": {
+      "path": "jev/results-completed-34426786/audit.json",
+      "sha256": "600458df209ca115f9f525b8a646013748bec54044cda00b7b85bb36c3b96208"
+    }
+  },
+  "tables": {
+    "action": [
+      {
+        "model": "Qwen3-32B",
+        "method": "Baseline / sampled x4",
+        "tpr": 1.0,
+        "fpr_clean": 0.28787878787878785,
+        "primary_accuracy": 0.822429906542056,
+        "gmean2_clean": 0.7121212121212122,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 164,
+            "valid": 164,
+            "detected": 164,
+            "decided": 41,
+            "decided_detected": 41
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 264,
+            "valid": 264,
+            "detected": 76,
+            "decided": 66,
+            "decided_detected": 23
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 160,
+            "valid": 160,
+            "detected": 54,
+            "decided": 40,
+            "decided_detected": 15
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 12,
+            "valid": 12,
+            "detected": 12,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Full / highest option",
+        "tpr": 0.9512195121951219,
+        "fpr_clean": 0.24242424242424243,
+        "gmean2_clean": 0.720620842572062,
+        "primary_accuracy": 0.8317757009345794,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 39,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 16,
+            "decided": 66,
+            "decided_detected": 16
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 8,
+            "decided": 40,
+            "decided_detected": 8
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Chunks / maximum",
+        "tpr": 0.926829268292683,
+        "fpr_clean": 0.12121212121212122,
+        "gmean2_clean": 0.8144863266814487,
+        "primary_accuracy": 0.897196261682243,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 38,
+            "decided": 41,
+            "decided_detected": 38
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 8,
+            "decided": 66,
+            "decided_detected": 8
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 5,
+            "decided": 40,
+            "decided_detected": 5
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Chunks / average",
+        "tpr": 0.926829268292683,
+        "fpr_clean": 0.10606060606060608,
+        "gmean2_clean": 0.828529194382853,
+        "primary_accuracy": 0.9065420560747663,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 38,
+            "decided": 41,
+            "decided_detected": 38
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 7,
+            "decided": 66,
+            "decided_detected": 7
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 5,
+            "decided": 40,
+            "decided_detected": 5
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": true,
+          "primary_accuracy": true,
+          "gmean2_clean": true
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Full / highest option",
+        "tpr": 1.0,
+        "fpr_clean": 0.4242424242424242,
+        "gmean2_clean": 0.5757575757575758,
+        "primary_accuracy": 0.7383177570093458,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 41,
+            "decided": 41,
+            "decided_detected": 41
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 28,
+            "decided": 66,
+            "decided_detected": 28
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 18,
+            "decided": 40,
+            "decided_detected": 18
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Chunks / maximum",
+        "tpr": 1.0,
+        "fpr_clean": 0.3484848484848485,
+        "gmean2_clean": 0.6515151515151515,
+        "primary_accuracy": 0.7850467289719626,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 41,
+            "decided": 41,
+            "decided_detected": 41
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 23,
+            "decided": 66,
+            "decided_detected": 23
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 14,
+            "decided": 40,
+            "decided_detected": 14
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Chunks / average",
+        "tpr": 1.0,
+        "fpr_clean": 0.3484848484848485,
+        "gmean2_clean": 0.6515151515151515,
+        "primary_accuracy": 0.7850467289719626,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 41,
+            "decided": 41,
+            "decided_detected": 41
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 23,
+            "decided": 66,
+            "decided_detected": 23
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 14,
+            "decided": 40,
+            "decided_detected": 14
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      }
+    ],
+    "cot": [
+      {
+        "model": "Qwen3-32B",
+        "method": "Baseline / sampled x4",
+        "tpr": 0.9512195121951219,
+        "fpr_clean": 0.21590909090909094,
+        "primary_accuracy": 0.8481308411214953,
+        "gmean2_clean": 0.7458425720620842,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 164,
+            "valid": 164,
+            "detected": 156,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 264,
+            "valid": 264,
+            "detected": 57,
+            "decided": 66,
+            "decided_detected": 17
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 160,
+            "valid": 160,
+            "detected": 42,
+            "decided": 40,
+            "decided_detected": 11
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 12,
+            "valid": 12,
+            "detected": 12,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Full / highest option",
+        "tpr": 0.7804878048780488,
+        "fpr_clean": 0.0,
+        "gmean2_clean": 0.7804878048780488,
+        "primary_accuracy": 0.9158878504672897,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 32,
+            "decided": 41,
+            "decided_detected": 32
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 0,
+            "decided": 66,
+            "decided_detected": 0
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 11,
+            "decided": 40,
+            "decided_detected": 11
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": true,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Chunks / maximum",
+        "tpr": 0.926829268292683,
+        "fpr_clean": 0.0,
+        "gmean2_clean": 0.926829268292683,
+        "primary_accuracy": 0.9719626168224299,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 38,
+            "decided": 41,
+            "decided_detected": 38
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 0,
+            "decided": 66,
+            "decided_detected": 0
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 7,
+            "decided": 40,
+            "decided_detected": 7
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": true,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Chunks / average",
+        "tpr": 0.926829268292683,
+        "fpr_clean": 0.0,
+        "gmean2_clean": 0.926829268292683,
+        "primary_accuracy": 0.9719626168224299,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 38,
+            "decided": 41,
+            "decided_detected": 38
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 0,
+            "decided": 66,
+            "decided_detected": 0
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 0,
+            "decided": 40,
+            "decided_detected": 0
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": true,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Full / highest option",
+        "tpr": 0.9512195121951219,
+        "fpr_clean": 0.13636363636363635,
+        "gmean2_clean": 0.8215077605321508,
+        "primary_accuracy": 0.897196261682243,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 39,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 9,
+            "decided": 66,
+            "decided_detected": 9
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 32,
+            "decided": 40,
+            "decided_detected": 32
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Chunks / maximum",
+        "tpr": 0.9512195121951219,
+        "fpr_clean": 0.06060606060606055,
+        "gmean2_clean": 0.893569844789357,
+        "primary_accuracy": 0.9439252336448598,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 39,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 4,
+            "decided": 66,
+            "decided_detected": 4
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 32,
+            "decided": 40,
+            "decided_detected": 32
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Chunks / average",
+        "tpr": 0.9512195121951219,
+        "fpr_clean": 0.0,
+        "gmean2_clean": 0.9512195121951219,
+        "primary_accuracy": 0.9813084112149533,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 39,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 0,
+            "decided": 66,
+            "decided_detected": 0
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 18,
+            "decided": 40,
+            "decided_detected": 18
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": true,
+          "primary_accuracy": true,
+          "gmean2_clean": true
+        }
+      }
+    ],
+    "all": [
+      {
+        "model": "Qwen3-32B",
+        "method": "Baseline / sampled x4",
+        "tpr": 0.9451219512195121,
+        "fpr_clean": 0.24242424242424243,
+        "primary_accuracy": 0.8294392523364486,
+        "gmean2_clean": 0.7160014781966001,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 164,
+            "valid": 164,
+            "detected": 155,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 264,
+            "valid": 264,
+            "detected": 64,
+            "decided": 66,
+            "decided_detected": 20
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 160,
+            "valid": 160,
+            "detected": 31,
+            "decided": 40,
+            "decided_detected": 9
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 12,
+            "valid": 12,
+            "detected": 12,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Full / highest option",
+        "tpr": 0.8780487804878049,
+        "fpr_clean": 0.06060606060606055,
+        "gmean2_clean": 0.8248337028824834,
+        "primary_accuracy": 0.9158878504672897,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 36,
+            "decided": 41,
+            "decided_detected": 36
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 4,
+            "decided": 66,
+            "decided_detected": 4
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 20,
+            "decided": 40,
+            "decided_detected": 20
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Chunks / maximum",
+        "tpr": 0.926829268292683,
+        "fpr_clean": 0.015151515151515138,
+        "gmean2_clean": 0.9127864005912787,
+        "primary_accuracy": 0.9626168224299065,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 38,
+            "decided": 41,
+            "decided_detected": 38
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 1,
+            "decided": 66,
+            "decided_detected": 1
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 9,
+            "decided": 40,
+            "decided_detected": 9
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "GLiDE-9B",
+        "method": "Chunks / average",
+        "tpr": 0.926829268292683,
+        "fpr_clean": 0.0,
+        "gmean2_clean": 0.926829268292683,
+        "primary_accuracy": 0.9719626168224299,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 38,
+            "decided": 41,
+            "decided_detected": 38
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 0,
+            "decided": 66,
+            "decided_detected": 0
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 0,
+            "decided": 40,
+            "decided_detected": 0
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": false,
+          "fpr_clean": true,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Full / highest option",
+        "tpr": 0.9512195121951219,
+        "fpr_clean": 0.0757575757575758,
+        "gmean2_clean": 0.8791574279379156,
+        "primary_accuracy": 0.9345794392523364,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 39,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 5,
+            "decided": 66,
+            "decided_detected": 5
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 27,
+            "decided": 40,
+            "decided_detected": 27
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Chunks / maximum",
+        "tpr": 0.9512195121951219,
+        "fpr_clean": 0.030303030303030276,
+        "gmean2_clean": 0.9223946784922394,
+        "primary_accuracy": 0.9626168224299065,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 39,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 2,
+            "decided": 66,
+            "decided_detected": 2
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 25,
+            "decided": 40,
+            "decided_detected": 25
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": false,
+          "primary_accuracy": false,
+          "gmean2_clean": false
+        }
+      },
+      {
+        "model": "Jev 1.14",
+        "method": "Chunks / average",
+        "tpr": 0.9512195121951219,
+        "fpr_clean": 0.0,
+        "gmean2_clean": 0.9512195121951219,
+        "primary_accuracy": 0.9813084112149533,
+        "counts": {
+          "positive": {
+            "pairs": 41,
+            "requested": 41,
+            "valid": 41,
+            "detected": 39,
+            "decided": 41,
+            "decided_detected": 39
+          },
+          "clean_negative": {
+            "pairs": 66,
+            "requested": 66,
+            "valid": 66,
+            "detected": 0,
+            "decided": 66,
+            "decided_detected": 0
+          },
+          "cross_negative": {
+            "pairs": 40,
+            "requested": 40,
+            "valid": 40,
+            "detected": 6,
+            "decided": 40,
+            "decided_detected": 6
+          },
+          "own_failure": {
+            "pairs": 3,
+            "requested": 3,
+            "valid": 3,
+            "detected": 3,
+            "decided": 3,
+            "decided_detected": 3
+          }
+        },
+        "coverage": 1.0,
+        "best": {
+          "tpr": true,
+          "fpr_clean": true,
+          "primary_accuracy": true,
+          "gmean2_clean": true
+        }
+      }
+    ]
+  }
+}

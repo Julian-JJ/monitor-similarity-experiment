@@ -1,0 +1,10 @@
+{
+  "sources": [
+    "jev/api-smoke-audit.json",
+    "jev/client.py"
+  ],
+  "source_sha256": {
+    "jev/api-smoke-audit.json": "1ce116286dcbe5c0f425eb0b97d5f928cd75c2d2589f92f01a3bdbcbfe27d3f2",
+    "jev/client.py": "081917059c244db7a01c09f68272b19521ef4ef1aaee3466d077280315468388"
+  }
+}

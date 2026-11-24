@@ -1,0 +1,14 @@
+{
+  "config_sha256": "46dcc1e02439ce6a971031ba5c8658ac616bca11b844c23bb9d88609000014e3",
+  "rollouts": 75,
+  "cases": 150,
+  "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+  "min_prompt_tokens": 22007,
+  "max_prompt_tokens": 216463,
+  "over_limit": 0,
+  "collection_hashes": {
+    "original_clean": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+    "main_only_v1": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+  },
+  "inputs_sha256": "ee844c697f6984916dca2f421bf8900f5865f90ffb31d5ec5346d8c717d94dc5"
+}

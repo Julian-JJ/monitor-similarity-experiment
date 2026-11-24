@@ -1,0 +1,10 @@
+{
+  "sources": [
+    "summary-results-20261124/audit.json",
+    "variants/prompts.py"
+  ],
+  "source_sha256": {
+    "summary-results-20261124/audit.json": "2164e455d0d39e1158b1c2728c5f50e778ea67265fc23d01efea6bd22081c3fe",
+    "variants/prompts.py": "f0ff3e266ebad8b7685f803500afa5cfca1a0dbd691e801d80443786b48e69f4"
+  }
+}

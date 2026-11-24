@@ -1,0 +1,177 @@
+{
+  "checked_utc": "2026-11-24T20:56:04.118527+00:00",
+  "queue": "",
+  "queue_error": "",
+  "accounting": "34371577|FAILED|1:0|06:46:08|2026-11-23T10:10:47|2026-11-23T16:56:55\n34371590|FAILED|1:0|00:05:17|2026-11-23T17:00:38|2026-11-23T17:05:55\n34371591|COMPLETED|0:0|00:00:21|2026-11-23T17:05:57|2026-11-23T17:06:18\n34391867|COMPLETED|0:0|00:08:59|2026-11-23T16:56:58|2026-11-23T17:05:57\n34391868|COMPLETED|0:0|00:01:16|2026-11-23T17:06:00|2026-11-23T17:07:16",
+  "accounting_error": "",
+  "qwen_summaries": {
+    "counts": {
+      "complete": 2808,
+      "failed": 26
+    },
+    "by_scope": {
+      "action": {
+        "complete": 184
+      },
+      "cot": {
+        "complete": 1243,
+        "failed": 13
+      },
+      "all": {
+        "complete": 1381,
+        "failed": 13
+      }
+    },
+    "affected_cases": 21,
+    "errors": {
+      "Empty or truncated summary": 26
+    }
+  },
+  "decision_models": {
+    "glide": {
+      "counts": {
+        "complete": 429,
+        "blocked": 21
+      },
+      "by_scope": {
+        "action": {
+          "complete": 150
+        },
+        "cot": {
+          "complete": 141,
+          "blocked": 9
+        },
+        "all": {
+          "complete": 138,
+          "blocked": 12
+        }
+      },
+      "failures": [],
+      "score_summary": {
+        "action-qwen-greedy": {
+          "complete": 148,
+          "invalid": 2
+        },
+        "action-glide-full": {
+          "complete": 150
+        },
+        "action-glide-max": {
+          "complete": 150
+        },
+        "action-glide-mean": {
+          "complete": 150
+        },
+        "action-glide-summaries": {
+          "complete": 150
+        },
+        "cot-qwen-greedy": {
+          "complete": 143,
+          "invalid": 7
+        },
+        "cot-glide-full": {
+          "complete": 150
+        },
+        "cot-glide-max": {
+          "complete": 150
+        },
+        "cot-glide-mean": {
+          "complete": 150
+        },
+        "cot-glide-summaries": {
+          "blocked": 9,
+          "complete": 141
+        },
+        "all-qwen-greedy": {
+          "complete": 149,
+          "invalid": 1
+        },
+        "all-glide-full": {
+          "complete": 150
+        },
+        "all-glide-max": {
+          "complete": 150
+        },
+        "all-glide-mean": {
+          "complete": 150
+        },
+        "all-glide-summaries": {
+          "blocked": 12,
+          "complete": 138
+        }
+      }
+    },
+    "jev": {
+      "counts": {
+        "complete": 429,
+        "blocked": 21
+      },
+      "by_scope": {
+        "action": {
+          "complete": 150
+        },
+        "cot": {
+          "complete": 141,
+          "blocked": 9
+        },
+        "all": {
+          "complete": 138,
+          "blocked": 12
+        }
+      },
+      "failures": [],
+      "score_summary": {
+        "action-full-greedy": {
+          "complete": 150
+        },
+        "action-full-sampled": {
+          "complete": 600
+        },
+        "action-max": {
+          "complete": 150
+        },
+        "action-mean": {
+          "complete": 150
+        },
+        "action-summaries": {
+          "complete": 150
+        },
+        "cot-full-greedy": {
+          "complete": 150
+        },
+        "cot-full-sampled": {
+          "complete": 600
+        },
+        "cot-max": {
+          "complete": 150
+        },
+        "cot-mean": {
+          "complete": 150
+        },
+        "cot-summaries": {
+          "complete": 141,
+          "blocked": 9
+        },
+        "all-full-greedy": {
+          "complete": 150
+        },
+        "all-full-sampled": {
+          "complete": 600
+        },
+        "all-max": {
+          "complete": 150
+        },
+        "all-mean": {
+          "complete": 150
+        },
+        "all-summaries": {
+          "complete": 138,
+          "blocked": 12
+        }
+      }
+    }
+  },
+  "log_tails": {
+    "jev-summaries-34391867.log": "{\"stage\": \"summaries\", \"case\": 445, \"status\": \"complete\"}\n{\"stage\": \"summaries\", \"case\": 446, \"status\": \"complete\"}\n{\"stage\": \"summaries\", \"case\": 447, \"status\": \"complete\"}\n{\"stage\": \"summaries\", \"case\": 448, \"status\": \"complete\"}\n{\"stage\": \"summaries\", \"case\": 449, \"status\": \"complete\"}",
+    "jev-score-34391868.log": "{\"action-full-greedy\": {\"complete\": 150}, \"action-full-sampled\": {\"complete\": 600}, \"action-max\": {\"complete\": 150}, \"action-mean\": {\"complete\": 150}, \"action-summaries\": {\"complete\": 150}, \"cot-full-greedy\": {\"complete\": 150}, \"cot-full-sampled\": {\"complete\": 600}, \"cot-max\": {\"complete\": 150}, \"cot-mean\": {\"complete\": 150}, \"cot-summaries\": {\"complete\": 141, \"blocked\": 9}, \"all-full-greedy\": {\"complete\": 150}, \"all-full-sampled\": {\"complete\": 600}, \"all-max\": {\"complete\": 150}, \"all-mean\": {\"complete\": 150}, \"all-summaries\": {\"complete\": 138, \"blocked\": 12}}"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "model": "jev",
+  "slug": "full_context_sampled",
+  "title": "Jev 1.14 \u2014 full context, sampled answers",
+  "purpose": "Compare four sampled labels with the highest answer from the same Jev inference.",
+  "method": "Draw four labels locally from each saved vector using temperature 0.6, top-p 0.9 and seed 0. Pool the labels individually. No extra API requests and no sampling settings sent to Jev.",
+  "notes": [
+    "All three input views were evaluated. These are four draws, not four independently generated analyses."
+  ],
+  "sources": {
+    "action": {
+      "records": "jev/results-completed-34426786/scores/action-full-sampled-records.json",
+      "metrics": "jev/results-completed-34426786/scores/action-full-sampled-metrics.json"
+    },
+    "cot": {
+      "records": "jev/results-completed-34426786/scores/cot-full-sampled-records.json",
+      "metrics": "jev/results-completed-34426786/scores/cot-full-sampled-metrics.json"
+    },
+    "all": {
+      "records": "jev/results-completed-34426786/scores/all-full-sampled-records.json",
+      "metrics": "jev/results-completed-34426786/scores/all-full-sampled-metrics.json"
+    }
+  },
+  "audits": [
+    "jev/results-completed-34426786/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/jev-variants-20261123/full/"
+  ],
+  "source_sha256": {
+    "jev/results-completed-34426786/audit.json": "600458df209ca115f9f525b8a646013748bec54044cda00b7b85bb36c3b96208",
+    "jev/results-completed-34426786/scores/action-full-sampled-metrics.json": "dccaf4f69bffa6e536f6fe81d3d56568a2e2d9d39ab196d5b5a235e94d79bd59",
+    "jev/results-completed-34426786/scores/action-full-sampled-records.json": "dbdfad7ee18183fc5ee85a0eb8b6e48fc9244923d33362dfd5a9cc42b8b2b489",
+    "jev/results-completed-34426786/scores/all-full-sampled-metrics.json": "570b88caf07e8b1928fabe98cd7e1325c577c84818f21dd7cddf1db41a13e587",
+    "jev/results-completed-34426786/scores/all-full-sampled-records.json": "d4575b5de79ec7e825669976699ef33c3f6c358850b8899525714532f7bdf5a5",
+    "jev/results-completed-34426786/scores/cot-full-sampled-metrics.json": "410227ea81f64249b47718663c408dd22738c8b878f66180168a0a08e6c38788",
+    "jev/results-completed-34426786/scores/cot-full-sampled-records.json": "63c19d834ab666d6188f3ae44575dc625e8479b629e070a00f21567ee8efc03a"
+  }
+}

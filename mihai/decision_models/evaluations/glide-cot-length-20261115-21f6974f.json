@@ -1,0 +1,283 @@
+{
+  "run_name": "glide-cot-length-20261115-21f6974f",
+  "prepared_utc": "2026-11-15T23:23:25.132300+00:00",
+  "status": "completed_verified",
+  "local_source": "/private/tmp/glide-cot-length-20261115-21f6974f",
+  "archive": "/private/tmp/glide-cot-length-20261115-21f6974f.tar.gz",
+  "archive_sha256": "81ca13508cf56b63db3a6ba55ce8600314ebd142dc17465cbe2a4bf9512d9282",
+  "source_manifest_sha256": "6dc9d33d8b6c6cd6e22d820f7858c2f60167f9732a01e2513e1c90d286dcc569",
+  "remote_source": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-length-20261115-21f6974f",
+  "config": {
+    "framework_commit": "6043ff7a875bf6d2d792cec7df603c5cd019c647",
+    "model": "fastino/GLiDE-9B",
+    "model_revision": "ab54df5acba0eebf7df45560ffdaacd64e32df3b",
+    "model_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/models/glide-9b-ab54df5a",
+    "collections": {
+      "original_clean": {
+        "root": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/rollouts_original_clean",
+        "count": 41,
+        "sha256": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f"
+      },
+      "main_only_v1": {
+        "root": "/nfs/roberts/project/cpsc4880/cpsc4880_as4833/rollouts_main_only_clean",
+        "count": 34,
+        "sha256": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+      }
+    },
+    "run_name": "glide-cot-length-20261115-21f6974f",
+    "framework_source": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-actions-20261115-60611f0f",
+    "scope": "cot",
+    "temperature": 0.6,
+    "top_p": 0.9,
+    "samples": 4,
+    "seed": 0,
+    "prompt_targets": [
+      2000,
+      8000,
+      16000,
+      32000,
+      40000,
+      64000,
+      96000,
+      128000,
+      192000
+    ],
+    "max_prompt_tokens": 240000,
+    "seconds_per_level": 900,
+    "output_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/glide-cot-length-20261115-21f6974f"
+  },
+  "preflight_job_id": "33507043",
+  "preflight_intent": "5ede7f73-1abf-4c0e-9727-f92d536a8fc8",
+  "gpu_job_id": "33507318",
+  "gpu_submission": {
+    "status": "submitted",
+    "intent": "d982a9dc-ac5e-4c50-8f78-ed0065831ac4",
+    "created_utc": "2026-11-15T23:30:17.333762+00:00",
+    "command": [
+      "sbatch",
+      "--parsable",
+      "--job-name=glide-length-gpu",
+      "--partition=gpu_devel,gpu_rtx6000",
+      "--constraint=gpu:rtx_pro_6000_blackwell",
+      "--gpus=1",
+      "--mem=96G",
+      "--time=02:00:00",
+      "--comment=glide-length:d982a9dc-ac5e-4c50-8f78-ed0065831ac4",
+      "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-length-gpu-%j.log",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-length-20261115-21f6974f/pilot.sbatch",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-length-20261115-21f6974f",
+      "measure"
+    ],
+    "prepare_job_id": "33507043",
+    "source_manifest_sha256": "6dc9d33d8b6c6cd6e22d820f7858c2f60167f9732a01e2513e1c90d286dcc569",
+    "job_id": "33507318",
+    "submitted_utc": "2026-11-15T23:30:17.372480+00:00"
+  },
+  "preflight": {
+    "config_sha256": "668086ca52c11241f106a6ac0ceaec28f29da880360a57021bf4882526f6d9a0",
+    "levels": [
+      {
+        "target": 2000,
+        "file": "inputs-2000.json",
+        "sha256": "3693bee0fd7e89980b586c73a87607cce73a0fde2feac727a4fe3740ba40cce9",
+        "actual_prompt_tokens": [
+          2000,
+          2000,
+          2000,
+          2000,
+          2000
+        ]
+      },
+      {
+        "target": 8000,
+        "file": "inputs-8000.json",
+        "sha256": "c572a601db8b4747c798c0d9ef1bd3c64d6a899ef740b874c37d7c4ab6fd6e72",
+        "actual_prompt_tokens": [
+          8000,
+          8000,
+          8000,
+          8000,
+          7999
+        ]
+      },
+      {
+        "target": 16000,
+        "file": "inputs-16000.json",
+        "sha256": "870965f6dbf7f04da8d362bf987db172b7b940f2f02c9ad137a737daf7791967",
+        "actual_prompt_tokens": [
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      {
+        "target": 32000,
+        "file": "inputs-32000.json",
+        "sha256": "cdb0b948a76be959902209daa1fa99a379c4f7d6bbcc0d6d991e7de0a33cb092",
+        "actual_prompt_tokens": [
+          32000,
+          32000,
+          32000,
+          32000,
+          32000
+        ]
+      },
+      {
+        "target": 40000,
+        "file": "inputs-40000.json",
+        "sha256": "c90df390d30716652132ef5bcee1cf5664473bc9d58ee89a4d5bbd7470b8b8b1",
+        "actual_prompt_tokens": [
+          40000,
+          40000,
+          40000,
+          40000,
+          40000
+        ]
+      },
+      {
+        "target": 64000,
+        "file": "inputs-64000.json",
+        "sha256": "5fa606cc355f3a389ae5e9d0719e38ec9287de35927f95cac7c9bed662e7157d",
+        "actual_prompt_tokens": [
+          64000,
+          64000,
+          64000,
+          64000,
+          64000
+        ]
+      },
+      {
+        "target": 96000,
+        "file": "inputs-96000.json",
+        "sha256": "ee57431079974ecff68657bde0484efebd9177b5a0751fe65f4810ffd246b5df",
+        "actual_prompt_tokens": [
+          96000,
+          96000,
+          96000,
+          96000,
+          96000
+        ]
+      },
+      {
+        "target": 128000,
+        "file": "inputs-128000.json",
+        "sha256": "33acd05177f6c199343272565c5693520cb7f5f102d99ab829cc064647e8d07c",
+        "actual_prompt_tokens": [
+          128000,
+          128000,
+          128000,
+          128000,
+          128000
+        ]
+      },
+      {
+        "target": 192000,
+        "file": "inputs-192000.json",
+        "sha256": "c2271585f754f8e47f4116dea1b4684d1b96275490e60ebee5af60d47e6fb404",
+        "actual_prompt_tokens": [
+          192000,
+          192000,
+          192000,
+          192000,
+          192000
+        ]
+      },
+      {
+        "target": 216463,
+        "file": "inputs-216463.json",
+        "sha256": "6b0e93b17c1e836d4dae79c9b677feb554f9d87f0b5b392a06201e724958a263",
+        "actual_prompt_tokens": [
+          216463,
+          216463,
+          216463,
+          216463,
+          216463
+        ]
+      }
+    ],
+    "source_manifest_sha256": "6dc9d33d8b6c6cd6e22d820f7858c2f60167f9732a01e2513e1c90d286dcc569",
+    "collection_hashes": {
+      "original_clean": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+      "main_only_v1": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+    },
+    "lengths": {
+      "rollouts": 75,
+      "objective_cases": 150,
+      "min": 22007,
+      "median": 68542.0,
+      "p95": 157782,
+      "max": 216463,
+      "over_default_40000": 118,
+      "model_position_limit": 262144,
+      "pilot_prompt_cap": 240000,
+      "selected_item_id": "american_airlines_2/malicious/sample_02",
+      "selected_told": "benign",
+      "selected_full_prompt_tokens": 216463
+    }
+  },
+  "last_observation_utc": "2026-11-16T00:09:29.165510+00:00",
+  "last_completed_target": 216463,
+  "scheduler": {
+    "job_id": "33507318",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:36:27",
+    "start_cluster_local": "2026-11-15T18:30:56",
+    "end_cluster_local": "2026-11-15T19:07:23",
+    "timezone": "America/New_York"
+  },
+  "final_audit": {
+    "audited_utc": "2026-11-16T00:08:01.759988+00:00",
+    "job_id": "33507318",
+    "checks_passed": true,
+    "valid_calls": 70,
+    "failed_calls": 0,
+    "missing_or_not_started_calls": 0,
+    "expected_calls": 70,
+    "all_successful_inputs_processed_in_full": true,
+    "lengths": {
+      "rollouts": 75,
+      "objective_cases": 150,
+      "min": 22007,
+      "median": 68542.0,
+      "p95": 157782,
+      "max": 216463,
+      "over_default_40000": 118,
+      "model_position_limit": 262144,
+      "pilot_prompt_cap": 240000,
+      "selected_item_id": "american_airlines_2/malicious/sample_02",
+      "selected_told": "benign",
+      "selected_full_prompt_tokens": 216463
+    },
+    "synthetic_controls": {
+      "default_correct": 40,
+      "default_total": 40,
+      "sampled_correct": 160,
+      "sampled_total": 160
+    },
+    "summary_sha256": "90c71b76ce2a2b16bab31a61999eb943c0f6036aff1f22c467bf1371cd3ba60f",
+    "limitations": [
+      "Synthetic capability controls use one constructed scenario.",
+      "Partial real reasoning inputs are not graded against full-rollout labels.",
+      "Peak GPU memory records are PyTorch allocated/reserved memory, excluding some driver overhead.",
+      "A model configuration with 262144 positions does not establish decision quality at that length."
+    ]
+  },
+  "runtime_projection": {
+    "objective_cases": 150,
+    "estimated_inference_seconds": 3507.754816991791,
+    "method": "Piecewise linear interpolation of measured warm runtime by each exact prompt token count.",
+    "limitations": "Estimate for this GPU and single-request method; excludes load, compilation, scoring, and other overhead. Not an actual full-CoT evaluation."
+  },
+  "results_directory": "mihai/decision_models/evaluations/glide-cot-length-20261115-21f6974f",
+  "summary_sha256": "90c71b76ce2a2b16bab31a61999eb943c0f6036aff1f22c467bf1371cd3ba60f",
+  "hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "gpu_total_bytes": 101973819392,
+    "torch": "2.14.0+cu130",
+    "cuda": "13.0"
+  }
+}

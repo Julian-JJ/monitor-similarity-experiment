@@ -1,0 +1,32 @@
+{
+  "config_sha256": "ebedf7bc120546f3796f92640aef18cd131fcc038b4aa1a866fcae549933839e",
+  "code_sha256": {
+    "run_jev.py": "9c0857792e78577d4c7397ef44f98d968b99d13e9f9ac3d63dc83d85d6999238",
+    "client.py": "081917059c244db7a01c09f68272b19521ef4ef1aaee3466d077280315468388"
+  },
+  "model": "jev-1.14.0",
+  "api_calls_made": 0,
+  "rollouts": 75,
+  "cases": 450,
+  "chunks": 2834,
+  "scopes": {
+    "action": {
+      "cases": 150,
+      "chunks": 184,
+      "max_glide_tokens_reference_only": 26275
+    },
+    "cot": {
+      "cases": 150,
+      "chunks": 1256,
+      "max_glide_tokens_reference_only": 216463
+    },
+    "all": {
+      "cases": 150,
+      "chunks": 1394,
+      "max_glide_tokens_reference_only": 229167
+    }
+  },
+  "qwen_summary_cases_ready": 3,
+  "maximum_api_calls": 3734,
+  "jev_token_counts": "Unknown until API response; GLiDE counts are not Jev counts"
+}

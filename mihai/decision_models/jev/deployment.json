@@ -1,0 +1,11 @@
+{
+  "package": "jev-variants-4090274c5245883d",
+  "source_manifest_sha256": "4090274c5245883d97f411c3a33c0fb9f4ae75f58fb0a7a16c065314530c67ff",
+  "archive_sha256": "98b43b7772b76abb2fd7426cf3b2bb501e5c848131f94275c600e6360db07c19",
+  "remote_package": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/jev-variants-4090274c5245883d",
+  "local_archive": "/private/tmp/jev-variants-4090274c5245883d.tar.gz",
+  "api_calls_made_at_preparation": 0,
+  "current_status": "status.json",
+  "previous_preparation_job": "34372138",
+  "previous_preparation_failure": "Test helper path assumed repository layout; standalone package now imports frozen helpers"
+}

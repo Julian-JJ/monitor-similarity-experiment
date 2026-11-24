@@ -1,0 +1,38 @@
+{
+  "run_name": "decision-variants-20261123",
+  "framework_source": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8",
+  "framework_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+  "output_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/decision-variants-20261123",
+  "collections": {
+    "original_clean": {
+      "root": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/rollouts_original_clean",
+      "count": 41,
+      "sha256": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f"
+    },
+    "main_only_v1": {
+      "root": "/nfs/roberts/project/cpsc4880/cpsc4880_as4833/rollouts_main_only_clean",
+      "count": 34,
+      "sha256": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+    }
+  },
+  "scopes": [
+    "action",
+    "cot",
+    "all"
+  ],
+  "model_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/models/glide-9b-ab54df5a",
+  "model_revision": "ab54df5acba0eebf7df45560ffdaacd64e32df3b",
+  "qwen_model_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_as4833/models/qwen3-32b",
+  "qwen_revision": "9216db5781bf21249d130ec9da846c4624c16137",
+  "reference_tokenizer": "/nfs/roberts/project/cpsc4880/cpsc4880_as4833/monitor-framework/cache/tokenizer/tokenizer.json",
+  "qwen_concurrency": 32,
+  "threshold": 0.5,
+  "glide_chunk_context": 40000,
+  "glide_full_context": 262144,
+  "seed": 0,
+  "reuse": {
+    "action": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/glide-actions-20261115-60611f0f",
+    "cot": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/glide-cot-20261115-c8f6c4e8"
+  },
+  "reference_tokenizer_sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+}

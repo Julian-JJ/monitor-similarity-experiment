@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1152" height="648" viewBox="0 0 1152 648">
+<rect width="100%" height="100%" fill="white"/>
+<text x="56" y="40" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="11" font-weight="700" fill="#566675" text-anchor="start">MONITOR COMPARISON</text>
+<text x="1096" y="40" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="11" font-weight="400" fill="#566675" text-anchor="end">23 NOV 2026</text>
+<text x="56" y="86" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="34" font-weight="700" fill="#142433" text-anchor="start">Combined / actions + CoT</text>
+<text x="56" y="114" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="13" font-weight="400" fill="#566675" text-anchor="start">Same 75 rollouts  /  150 objective checks per input view  /  100% completed for every row</text>
+<line x1="56" y1="141" x2="1096" y2="141" stroke="#142433" stroke-width="1.5"/>
+<text x="66" y="173" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="15" font-weight="700" fill="#142433" text-anchor="start">Monitor</text>
+<text x="250" y="173" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="15" font-weight="700" fill="#142433" text-anchor="start">Decision rule</text>
+<text x="592" y="167" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="15" font-weight="700" fill="#142433" text-anchor="middle">Detection</text>
+<text x="585" y="188" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="12" font-weight="400" fill="#566675" text-anchor="middle">TPR</text>
+<line x1="605.4521484375" y1="188" x2="605.4521484375" y2="179" stroke="#566675" stroke-width="0.9"/>
+<line x1="602.4521484375" y1="182" x2="605.4521484375" y2="179" stroke="#566675" stroke-width="0.9"/>
+<line x1="608.4521484375" y1="182" x2="605.4521484375" y2="179" stroke="#566675" stroke-width="0.9"/>
+<text x="738" y="167" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="15" font-weight="700" fill="#142433" text-anchor="middle">False alarms</text>
+<text x="731" y="188" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="12" font-weight="400" fill="#566675" text-anchor="middle">Clean FPR</text>
+<line x1="770.1728515625" y1="188" x2="770.1728515625" y2="179" stroke="#566675" stroke-width="0.9"/>
+<line x1="767.1728515625" y1="185" x2="770.1728515625" y2="188" stroke="#566675" stroke-width="0.9"/>
+<line x1="773.1728515625" y1="185" x2="770.1728515625" y2="188" stroke="#566675" stroke-width="0.9"/>
+<text x="884" y="167" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="15" font-weight="700" fill="#142433" text-anchor="middle">Accuracy*</text>
+<line x1="884" y1="188" x2="884" y2="179" stroke="#566675" stroke-width="0.9"/>
+<line x1="881" y1="182" x2="884" y2="179" stroke="#566675" stroke-width="0.9"/>
+<line x1="887" y1="182" x2="884" y2="179" stroke="#566675" stroke-width="0.9"/>
+<text x="1030" y="167" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="15" font-weight="700" fill="#142433" text-anchor="middle">G-mean²</text>
+<line x1="1030" y1="188" x2="1030" y2="179" stroke="#566675" stroke-width="0.9"/>
+<line x1="1027" y1="182" x2="1030" y2="179" stroke="#566675" stroke-width="0.9"/>
+<line x1="1033" y1="182" x2="1030" y2="179" stroke="#566675" stroke-width="0.9"/>
+<line x1="56" y1="201" x2="1096" y2="201" stroke="#142433" stroke-width="0.8"/>
+<text x="66" y="230" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="700" fill="#142433" text-anchor="start">Qwen3-32B</text>
+<text x="250" y="230" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="16" font-weight="400" fill="#142433" text-anchor="start">Baseline / sampled x4</text>
+<text x="592" y="230" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">94.5%</text>
+<text x="738" y="230" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">24.2%</text>
+<text x="884" y="230" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">82.9%</text>
+<text x="1030" y="230" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">0.716</text>
+<line x1="56" y1="251" x2="1096" y2="251" stroke="#AEB9C2" stroke-width="0.65"/>
+<text x="250" y="283" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="16" font-weight="400" fill="#142433" text-anchor="start">Full / highest option</text>
+<text x="592" y="283" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">87.8%</text>
+<text x="738" y="283" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">6.1%</text>
+<text x="884" y="283" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">91.6%</text>
+<text x="1030" y="283" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">0.825</text>
+<text x="66" y="323" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="700" fill="#142433" text-anchor="start">GLiDE-9B</text>
+<text x="250" y="323" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="16" font-weight="400" fill="#142433" text-anchor="start">Chunks / maximum</text>
+<text x="592" y="323" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">92.7%</text>
+<text x="738" y="323" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">1.5%</text>
+<text x="884" y="323" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">96.3%</text>
+<text x="1030" y="323" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">0.913</text>
+<text x="250" y="363" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="16" font-weight="400" fill="#142433" text-anchor="start">Chunks / average</text>
+<text x="592" y="363" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">92.7%</text>
+<text x="738" y="363" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" fill="#142433" text-anchor="middle">0.0%</text>
+<text x="884" y="363" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">97.2%</text>
+<text x="1030" y="363" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">0.927</text>
+<line x1="56" y1="384" x2="1096" y2="384" stroke="#AEB9C2" stroke-width="0.65"/>
+<text x="250" y="416" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="16" font-weight="400" fill="#142433" text-anchor="start">Full / highest option</text>
+<text x="592" y="416" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" fill="#142433" text-anchor="middle">95.1%</text>
+<text x="738" y="416" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">7.6%</text>
+<text x="884" y="416" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">93.5%</text>
+<text x="1030" y="416" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">0.879</text>
+<text x="66" y="456" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="700" fill="#142433" text-anchor="start">Jev 1.14</text>
+<text x="250" y="456" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="16" font-weight="400" fill="#142433" text-anchor="start">Chunks / maximum</text>
+<text x="592" y="456" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" fill="#142433" text-anchor="middle">95.1%</text>
+<text x="738" y="456" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">3.0%</text>
+<text x="884" y="456" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">96.3%</text>
+<text x="1030" y="456" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" fill="#142433" text-anchor="middle">0.922</text>
+<text x="250" y="496" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="16" font-weight="400" fill="#142433" text-anchor="start">Chunks / average</text>
+<text x="592" y="496" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" fill="#142433" text-anchor="middle">95.1%</text>
+<text x="738" y="496" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" fill="#142433" text-anchor="middle">0.0%</text>
+<text x="884" y="496" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" fill="#142433" text-anchor="middle">98.1%</text>
+<text x="1030" y="496" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" fill="#142433" text-anchor="middle">0.951</text>
+<line x1="56" y1="517" x2="1096" y2="517" stroke="#142433" stroke-width="1.5"/>
+<text x="56" y="543" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="12" font-weight="400" fill="#566675" text-anchor="start">Bold = best point estimate, including ties; this does not establish statistical significance.</text>
+<text x="56" y="563" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="12" font-weight="400" fill="#566675" text-anchor="start">*Accuracy: 41 positive + 66 clean cases; sampled baseline pools four judgments per case.</text>
+<text x="56" y="583" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="12" font-weight="400" fill="#566675" text-anchor="start">G-mean² = TPR × (1 − FPR). Chunk rules use P(A) ≥ 0.5; full decision models take the highest option.</text>
+<text x="56" y="616" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="10.5" font-weight="400" fill="#566675" text-anchor="start">Qwen: sampled baseline with existing hierarchy. New greedy Qwen and summary conditions are pending.</text>
+<text x="1096" y="616" font-family="Bitstream Vera Sans,DejaVu Sans,Arial,sans-serif" font-size="10.5" font-weight="400" fill="#566675" text-anchor="end">3 / 3</text>
+</svg>

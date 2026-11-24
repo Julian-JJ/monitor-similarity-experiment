@@ -1,0 +1,14 @@
+{
+  "sources": [
+    "evaluations/glide-cot-length-20261115-21f6974f/summary.json",
+    "evaluations/glide-cot-length-20261115-21f6974f/final-audit.json",
+    "evaluations/glide-cot-length-20261115-21f6974f/length-pilot.png",
+    "long_context/measure.py"
+  ],
+  "source_sha256": {
+    "evaluations/glide-cot-length-20261115-21f6974f/summary.json": "90c71b76ce2a2b16bab31a61999eb943c0f6036aff1f22c467bf1371cd3ba60f",
+    "evaluations/glide-cot-length-20261115-21f6974f/final-audit.json": "1122e3dca6b3303b048bbce62859bb5e80fdc2dcfd453bd19578b414a9ad4421",
+    "evaluations/glide-cot-length-20261115-21f6974f/length-pilot.png": "0d1bba91afe7bef0de640297021268a8187115b2b5b98c2f624af28a4d655deb",
+    "long_context/measure.py": "704f56918acefc57ecb59c4640f38188d7ccdb3526fb55f25b09d8120f0583c8"
+  }
+}

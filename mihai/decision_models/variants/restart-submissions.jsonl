@@ -1,0 +1,6 @@
+{"stage": "v3-qwen-smoke-cpu6", "job_id": "34371575", "dependency": null}
+{"stage": "v3-glide-smoke", "job_id": "34371576", "dependency": "afterok:34371575"}
+{"stage": "v3-qwen-production", "job_id": "34371577", "dependency": "afterok:34371575"}
+{"stage": "v3-glide-production", "job_id": "34371578", "dependency": "afterok:34371576"}
+{"stage": "v3-glide-summaries", "job_id": "34371590", "dependency": "afterok:34371576,afterany:34371577"}
+{"stage": "v3-score", "job_id": "34371591", "dependency": "afterany:34371577:34371578:34371590"}

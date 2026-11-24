@@ -1,0 +1,64 @@
+% Requires \usepackage{booktabs}; all metrics are point estimates.
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Monitor & Decision rule & TPR $\uparrow$ & FPR $\downarrow$ & Accuracy$^*$ $\uparrow$ & G-mean$^2$ $\uparrow$ \\
+\midrule
+Qwen3-32B & Baseline / sampled x4 & \textbf{100.0\%} & 28.8\% & 82.2\% & 0.712 \\
+\midrule
+GLiDE-9B & Full / highest option & 95.1\% & 24.2\% & 83.2\% & 0.721 \\
+GLiDE-9B & Chunks / maximum & 92.7\% & 12.1\% & 89.7\% & 0.814 \\
+GLiDE-9B & Chunks / average & 92.7\% & \textbf{10.6\%} & \textbf{90.7\%} & \textbf{0.829} \\
+\midrule
+Jev 1.14 & Full / highest option & \textbf{100.0\%} & 42.4\% & 73.8\% & 0.576 \\
+Jev 1.14 & Chunks / maximum & \textbf{100.0\%} & 34.8\% & 78.5\% & 0.652 \\
+Jev 1.14 & Chunks / average & \textbf{100.0\%} & 34.8\% & 78.5\% & 0.652 \\
+\bottomrule
+\end{tabular}
+\caption{Actions. Best point estimates are bold, including ties. Accuracy uses 41 positive and 66 clean cases; the sampled baseline pools four judgments per case. G-mean$^2$ is TPR times clean TNR. Qwen uses its existing hierarchy; chunk rules use a 0.5 threshold.}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Monitor & Decision rule & TPR $\uparrow$ & FPR $\downarrow$ & Accuracy$^*$ $\uparrow$ & G-mean$^2$ $\uparrow$ \\
+\midrule
+Qwen3-32B & Baseline / sampled x4 & \textbf{95.1\%} & 21.6\% & 84.8\% & 0.746 \\
+\midrule
+GLiDE-9B & Full / highest option & 78.0\% & \textbf{0.0\%} & 91.6\% & 0.780 \\
+GLiDE-9B & Chunks / maximum & 92.7\% & \textbf{0.0\%} & 97.2\% & 0.927 \\
+GLiDE-9B & Chunks / average & 92.7\% & \textbf{0.0\%} & 97.2\% & 0.927 \\
+\midrule
+Jev 1.14 & Full / highest option & \textbf{95.1\%} & 13.6\% & 89.7\% & 0.822 \\
+Jev 1.14 & Chunks / maximum & \textbf{95.1\%} & 6.1\% & 94.4\% & 0.894 \\
+Jev 1.14 & Chunks / average & \textbf{95.1\%} & \textbf{0.0\%} & \textbf{98.1\%} & \textbf{0.951} \\
+\bottomrule
+\end{tabular}
+\caption{CoT. Best point estimates are bold, including ties. Accuracy uses 41 positive and 66 clean cases; the sampled baseline pools four judgments per case. G-mean$^2$ is TPR times clean TNR. Qwen uses its existing hierarchy; chunk rules use a 0.5 threshold.}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Monitor & Decision rule & TPR $\uparrow$ & FPR $\downarrow$ & Accuracy$^*$ $\uparrow$ & G-mean$^2$ $\uparrow$ \\
+\midrule
+Qwen3-32B & Baseline / sampled x4 & 94.5\% & 24.2\% & 82.9\% & 0.716 \\
+\midrule
+GLiDE-9B & Full / highest option & 87.8\% & 6.1\% & 91.6\% & 0.825 \\
+GLiDE-9B & Chunks / maximum & 92.7\% & 1.5\% & 96.3\% & 0.913 \\
+GLiDE-9B & Chunks / average & 92.7\% & \textbf{0.0\%} & 97.2\% & 0.927 \\
+\midrule
+Jev 1.14 & Full / highest option & \textbf{95.1\%} & 7.6\% & 93.5\% & 0.879 \\
+Jev 1.14 & Chunks / maximum & \textbf{95.1\%} & 3.0\% & 96.3\% & 0.922 \\
+Jev 1.14 & Chunks / average & \textbf{95.1\%} & \textbf{0.0\%} & \textbf{98.1\%} & \textbf{0.951} \\
+\bottomrule
+\end{tabular}
+\caption{Combined. Best point estimates are bold, including ties. Accuracy uses 41 positive and 66 clean cases; the sampled baseline pools four judgments per case. G-mean$^2$ is TPR times clean TNR. Qwen uses its existing hierarchy; chunk rules use a 0.5 threshold.}
+\end{table}
+

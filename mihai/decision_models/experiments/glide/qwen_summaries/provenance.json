@@ -1,0 +1,42 @@
+{
+  "model": "glide",
+  "slug": "qwen_summaries",
+  "title": "Qwen3-32B summaries \u2192 GLiDE-9B",
+  "purpose": "Test whether a decision model benefits from reading compact evidence summaries instead of the raw transcript.",
+  "method": "Qwen greedily summarizes each shared chunk without an A\u2013D verdict, targeting at most 350 words. Concatenate every summary in order and ask GLiDE-9B for one highest-probability A\u2013D answer.",
+  "notes": [
+    "429/450 final cases completed: 150 Actions, 141 CoT and 138 Combined. The other 21 were blocked by missing valid Qwen summaries.",
+    "There were no downstream decision-model inference failures. Missing summaries are never silently dropped.",
+    "This is a two-model system; its cost includes Qwen summary generation.",
+    "Downstream job duration: 5:17 for GLiDE. Qwen took 6:46:08 for greedy monitoring plus summary generation together."
+  ],
+  "sources": {
+    "action": {
+      "records": "summary-results-20261124/glide/scores/action-glide-summaries-records.json",
+      "metrics": "summary-results-20261124/glide/scores/action-glide-summaries-metrics.json"
+    },
+    "cot": {
+      "records": "summary-results-20261124/glide/scores/cot-glide-summaries-records.json",
+      "metrics": "summary-results-20261124/glide/scores/cot-glide-summaries-metrics.json"
+    },
+    "all": {
+      "records": "summary-results-20261124/glide/scores/all-glide-summaries-records.json",
+      "metrics": "summary-results-20261124/glide/scores/all-glide-summaries-metrics.json"
+    }
+  },
+  "audits": [
+    "summary-results-20261124/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/decision-variants-20261123/glide-summaries/"
+  ],
+  "source_sha256": {
+    "summary-results-20261124/audit.json": "2164e455d0d39e1158b1c2728c5f50e778ea67265fc23d01efea6bd22081c3fe",
+    "summary-results-20261124/glide/scores/action-glide-summaries-metrics.json": "f0b9b1b6898ed34840e9df151c0b969ab009bf274d5b5780802da3c6543f0177",
+    "summary-results-20261124/glide/scores/action-glide-summaries-records.json": "321493ee4697d2d2e774c4492e8751969e0f182621bf662b555e5096ca3359a7",
+    "summary-results-20261124/glide/scores/all-glide-summaries-metrics.json": "06e442b2cf2bdcbb6564b5bece63e4201a0ab2394266e2db25bedf1ebc2368d4",
+    "summary-results-20261124/glide/scores/all-glide-summaries-records.json": "2032392423a6430a09682aaa9c063d824dfb060e14e7d60e077e52cb6d532595",
+    "summary-results-20261124/glide/scores/cot-glide-summaries-metrics.json": "798394738cd54adb14255e9b09fd56f65ba88ea02726b4d7af8c0d59af7bbe6f",
+    "summary-results-20261124/glide/scores/cot-glide-summaries-records.json": "1a16c1a15aefc633f485ce7784c3d39c40ab552373e503f41f0b5e7b08e962a7"
+  }
+}

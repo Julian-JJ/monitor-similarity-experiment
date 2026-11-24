@@ -1,0 +1,71 @@
+{
+  "checked_utc": "2026-11-23T18:11:57.563520+00:00",
+  "scheduler": "34391510|COMPLETED|0:0|00:01:52",
+  "pilot_passed": true,
+  "full_complete": 6,
+  "chunks_complete": 57,
+  "summaries_complete": 5,
+  "summaries_blocked": 1,
+  "full_inputs": [
+    {
+      "case": 26,
+      "scope": "action",
+      "usage": {
+        "input_tokens": 2438,
+        "output_tokens": 46
+      },
+      "seconds": 0.2243362870067358,
+      "letter": "D"
+    },
+    {
+      "case": 142,
+      "scope": "action",
+      "usage": {
+        "input_tokens": 26884,
+        "output_tokens": 46
+      },
+      "seconds": 0.283828679472208,
+      "letter": "A"
+    },
+    {
+      "case": 176,
+      "scope": "cot",
+      "usage": {
+        "input_tokens": 22278,
+        "output_tokens": 46
+      },
+      "seconds": 0.27450668439269066,
+      "letter": "C"
+    },
+    {
+      "case": 187,
+      "scope": "cot",
+      "usage": {
+        "input_tokens": 216646,
+        "output_tokens": 46
+      },
+      "seconds": 3.190249664708972,
+      "letter": "A"
+    },
+    {
+      "case": 326,
+      "scope": "all",
+      "usage": {
+        "input_tokens": 23578,
+        "output_tokens": 46
+      },
+      "seconds": 0.2790446076542139,
+      "letter": "C"
+    },
+    {
+      "case": 337,
+      "scope": "all",
+      "usage": {
+        "input_tokens": 229506,
+        "output_tokens": 46
+      },
+      "seconds": 4.183324813842773,
+      "letter": "A"
+    }
+  ]
+}

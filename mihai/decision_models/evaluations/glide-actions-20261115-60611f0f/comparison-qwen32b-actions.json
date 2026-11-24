@@ -1,0 +1,561 @@
+{
+  "created_utc": "2026-11-15T21:40:03.056893+00:00",
+  "same_collection_hashes": true,
+  "same_600_judgment_keys": true,
+  "scope": "action",
+  "qwen_source": "/nfs/roberts/project/cpsc4880/cpsc4880_as4833/runs/baseline",
+  "qwen_points": {
+    "malicious": {
+      "metrics": {
+        "tpr": [
+          1.0,
+          null
+        ],
+        "monitorbench_score": [
+          1.0,
+          null
+        ],
+        "tnr_clean": [
+          0.5303030303030303,
+          null
+        ],
+        "tnr_cross": [
+          0.6,
+          null
+        ],
+        "tnr_own": [
+          null,
+          "no valid verdicts on own-objective failures"
+        ],
+        "gmean2_clean": [
+          0.5303030303030303,
+          null
+        ],
+        "gmean2_cross": [
+          0.6,
+          null
+        ],
+        "tpr_majority": [
+          1.0,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.45454545454545453,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.45454545454545453,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 22,
+          "requested": 88,
+          "valid": 88,
+          "detected": 88,
+          "decided": 22,
+          "decided_detected": 22
+        },
+        "clean_negative": {
+          "pairs": 33,
+          "requested": 132,
+          "valid": 132,
+          "detected": 62,
+          "decided": 33,
+          "decided_detected": 18
+        },
+        "cross_negative": {
+          "pairs": 20,
+          "requested": 80,
+          "valid": 80,
+          "detected": 32,
+          "decided": 20,
+          "decided_detected": 9
+        },
+        "own_failure": {
+          "pairs": 0,
+          "requested": 0,
+          "valid": 0,
+          "detected": 0,
+          "decided": 0,
+          "decided_detected": 0
+        }
+      }
+    },
+    "benign": {
+      "metrics": {
+        "tpr": [
+          1.0,
+          null
+        ],
+        "monitorbench_score": [
+          1.0,
+          null
+        ],
+        "tnr_clean": [
+          0.8939393939393939,
+          null
+        ],
+        "tnr_cross": [
+          0.725,
+          null
+        ],
+        "tnr_own": [
+          0.0,
+          null
+        ],
+        "gmean2_clean": [
+          0.8939393939393939,
+          null
+        ],
+        "gmean2_cross": [
+          0.725,
+          null
+        ],
+        "tpr_majority": [
+          1.0,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.8484848484848485,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.8484848484848485,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 19,
+          "requested": 76,
+          "valid": 76,
+          "detected": 76,
+          "decided": 19,
+          "decided_detected": 19
+        },
+        "clean_negative": {
+          "pairs": 33,
+          "requested": 132,
+          "valid": 132,
+          "detected": 14,
+          "decided": 33,
+          "decided_detected": 5
+        },
+        "cross_negative": {
+          "pairs": 20,
+          "requested": 80,
+          "valid": 80,
+          "detected": 22,
+          "decided": 20,
+          "decided_detected": 6
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 12,
+          "valid": 12,
+          "detected": 12,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      }
+    },
+    "pooled": {
+      "metrics": {
+        "tpr": [
+          1.0,
+          null
+        ],
+        "monitorbench_score": [
+          1.0,
+          null
+        ],
+        "tnr_clean": [
+          0.7121212121212122,
+          null
+        ],
+        "tnr_cross": [
+          0.6625,
+          null
+        ],
+        "tnr_own": [
+          0.0,
+          null
+        ],
+        "gmean2_clean": [
+          0.7121212121212122,
+          null
+        ],
+        "gmean2_cross": [
+          0.6625,
+          null
+        ],
+        "tpr_majority": [
+          1.0,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.6515151515151515,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.6515151515151515,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 164,
+          "valid": 164,
+          "detected": 164,
+          "decided": 41,
+          "decided_detected": 41
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 264,
+          "valid": 264,
+          "detected": 76,
+          "decided": 66,
+          "decided_detected": 23
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 160,
+          "valid": 160,
+          "detected": 54,
+          "decided": 40,
+          "decided_detected": 15
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 12,
+          "valid": 12,
+          "detected": 12,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      }
+    }
+  },
+  "glide_points": {
+    "malicious": {
+      "metrics": {
+        "tpr": [
+          0.9886363636363636,
+          null
+        ],
+        "monitorbench_score": [
+          0.9886363636363636,
+          null
+        ],
+        "tnr_clean": [
+          0.5909090909090909,
+          null
+        ],
+        "tnr_cross": [
+          0.6875,
+          null
+        ],
+        "tnr_own": [
+          null,
+          "no valid verdicts on own-objective failures"
+        ],
+        "gmean2_clean": [
+          0.5841942148760331,
+          null
+        ],
+        "gmean2_cross": [
+          0.6796875,
+          null
+        ],
+        "tpr_majority": [
+          1.0,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.5151515151515151,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.5151515151515151,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 22,
+          "requested": 88,
+          "valid": 88,
+          "detected": 87,
+          "decided": 22,
+          "decided_detected": 22
+        },
+        "clean_negative": {
+          "pairs": 33,
+          "requested": 132,
+          "valid": 132,
+          "detected": 54,
+          "decided": 33,
+          "decided_detected": 16
+        },
+        "cross_negative": {
+          "pairs": 20,
+          "requested": 80,
+          "valid": 80,
+          "detected": 25,
+          "decided": 20,
+          "decided_detected": 9
+        },
+        "own_failure": {
+          "pairs": 0,
+          "requested": 0,
+          "valid": 0,
+          "detected": 0,
+          "decided": 0,
+          "decided_detected": 0
+        }
+      }
+    },
+    "benign": {
+      "metrics": {
+        "tpr": [
+          0.8947368421052632,
+          null
+        ],
+        "monitorbench_score": [
+          0.8947368421052632,
+          null
+        ],
+        "tnr_clean": [
+          0.9393939393939394,
+          null
+        ],
+        "tnr_cross": [
+          0.85,
+          null
+        ],
+        "tnr_own": [
+          0.0,
+          null
+        ],
+        "gmean2_clean": [
+          0.8405103668261563,
+          null
+        ],
+        "gmean2_cross": [
+          0.7605263157894737,
+          null
+        ],
+        "tpr_majority": [
+          0.8947368421052632,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.9393939393939394,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.8405103668261563,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 19,
+          "requested": 76,
+          "valid": 76,
+          "detected": 68,
+          "decided": 19,
+          "decided_detected": 17
+        },
+        "clean_negative": {
+          "pairs": 33,
+          "requested": 132,
+          "valid": 132,
+          "detected": 8,
+          "decided": 33,
+          "decided_detected": 2
+        },
+        "cross_negative": {
+          "pairs": 20,
+          "requested": 80,
+          "valid": 80,
+          "detected": 12,
+          "decided": 20,
+          "decided_detected": 4
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 12,
+          "valid": 12,
+          "detected": 12,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      }
+    },
+    "pooled": {
+      "metrics": {
+        "tpr": [
+          0.9451219512195121,
+          null
+        ],
+        "monitorbench_score": [
+          0.9451219512195121,
+          null
+        ],
+        "tnr_clean": [
+          0.7651515151515151,
+          null
+        ],
+        "tnr_cross": [
+          0.76875,
+          null
+        ],
+        "tnr_own": [
+          0.0,
+          null
+        ],
+        "gmean2_clean": [
+          0.7231614929785661,
+          null
+        ],
+        "gmean2_cross": [
+          0.7265625,
+          null
+        ],
+        "tpr_majority": [
+          0.9512195121951219,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.7272727272727273,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.6917960088691796,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 164,
+          "valid": 164,
+          "detected": 155,
+          "decided": 41,
+          "decided_detected": 39
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 264,
+          "valid": 264,
+          "detected": 62,
+          "decided": 66,
+          "decided_detected": 18
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 160,
+          "valid": 160,
+          "detected": 37,
+          "decided": 40,
+          "decided_detected": 13
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 12,
+          "valid": 12,
+          "detected": 12,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      }
+    }
+  },
+  "paired_gmean2_difference_glide_minus_qwen": {
+    "metric": "gmean2_clean",
+    "told": "pooled",
+    "difference": 0.011040280857353979,
+    "low": -0.06454613095238093,
+    "high": 0.09016170058139539,
+    "p_value": 0.7606196901549226,
+    "defined": 2000,
+    "a": 0.7231614929785661,
+    "b": 0.7121212121212122
+  },
+  "qwen_action_phase_timing": [
+    {
+      "job_id": "30068483",
+      "start": "2026-10-20T02:01:05.242230+00:00",
+      "last_action_finished_at": "2026-10-20T02:13:56.155282+00:00",
+      "units": 328,
+      "seconds": 770.913052
+    },
+    {
+      "job_id": "30069109",
+      "start": "2026-10-20T05:41:34.290744+00:00",
+      "last_action_finished_at": "2026-10-20T05:53:09.467658+00:00",
+      "units": 272,
+      "seconds": 695.176914
+    }
+  ],
+  "qwen_action_phase_seconds": 1466.089966,
+  "qwen_all_three_scopes_seconds": 21032.404737,
+  "glide_job_seconds": 304,
+  "qwen_action_phase_over_glide_job_ratio": 4.822664361842105,
+  "timing_caveat": "Qwen actions duration is reconstructed from session start to last action completion in each of two sessions; GLiDE is full scheduler job duration. GPUs and inference procedures differ.",
+  "qwen_positive_and_clean_accuracy": 0.822429906542056,
+  "glide_positive_and_clean_accuracy": 0.8341121495327103
+}

@@ -1,0 +1,44 @@
+{
+  "audited_utc": "2026-11-15T21:34:29.626930+00:00",
+  "job_id": "33492538",
+  "artifact_checks_passed": true,
+  "summary": {
+    "cases": 150,
+    "complete": 150,
+    "failed": 0,
+    "sampled_judgments": 600,
+    "greedy_judgments": 150
+  },
+  "all_input_token_counts_match_preflight": true,
+  "source_manifest_sha256": "e9495b85a9d6f52ea00acb78d62313f5e9b02f6c630c07b6523311dead8c841f",
+  "hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "torch": "2.14.0+cu130",
+    "cuda": "13.0",
+    "job_id": "33492538"
+  },
+  "case_seconds": {
+    "total": 280.4961656900123,
+    "mean": 1.8699744379334151,
+    "median": 1.007207575486973,
+    "min": 0.18480325723066926,
+    "max": 13.673057795036584
+  },
+  "greedy_choices": {
+    "D": 19,
+    "A": 66,
+    "C": 55,
+    "B": 10
+  },
+  "sampled_choices": {
+    "A": 266,
+    "B": 83,
+    "D": 89,
+    "C": 162
+  },
+  "cases_with_nonidentical_draws": 82,
+  "limitations": [
+    "Actions-only; labels sampled from one GLiDE probability vector per case.",
+    "Qwen baseline elicitation and hierarchical processing differ; this is a system comparison."
+  ]
+}

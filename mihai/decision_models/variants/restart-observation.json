@@ -1,0 +1,26 @@
+{
+  "checked_utc": "2026-11-23T15:05:41.282185+00:00",
+  "scheduler": [
+    "34371575|COMPLETED|0:0|00:03:30|2026-11-23T10:02:27",
+    "34371576|RUNNING|0:0|00:00:47|Unknown",
+    "34371577|PENDING|0:0|00:00:00|Unknown",
+    "34371578|PENDING|0:0|00:00:00|Unknown",
+    "34371590|PENDING|0:0|00:00:00|Unknown",
+    "34371591|PENDING|0:0|00:00:00|Unknown",
+    "34372327|COMPLETED|0:0|00:00:13|2026-11-23T10:03:19"
+  ],
+  "progress": {
+    "action": {
+      "qwen_complete": 1,
+      "qwen_not_started_or_incomplete": 149
+    },
+    "cot": {
+      "qwen_complete": 1,
+      "qwen_not_started_or_incomplete": 149
+    },
+    "all": {
+      "qwen_complete": 1,
+      "qwen_not_started_or_incomplete": 149
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "status": "submitted",
+  "intent": "d3dc1e8f-6191-420f-b613-e5ff5f977635",
+  "created_utc": "2026-11-23T05:31:01.295802+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=decision-variants-20261123-prepare",
+    "--comment=decision-variants:d3dc1e8f-6191-420f-b613-e5ff5f977635",
+    "--partition=devel",
+    "--cpus-per-task=4",
+    "--mem=48G",
+    "--time=01:00:00",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/decision-variants-prepare-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b/run.sbatch",
+    "prepare",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b/config.json",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73"
+  ],
+  "source_manifest_sha256": "d98ee84c398bee9b90f66132b15a8c5fd53476d97534a0d5a1f9569cbde0a616",
+  "prior_receipts": {},
+  "queue_before": "",
+  "accounting_before": "",
+  "job_id": "34326291",
+  "submitted_utc": "2026-11-23T05:31:01.321094+00:00",
+  "stderr": ""
+}

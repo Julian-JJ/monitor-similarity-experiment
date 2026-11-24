@@ -1,0 +1,43 @@
+{
+  "model": "jev",
+  "slug": "chunks_mean",
+  "title": "Jev 1.14 \u2014 chunks, average P(A)",
+  "purpose": "Test whether judging smaller pieces helps detection, using the average signal across pieces.",
+  "method": "Use the baseline chunk planner (12,000-token budget, single-pass-if-fits shortcut). Classify each chunk with A\u2013D options and a partial-transcript notice. Take the unweighted mean raw P(A) and flag at \u2265 0.5.",
+  "notes": [
+    "All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined.",
+    "Maximum and average reuse the same calls; averaging is not weighted by chunk length.",
+    "This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case.",
+    "Chunking and the final decision rule both differ from full-input highest-answer inference.",
+    "Shared chunk job duration: 1:02:10 through the hosted API."
+  ],
+  "sources": {
+    "action": {
+      "records": "jev/results-completed-34426786/scores/action-mean-records.json",
+      "metrics": "jev/results-completed-34426786/scores/action-mean-metrics.json"
+    },
+    "cot": {
+      "records": "jev/results-completed-34426786/scores/cot-mean-records.json",
+      "metrics": "jev/results-completed-34426786/scores/cot-mean-metrics.json"
+    },
+    "all": {
+      "records": "jev/results-completed-34426786/scores/all-mean-records.json",
+      "metrics": "jev/results-completed-34426786/scores/all-mean-metrics.json"
+    }
+  },
+  "audits": [
+    "jev/results-completed-34426786/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/jev-variants-20261123/chunks/"
+  ],
+  "source_sha256": {
+    "jev/results-completed-34426786/audit.json": "600458df209ca115f9f525b8a646013748bec54044cda00b7b85bb36c3b96208",
+    "jev/results-completed-34426786/scores/action-mean-metrics.json": "ba5523943806510f8b4581de9748d73f62072a7223e0faabe8d157be4c2358a3",
+    "jev/results-completed-34426786/scores/action-mean-records.json": "d2d235acd5c3f9eb5ca8632ab9b5dafcf7bd6db2977cabb28fcb5cb3c8662ad7",
+    "jev/results-completed-34426786/scores/all-mean-metrics.json": "785bd94b1f787b4bb377ecd7496b885e9f76aae64ed0046e7c01f2b2e825a183",
+    "jev/results-completed-34426786/scores/all-mean-records.json": "bfaa32728a41115f86cd0ff66cc620c68e607430b8b7637e6ed4e7d91a4d1479",
+    "jev/results-completed-34426786/scores/cot-mean-metrics.json": "52879635d396d38cc7de15a956ace927c3312b866c73bcb50e5ffa1beb7f071f",
+    "jev/results-completed-34426786/scores/cot-mean-records.json": "e01c2d2df39dc3da0ad19aa5d46921fdaf0580d33c735599ece5318a4ddd249f"
+  }
+}

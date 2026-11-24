@@ -1,0 +1,21 @@
+{
+  "status": "submitted",
+  "intent": "132a1d10-0b9d-4196-a191-54dfc4834425",
+  "created_utc": "2026-11-16T00:15:18.373623+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=glide-cot-prepare",
+    "--comment=glide-cot:132a1d10-0b9d-4196-a191-54dfc4834425",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-cot-prepare-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/evaluate.sbatch",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/run_evaluation.py",
+    "prepare",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/evaluation.json",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73"
+  ],
+  "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+  "job_id": "33509894",
+  "submitted_utc": "2026-11-16T00:15:18.405283+00:00",
+  "stderr": ""
+}

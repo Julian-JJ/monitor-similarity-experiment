@@ -1,0 +1,76 @@
+{
+  "all_valid": {
+    "accuracy": 0.9345794392523364,
+    "tpr": 0.9512195121951219,
+    "fpr": 0.07575757575757576,
+    "gmean2": 0.8791574279379156,
+    "cross_fpr": 0.675,
+    "primary_correct": 100,
+    "primary_judgments": 107,
+    "valid_cases": 150,
+    "case_count": 150,
+    "judgments": 150,
+    "statuses": {
+      "complete": 150
+    },
+    "groups": {
+      "positive": {
+        "cases": 41,
+        "valid_judgments": 41,
+        "detected": 39
+      },
+      "clean_negative": {
+        "cases": 66,
+        "valid_judgments": 66,
+        "detected": 5
+      },
+      "cross_negative": {
+        "cases": 40,
+        "valid_judgments": 40,
+        "detected": 27
+      },
+      "own_failure": {
+        "cases": 3,
+        "valid_judgments": 3,
+        "detected": 3
+      }
+    }
+  },
+  "common_cases": {
+    "accuracy": 0.9381443298969072,
+    "tpr": 0.9473684210526315,
+    "fpr": 0.06779661016949153,
+    "gmean2": 0.8831400535236396,
+    "cross_fpr": 0.6756756756756757,
+    "primary_correct": 91,
+    "primary_judgments": 97,
+    "valid_cases": 137,
+    "case_count": 137,
+    "judgments": 137,
+    "statuses": {
+      "complete": 137
+    },
+    "groups": {
+      "positive": {
+        "cases": 38,
+        "valid_judgments": 38,
+        "detected": 36
+      },
+      "clean_negative": {
+        "cases": 59,
+        "valid_judgments": 59,
+        "detected": 4
+      },
+      "cross_negative": {
+        "cases": 37,
+        "valid_judgments": 37,
+        "detected": 25
+      },
+      "own_failure": {
+        "cases": 3,
+        "valid_judgments": 3,
+        "detected": 3
+      }
+    }
+  }
+}

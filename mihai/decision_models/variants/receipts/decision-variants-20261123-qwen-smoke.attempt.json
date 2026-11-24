@@ -1,0 +1,41 @@
+{
+  "status": "confirmed_rejected",
+  "intent": "24d81091-83f6-4713-ab0c-323a531f63fd",
+  "created_utc": "2026-11-23T05:36:06.120856+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=decision-variants-20261123-qwen-smoke",
+    "--comment=decision-variants:24d81091-83f6-4713-ab0c-323a531f63fd",
+    "--partition=gpu_h200",
+    "--gpus=h200:1",
+    "--cpus-per-task=8",
+    "--mem=96G",
+    "--account=cpsc4880",
+    "--nodes=1",
+    "--ntasks=1",
+    "--no-requeue",
+    "--time=02:00:00",
+    "--dependency=afterok:34326291",
+    "--kill-on-invalid-dep=yes",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/decision-variants-qwen-smoke-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b/run.sbatch",
+    "qwen",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b/config.json",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+    "smoke"
+  ],
+  "source_manifest_sha256": "d98ee84c398bee9b90f66132b15a8c5fd53476d97534a0d5a1f9569cbde0a616",
+  "prior_receipts": {
+    "decision-variants-20261123-prepare.submission.json": "34326291"
+  },
+  "queue_before": "34326291|decision-variants-20261123-prepare|RUNNING|decision-variants:d3dc1e8f-6191-420f-b613-e5ff5f977635\n",
+  "accounting_before": "34326291|decision-variants-20261123-prepare|RUNNING|\n",
+  "stdout": "",
+  "stderr": "sbatch: error: Jobs in the gpu_h200 partition may request at most 6 CPUs per GPU. This job requested 8 CPUs for 1 GPU(s); please request at most 6 CPUs or more GPUs.\nsbatch: error: Batch job submission failed: More processors requested than permitted\n",
+  "reconciliation": {
+    "queue": "34326291|decision-variants-20261123-prepare|RUNNING|decision-variants:d3dc1e8f-6191-420f-b613-e5ff5f977635\n",
+    "accounting": "34326291|decision-variants-20261123-prepare|RUNNING|\n",
+    "reason": "Slurm rejected resource limits before assigning a job ID. Corrected request uses a new UUID and name."
+  }
+}

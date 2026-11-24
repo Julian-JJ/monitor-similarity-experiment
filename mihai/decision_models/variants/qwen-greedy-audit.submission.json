@@ -1,0 +1,24 @@
+{
+  "status": "submitted",
+  "intent": "f1d16911-d86c-4b02-ae9d-ba6a4bcae1fe",
+  "script_sha256": "7538db36b7006ab16e09f8c80a2df1bebb7f718b0fbc6a77fa0b073c3ba78fc1",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=qwen-greedy-audit-7538db36b7006ab1",
+    "--comment=offline-audit:f1d16911-d86c-4b02-ae9d-ba6a4bcae1fe",
+    "--account=cpsc4880",
+    "--partition=devel",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=2",
+    "--mem=32G",
+    "--time=00:15:00",
+    "--no-requeue",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/qwen-greedy-audit-%j.log",
+    "--wrap=env PYTHONDONTWRITEBYTECODE=1 /nfs/roberts/project/cpsc4880/cpsc4880_mae73/envs/monitor-research/bin/python -B /nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/qwen-greedy-audit-7538db36b7006ab1.py"
+  ],
+  "created_utc": "2026-11-24T22:29:24.507517+00:00",
+  "job_id": "34584150",
+  "submitted_utc": "2026-11-24T22:29:24.546200+00:00"
+}

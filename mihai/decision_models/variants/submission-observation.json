@@ -1,0 +1,62 @@
+{
+  "checked_utc": "2026-11-23T05:40:28.388189+00:00",
+  "job_ids": [
+    "34326291",
+    "34327025",
+    "34327026",
+    "34327027",
+    "34327028",
+    "34327029",
+    "34327030"
+  ],
+  "queue": "34327030|decision-variants-20261123-score|PENDING|afterany:34327027(unfulfilled),afterany:34327028(unfulfilled),afterany:34327029(unfulfilled)|(Dependency)\n34327025|decision-variants-20261123-qwen-smoke-cpu6|PENDING|(null)|(Nodes required for job are DOWN, DRAINED or reserved for jobs in higher priority partitions)\n34327027|decision-variants-20261123-qwen-production|PENDING|afterok:34327025(unfulfilled)|(Dependency)\n34327029|decision-variants-20261123-glide-summaries|PENDING|afterok:34327026(unfulfilled),afterany:34327027(unfulfilled)|(Dependency)\n34327028|decision-variants-20261123-glide-production|PENDING|afterok:34327026(unfulfilled)|(Dependency)\n34327026|decision-variants-20261123-glide-smoke|PENDING|afterok:34327025(unfulfilled)|(Dependency)\n",
+  "accounting": "34326291|COMPLETED|0:0|00:06:36\n34327025|PENDING|0:0|00:00:00\n34327026|PENDING|0:0|00:00:00\n34327027|PENDING|0:0|00:00:00\n34327028|PENDING|0:0|00:00:00\n34327029|PENDING|0:0|00:00:00\n34327030|PENDING|0:0|00:00:00\n",
+  "preflight": {
+    "config_sha256": "2c9655f9badf0da6cb77d89fd94f770e680f4f25d163276501cd642c193d3c28",
+    "inputs_sha256": "b80956c60284f02ee85cd245b053f7533e71105bed163af3efef76b981285cdd",
+    "source_manifest_sha256": "d98ee84c398bee9b90f66132b15a8c5fd53476d97534a0d5a1f9569cbde0a616",
+    "reference_tokenizer_sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "qwen_model_manifest_sha256": "a3573ebbaec9ea255752c7d0830e89657d1ba6b07bf4d2c58d19c444a6b3fad3",
+    "glide_model_manifest_sha256": "69e4bdf6c9a8e9ef4530e7e38fd7b5388308840dfe0e6f9181674c911b96ebfb",
+    "collection_hashes": {
+      "original_clean": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+      "main_only_v1": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+    },
+    "reuse_hashes": {
+      "action": {
+        "inputs.json": "69240cc092509f5affe3f2ee749eb08a16c2454ba1cca0b4fff29d423fd51abf",
+        "ready.json": "231a087fa6f5f94f59e2ed54978ccedcca0029ba74111d3286a5e1b99c512838",
+        "greedy-records.json": "944c4558d158103c7eef32af575875ba7f9922a245c35b3a4bffb8e46a5776db",
+        "greedy-metrics.json": "f335c1f60a7525b8a1578eedc59c34ba9b92f69e8121fc3adeece84a938ffcf1"
+      },
+      "cot": {
+        "inputs.json": "ee844c697f6984916dca2f421bf8900f5865f90ffb31d5ec5346d8c717d94dc5",
+        "ready.json": "386f6a171e76e598487bc8f18fd5bec03e552e9c6cc1fc5da64c03d1cf301cfb",
+        "greedy-records.json": "879ca37ed1e61f68ad91180530fe67d566a7cf51ae7803f8a6c7dd1c80fb81f0",
+        "greedy-metrics.json": "a83c347a0a369554927bd90e4790cc3c257b01341c95905781b6e52331310834"
+      }
+    },
+    "rollouts": 75,
+    "cases": 450,
+    "per_scope": {
+      "action": {
+        "cases": 150,
+        "chunks": 184,
+        "max_full_tokens": 26275
+      },
+      "cot": {
+        "cases": 150,
+        "chunks": 1256,
+        "max_full_tokens": 216463
+      },
+      "all": {
+        "cases": 150,
+        "chunks": 1394,
+        "max_full_tokens": 229167
+      }
+    },
+    "chunks": 2834,
+    "max_full_tokens": 229167
+  },
+  "note": "No inference results yet; Qwen smoke test is pending H200 resources. Production jobs are success-gated."
+}

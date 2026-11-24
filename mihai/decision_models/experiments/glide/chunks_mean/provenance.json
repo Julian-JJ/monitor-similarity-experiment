@@ -1,0 +1,43 @@
+{
+  "model": "glide",
+  "slug": "chunks_mean",
+  "title": "GLiDE-9B \u2014 chunks, average P(A)",
+  "purpose": "Test whether judging smaller pieces helps detection, using the average signal across pieces.",
+  "method": "Use the baseline chunk planner (12,000-token budget, single-pass-if-fits shortcut). Classify each chunk with A\u2013D options and a partial-transcript notice. Take the unweighted mean raw P(A) and flag at \u2265 0.5.",
+  "notes": [
+    "All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined.",
+    "Maximum and average reuse the same calls; averaging is not weighted by chunk length.",
+    "This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case.",
+    "Chunking and the final decision rule both differ from full-input highest-answer inference.",
+    "Shared chunk job duration: 2:02:25, also including the new full Combined evaluation."
+  ],
+  "sources": {
+    "action": {
+      "records": "variants/results-completed-34428767/scores/action-mean-records.json",
+      "metrics": "variants/results-completed-34428767/scores/action-mean-metrics.json"
+    },
+    "cot": {
+      "records": "variants/results-completed-34428767/scores/cot-mean-records.json",
+      "metrics": "variants/results-completed-34428767/scores/cot-mean-metrics.json"
+    },
+    "all": {
+      "records": "variants/results-completed-34428767/scores/all-mean-records.json",
+      "metrics": "variants/results-completed-34428767/scores/all-mean-metrics.json"
+    }
+  },
+  "audits": [
+    "variants/results-completed-34428767/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/decision-variants-20261123/glide-chunks/"
+  ],
+  "source_sha256": {
+    "variants/results-completed-34428767/audit.json": "59041a0fcb3211482537b8836f52c717642de15aa1290411190819b25b66dc0e",
+    "variants/results-completed-34428767/scores/action-mean-metrics.json": "dd38b1e46544c83031c6ee43dcf44a0980c4bb923f5124a08c9b5197749792e1",
+    "variants/results-completed-34428767/scores/action-mean-records.json": "a78ea6ce89c3e8a8150ec8a4d280ec3db3e113ed0a9d5acb1da94c463640febd",
+    "variants/results-completed-34428767/scores/all-mean-metrics.json": "fdab0a5dbc199f4528da97207c57964bc9ae66581db9bdf942e0677b28664b4c",
+    "variants/results-completed-34428767/scores/all-mean-records.json": "6df089dc814980ec0da3c5d13b6df15dc4738fc2feffe336ba8df0da9ced929e",
+    "variants/results-completed-34428767/scores/cot-mean-metrics.json": "fdab0a5dbc199f4528da97207c57964bc9ae66581db9bdf942e0677b28664b4c",
+    "variants/results-completed-34428767/scores/cot-mean-records.json": "6df089dc814980ec0da3c5d13b6df15dc4738fc2feffe336ba8df0da9ced929e"
+  }
+}

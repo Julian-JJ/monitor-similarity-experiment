@@ -1,0 +1,579 @@
+{
+  "run_name": "glide-cot-20261115-c8f6c4e8",
+  "prepared_utc": "2026-11-16T00:14:34.736950+00:00",
+  "status": "completed_verified",
+  "local_source": "/private/tmp/glide-cot-20261115-c8f6c4e8",
+  "archive": "/private/tmp/glide-cot-20261115-c8f6c4e8.tar.gz",
+  "archive_sha256": "77c857ef2d86065b790c9b0f3d23d95bcf7eddbfd439f362474a357766de81b2",
+  "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+  "remote_source": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8",
+  "config": {
+    "run_name": "glide-cot-20261115-c8f6c4e8",
+    "framework_commit": "6043ff7a875bf6d2d792cec7df603c5cd019c647",
+    "model": "fastino/GLiDE-9B",
+    "model_revision": "ab54df5acba0eebf7df45560ffdaacd64e32df3b",
+    "model_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/models/glide-9b-ab54df5a",
+    "scope": "cot",
+    "truncate_chars": 2000,
+    "turn_labels": true,
+    "hierarchy": false,
+    "max_context": 216471,
+    "temperature": 0.6,
+    "top_p": 0.9,
+    "samples": 4,
+    "seed": 0,
+    "output_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/glide-cot-20261115-c8f6c4e8",
+    "collections": {
+      "original_clean": {
+        "root": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/rollouts_original_clean",
+        "count": 41,
+        "sha256": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f"
+      },
+      "main_only_v1": {
+        "root": "/nfs/roberts/project/cpsc4880/cpsc4880_as4833/rollouts_main_only_clean",
+        "count": 34,
+        "sha256": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+      }
+    },
+    "expected_lengths_path": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/glide-cot-length-20261115-21f6974f/lengths.json",
+    "expected_lengths_sha256": "2d97ba2277e3e231fbe0c6d0a50eb0cab175cef6e4b262f075a19c7d4e580cba"
+  },
+  "changes_from_actions": [
+    "CoT renderer and exact length-pilot prompt; full input, no hierarchy.",
+    "Input token counts checked against pilot inventory during preparation and against model usage for every call.",
+    "GPU synchronization for timing and peak memory recording; unchanged four-answer sampling and scoring."
+  ],
+  "preflight_job_id": "33509894",
+  "gpu_job_id": "33512196",
+  "preflight_submission": {
+    "status": "submitted",
+    "intent": "132a1d10-0b9d-4196-a191-54dfc4834425",
+    "created_utc": "2026-11-16T00:15:18.373623+00:00",
+    "command": [
+      "sbatch",
+      "--parsable",
+      "--job-name=glide-cot-prepare",
+      "--comment=glide-cot:132a1d10-0b9d-4196-a191-54dfc4834425",
+      "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-cot-prepare-%j.log",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/evaluate.sbatch",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/run_evaluation.py",
+      "prepare",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/evaluation.json",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73"
+    ],
+    "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+    "job_id": "33509894",
+    "submitted_utc": "2026-11-16T00:15:18.405283+00:00",
+    "stderr": ""
+  },
+  "gpu_submission": {
+    "status": "submitted",
+    "intent": "91e24da2-b7af-46b2-9e9d-9636dc396b75",
+    "created_utc": "2026-11-16T00:16:17.967644+00:00",
+    "command": [
+      "sbatch",
+      "--parsable",
+      "--job-name=glide-cot",
+      "--partition=gpu_devel,gpu_rtx6000",
+      "--constraint=gpu:rtx_pro_6000_blackwell",
+      "--gpus=1",
+      "--mem=96G",
+      "--time=02:00:00",
+      "--dependency=afterok:33509894",
+      "--comment=glide-cot:91e24da2-b7af-46b2-9e9d-9636dc396b75",
+      "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-cot-%j.log",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/evaluate.sbatch",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/run_evaluation.py",
+      "run",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/evaluation.json",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73"
+    ],
+    "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+    "preflight_job_id": "33509894",
+    "job_id": "33509938",
+    "submitted_utc": "2026-11-16T00:16:17.993103+00:00",
+    "stderr": ""
+  },
+  "last_observation_utc": "2026-11-16T03:42:37.780702+00:00",
+  "preflight": {
+    "config_sha256": "46dcc1e02439ce6a971031ba5c8658ac616bca11b844c23bb9d88609000014e3",
+    "rollouts": 75,
+    "cases": 150,
+    "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+    "min_prompt_tokens": 22007,
+    "max_prompt_tokens": 216463,
+    "over_limit": 0,
+    "collection_hashes": {
+      "original_clean": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+      "main_only_v1": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+    },
+    "inputs_sha256": "ee844c697f6984916dca2f421bf8900f5865f90ffb31d5ec5346d8c717d94dc5"
+  },
+  "submission_check": {
+    "checked_utc": "2026-11-16T00:18:20.322079+00:00",
+    "full_input_checks_passed": true,
+    "cases": 150,
+    "longest_request_matches_pilot": true,
+    "accounting": "33509894|COMPLETED|0:0|00:00:44\n33509938|RUNNING|0:0|00:01:08\n",
+    "queue": "33509938|RUNNING|a1112u01n01|glide-cot:91e24da2-b7af-46b2-9e9d-9636dc396b75\n",
+    "resources": {
+      "JobId": "33509938",
+      "Account": "cpsc4880",
+      "JobState": "RUNNING",
+      "Dependency": "(null)",
+      "Requeue": "0",
+      "TimeLimit": "02:00:00",
+      "Partition": "gpu_devel",
+      "NumCPUs": "4",
+      "ReqTRES": "cpu=4,mem=96G,node=1,billing=15,gres/gpu=1",
+      "Features": "gpu:rtx_pro_6000_blackwell"
+    },
+    "completed_cases_so_far": 1
+  },
+  "hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "torch": "2.14.0+cu130",
+    "cuda": "13.0",
+    "job_id": "33512196"
+  },
+  "scheduler": {
+    "job_id": "33512196",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:39:00",
+    "end_cluster_local": "2026-11-15T21:01:06",
+    "timezone": "America/New_York"
+  },
+  "partial_audit": {
+    "checked_utc": "2026-11-16T01:07:44.378322+00:00",
+    "job_id": "33509938",
+    "scheduler": {
+      "state": "FAILED",
+      "exit_code": "1:0",
+      "elapsed": "00:27:13",
+      "time_limit": "02:00:00"
+    },
+    "saved_artifact_checks_passed": true,
+    "expected_cases": 150,
+    "verified_complete": 108,
+    "recorded_case_errors": 0,
+    "missing_results": 42,
+    "rollouts_with_both_objectives_complete": 53,
+    "rollouts_with_one_objective_complete": 2,
+    "rollouts_without_results": 20,
+    "missing_cases": [
+      {
+        "case": 6,
+        "item_id": "american_airlines_2/benign/sample_04",
+        "told": "malicious",
+        "prompt_tokens": 112253
+      },
+      {
+        "case": 7,
+        "item_id": "american_airlines_2/benign/sample_04",
+        "told": "benign",
+        "prompt_tokens": 112343
+      },
+      {
+        "case": 34,
+        "item_id": "american_airlines_2/malicious/sample_00",
+        "told": "malicious",
+        "prompt_tokens": 140916
+      },
+      {
+        "case": 35,
+        "item_id": "american_airlines_2/malicious/sample_00",
+        "told": "benign",
+        "prompt_tokens": 141006
+      },
+      {
+        "case": 36,
+        "item_id": "american_airlines_2/malicious/sample_02",
+        "told": "malicious",
+        "prompt_tokens": 216373
+      },
+      {
+        "case": 38,
+        "item_id": "american_airlines_2/malicious/sample_03",
+        "told": "malicious",
+        "prompt_tokens": 136396
+      },
+      {
+        "case": 39,
+        "item_id": "american_airlines_2/malicious/sample_03",
+        "told": "benign",
+        "prompt_tokens": 136486
+      },
+      {
+        "case": 40,
+        "item_id": "american_airlines_2/malicious/sample_04",
+        "told": "malicious",
+        "prompt_tokens": 131820
+      },
+      {
+        "case": 41,
+        "item_id": "american_airlines_2/malicious/sample_04",
+        "told": "benign",
+        "prompt_tokens": 131910
+      },
+      {
+        "case": 42,
+        "item_id": "american_airlines_2/malicious/sample_05",
+        "told": "malicious",
+        "prompt_tokens": 142390
+      },
+      {
+        "case": 43,
+        "item_id": "american_airlines_2/malicious/sample_05",
+        "told": "benign",
+        "prompt_tokens": 142480
+      },
+      {
+        "case": 44,
+        "item_id": "american_airlines_2/malicious/sample_06",
+        "told": "malicious",
+        "prompt_tokens": 126602
+      },
+      {
+        "case": 45,
+        "item_id": "american_airlines_2/malicious/sample_06",
+        "told": "benign",
+        "prompt_tokens": 126692
+      },
+      {
+        "case": 54,
+        "item_id": "bank_transfer_2/benign/sample_04",
+        "told": "malicious",
+        "prompt_tokens": 145690
+      },
+      {
+        "case": 55,
+        "item_id": "bank_transfer_2/benign/sample_04",
+        "told": "benign",
+        "prompt_tokens": 145679
+      },
+      {
+        "case": 64,
+        "item_id": "bank_transfer_2/main_only/sample_01",
+        "told": "malicious",
+        "prompt_tokens": 162859
+      },
+      {
+        "case": 65,
+        "item_id": "bank_transfer_2/main_only/sample_01",
+        "told": "benign",
+        "prompt_tokens": 162848
+      },
+      {
+        "case": 68,
+        "item_id": "bank_transfer_2/main_only/sample_03",
+        "told": "malicious",
+        "prompt_tokens": 105817
+      },
+      {
+        "case": 69,
+        "item_id": "bank_transfer_2/main_only/sample_03",
+        "told": "benign",
+        "prompt_tokens": 105806
+      },
+      {
+        "case": 70,
+        "item_id": "bank_transfer_2/main_only/sample_04",
+        "told": "malicious",
+        "prompt_tokens": 149647
+      },
+      {
+        "case": 71,
+        "item_id": "bank_transfer_2/main_only/sample_04",
+        "told": "benign",
+        "prompt_tokens": 149636
+      },
+      {
+        "case": 72,
+        "item_id": "bank_transfer_2/main_only/sample_05",
+        "told": "malicious",
+        "prompt_tokens": 133081
+      },
+      {
+        "case": 73,
+        "item_id": "bank_transfer_2/main_only/sample_05",
+        "told": "benign",
+        "prompt_tokens": 133070
+      },
+      {
+        "case": 74,
+        "item_id": "bank_transfer_2/main_only/sample_06",
+        "told": "malicious",
+        "prompt_tokens": 134458
+      },
+      {
+        "case": 75,
+        "item_id": "bank_transfer_2/main_only/sample_06",
+        "told": "benign",
+        "prompt_tokens": 134447
+      },
+      {
+        "case": 76,
+        "item_id": "bank_transfer_2/main_only/sample_07",
+        "told": "malicious",
+        "prompt_tokens": 156000
+      },
+      {
+        "case": 77,
+        "item_id": "bank_transfer_2/main_only/sample_07",
+        "told": "benign",
+        "prompt_tokens": 155989
+      },
+      {
+        "case": 78,
+        "item_id": "bank_transfer_2/main_only/sample_08",
+        "told": "malicious",
+        "prompt_tokens": 143467
+      },
+      {
+        "case": 79,
+        "item_id": "bank_transfer_2/main_only/sample_08",
+        "told": "benign",
+        "prompt_tokens": 143456
+      },
+      {
+        "case": 82,
+        "item_id": "bank_transfer_2/main_only/sample_10",
+        "told": "malicious",
+        "prompt_tokens": 105932
+      },
+      {
+        "case": 83,
+        "item_id": "bank_transfer_2/main_only/sample_10",
+        "told": "benign",
+        "prompt_tokens": 105921
+      },
+      {
+        "case": 84,
+        "item_id": "bank_transfer_2/main_only/sample_11",
+        "told": "malicious",
+        "prompt_tokens": 136182
+      },
+      {
+        "case": 85,
+        "item_id": "bank_transfer_2/main_only/sample_11",
+        "told": "benign",
+        "prompt_tokens": 136171
+      },
+      {
+        "case": 86,
+        "item_id": "bank_transfer_2/malicious/sample_01",
+        "told": "malicious",
+        "prompt_tokens": 212830
+      },
+      {
+        "case": 87,
+        "item_id": "bank_transfer_2/malicious/sample_01",
+        "told": "benign",
+        "prompt_tokens": 212819
+      },
+      {
+        "case": 88,
+        "item_id": "bank_transfer_2/malicious/sample_02",
+        "told": "malicious",
+        "prompt_tokens": 105133
+      },
+      {
+        "case": 90,
+        "item_id": "bank_transfer_2/malicious/sample_03",
+        "told": "malicious",
+        "prompt_tokens": 157782
+      },
+      {
+        "case": 91,
+        "item_id": "bank_transfer_2/malicious/sample_03",
+        "told": "benign",
+        "prompt_tokens": 157771
+      },
+      {
+        "case": 92,
+        "item_id": "bank_transfer_2/malicious/sample_05",
+        "told": "malicious",
+        "prompt_tokens": 127648
+      },
+      {
+        "case": 93,
+        "item_id": "bank_transfer_2/malicious/sample_05",
+        "told": "benign",
+        "prompt_tokens": 127637
+      },
+      {
+        "case": 96,
+        "item_id": "bank_transfer_2/malicious/sample_07",
+        "told": "malicious",
+        "prompt_tokens": 172910
+      },
+      {
+        "case": 97,
+        "item_id": "bank_transfer_2/malicious/sample_07",
+        "told": "benign",
+        "prompt_tokens": 172899
+      }
+    ],
+    "largest_completed_prompt": 216463,
+    "peak_allocated_GiB": 50.5292592048645,
+    "peak_reserved_GiB": 64.8203125,
+    "diagnosis": "Unexplained process exit 1. Log ends after a successful saved case, without a traceback or reported CUDA error. Scheduler does not report timeout or OOM. Full 216463-token prompt already completed. No final scoring outputs exist.",
+    "next_case_without_saved_result": {
+      "case": 88,
+      "item_id": "bank_transfer_2/malicious/sample_02",
+      "told": "malicious",
+      "prompt_tokens": 105133
+    },
+    "retry_submitted": false
+  },
+  "initial_gpu_job_id": "33509938",
+  "restart_submission": {
+    "status": "submitted",
+    "intent": "94f63b6c-25ab-45c9-a05f-0af64f29cbfe",
+    "created_utc": "2026-11-16T01:22:05.817686+00:00",
+    "command": [
+      "sbatch",
+      "--parsable",
+      "--job-name=glide-cot-resume",
+      "--comment=glide-cot-resume:94f63b6c-25ab-45c9-a05f-0af64f29cbfe",
+      "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-cot-resume-%j.log",
+      "--error=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-cot-resume-%j.err",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-resume-506bda596e25d7d7.sbatch",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+      "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8"
+    ],
+    "predecessor_job_id": "33509938",
+    "preserved_cases": 108,
+    "remaining_cases": 42,
+    "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+    "config_sha256": "46dcc1e02439ce6a971031ba5c8658ac616bca11b844c23bb9d88609000014e3",
+    "launcher_sha256": "506bda596e25d7d76752c063f41541753349766c6d3aa1f93fb395e3422bc30c",
+    "preflight_sha256": "80cc3747528d543d3d60ce4dfb69bef3c17b1afca82f10c4677f8184d2694970",
+    "job_id": "33512196",
+    "submitted_utc": "2026-11-16T01:22:05.833523+00:00",
+    "stderr": ""
+  },
+  "predecessor_scheduler": {
+    "state": "FAILED",
+    "exit_code": "1:0",
+    "elapsed": "00:27:13",
+    "time_limit": "02:00:00"
+  },
+  "restart_details": {
+    "unchanged_source_and_configuration": true,
+    "preserved_results": 108,
+    "remaining_cases_at_submission": 42,
+    "estimated_remaining_inference_minutes": 36.0,
+    "preserved_case_manifest": "restart-1-preflight.json",
+    "diagnostics": "Separate stderr, Python fatal-error stacks, C++ exception stacks, and a shell exit-status file."
+  },
+  "restart_observation": {
+    "checked_utc": "2026-11-16T01:24:08.572406+00:00",
+    "job_id": "33512196",
+    "accounting": "33512196|RUNNING|0:0|00:02:02\n",
+    "preserved_results_unchanged": true,
+    "new_complete": 3,
+    "new_failed": 0,
+    "new_cases": [
+      {
+        "case_file": "068.json",
+        "item_id": "bank_transfer_2/main_only/sample_03",
+        "told": "malicious",
+        "status": "complete",
+        "seconds": 28.532178820110857,
+        "error_type": null
+      },
+      {
+        "case_file": "069.json",
+        "item_id": "bank_transfer_2/main_only/sample_03",
+        "told": "benign",
+        "status": "complete",
+        "seconds": 28.518942988011986,
+        "error_type": null
+      },
+      {
+        "case_file": "088.json",
+        "item_id": "bank_transfer_2/malicious/sample_02",
+        "told": "malicious",
+        "status": "complete",
+        "seconds": 29.147010505199432,
+        "error_type": null
+      }
+    ],
+    "hardware": {
+      "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "torch": "2.14.0+cu130",
+      "cuda": "13.0",
+      "job_id": "33512196"
+    }
+  },
+  "initial_hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "torch": "2.14.0+cu130",
+    "cuda": "13.0",
+    "job_id": "33509938"
+  },
+  "progress": {
+    "complete": 150,
+    "failed": 0,
+    "remaining": 0
+  },
+  "final_audit": {
+    "audited_utc": "2026-11-16T03:42:37.780702+00:00",
+    "job_id": "33512196",
+    "artifact_checks_passed": true,
+    "scheduler_accounting": "33509938|FAILED|1:0|00:27:13|2026-11-15T19:17:12|2026-11-15T19:44:25\n33512196|COMPLETED|0:0|00:39:00|2026-11-15T20:22:06|2026-11-15T21:01:06\n",
+    "restart_exit_status": "job=33512196 exit_code=0 ended_utc=2026-11-16T02:01:05Z",
+    "original_results_preserved": 108,
+    "new_results_from_restart": 42,
+    "allocation_warning_count": 6,
+    "memory": {
+      "max_allocated_GiB": 50.5292592048645,
+      "max_reserved_GiB": 93.1171875
+    },
+    "summary_sha256": "fd37b38864aa3065564f7eab5a6bcc5b6091199351c5363b582d3dd96ae8d7af",
+    "sampled_metrics_sha256": "f0c33ae221600522c104f9b26558a75d48846f8c13e05b874a756ae2ce7326f9",
+    "greedy_metrics_sha256": "a83c347a0a369554927bd90e4790cc3c257b01341c95905781b6e52331310834",
+    "summary": {
+      "cases": 150,
+      "complete": 150,
+      "failed": 0,
+      "sampled_judgments": 600,
+      "greedy_judgments": 150
+    },
+    "all_input_token_counts_match_preflight": true,
+    "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+    "hardware": {
+      "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "torch": "2.14.0+cu130",
+      "cuda": "13.0",
+      "job_id": "33512196"
+    },
+    "case_seconds": {
+      "total": 3901.516188375186,
+      "mean": 26.01010792250124,
+      "median": 18.769687578314915,
+      "min": 2.7016943390481174,
+      "max": 114.57773828785866
+    },
+    "greedy_choices": {
+      "B": 28,
+      "A": 46,
+      "C": 75,
+      "D": 1
+    },
+    "sampled_choices": {
+      "B": 159,
+      "C": 260,
+      "A": 149,
+      "D": 32
+    },
+    "cases_with_nonidentical_draws": 103,
+    "limitations": [
+      "Full CoT without hierarchy; four labels sampled from one GLiDE probability vector per case.",
+      "Qwen baseline elicitation and hierarchical processing differ; this is a system comparison.",
+      "Initial process exit remains unexplained; restart completed despite logged allocation warnings."
+    ]
+  }
+}

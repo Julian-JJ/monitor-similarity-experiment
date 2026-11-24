@@ -1,0 +1,9 @@
+{
+  "reason": "Qwen client stopped before inference: research environment lacks tokenizers",
+  "change": "Run Qwen evaluation client in the existing monitor-glide-ab54df5a environment; precheck tokenizer import before server start",
+  "launcher_sha256": "9d68d6231103ec247ae99193a6990df22dd568cab11f750f475e1dc3e873ea3a",
+  "remote_launcher": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-launcher-9d68d6231103ec24/run.sbatch",
+  "unchanged_source_package": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b",
+  "inference_and_input_changes": false,
+  "failed_job": "34327025"
+}

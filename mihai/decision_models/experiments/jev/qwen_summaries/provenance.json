@@ -1,0 +1,42 @@
+{
+  "model": "jev",
+  "slug": "qwen_summaries",
+  "title": "Qwen3-32B summaries \u2192 Jev 1.14",
+  "purpose": "Test whether a decision model benefits from reading compact evidence summaries instead of the raw transcript.",
+  "method": "Qwen greedily summarizes each shared chunk without an A\u2013D verdict, targeting at most 350 words. Concatenate every summary in order and ask Jev 1.14 for one highest-probability A\u2013D answer.",
+  "notes": [
+    "429/450 final cases completed: 150 Actions, 141 CoT and 138 Combined. The other 21 were blocked by missing valid Qwen summaries.",
+    "There were no downstream decision-model inference failures. Missing summaries are never silently dropped.",
+    "This is a two-model system; its cost includes Qwen summary generation.",
+    "Downstream job duration: 8:59 for Jev. Qwen took 6:46:08 for greedy monitoring plus summary generation together."
+  ],
+  "sources": {
+    "action": {
+      "records": "summary-results-20261124/jev/scores/action-summaries-records.json",
+      "metrics": "summary-results-20261124/jev/scores/action-summaries-metrics.json"
+    },
+    "cot": {
+      "records": "summary-results-20261124/jev/scores/cot-summaries-records.json",
+      "metrics": "summary-results-20261124/jev/scores/cot-summaries-metrics.json"
+    },
+    "all": {
+      "records": "summary-results-20261124/jev/scores/all-summaries-records.json",
+      "metrics": "summary-results-20261124/jev/scores/all-summaries-metrics.json"
+    }
+  },
+  "audits": [
+    "summary-results-20261124/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/jev-variants-20261123/summaries/"
+  ],
+  "source_sha256": {
+    "summary-results-20261124/audit.json": "2164e455d0d39e1158b1c2728c5f50e778ea67265fc23d01efea6bd22081c3fe",
+    "summary-results-20261124/jev/scores/action-summaries-metrics.json": "4fe435266eebaa7ce56b3ea50ae1ecff2a3adcfb72e76f65126fabcf0ccf80b8",
+    "summary-results-20261124/jev/scores/action-summaries-records.json": "06351dbf15142d0b345ab211e99d1bee0b1b50ff1e981c844ade8157328d6036",
+    "summary-results-20261124/jev/scores/all-summaries-metrics.json": "a59b23ce4561e93f279c22825c8177b38bb717287a73ab03225f25126967cee2",
+    "summary-results-20261124/jev/scores/all-summaries-records.json": "b01def2197800a853d28dba055bf9f32667f624c5d49f3d02e77c8097f69bdc2",
+    "summary-results-20261124/jev/scores/cot-summaries-metrics.json": "ff8d0b5cdc94cae5fcca81be9f863c7a640e69392ade71e293e77eea2239aa85",
+    "summary-results-20261124/jev/scores/cot-summaries-records.json": "34392dece360d5d1af916b548bd62884f170c1fb341bca1aed9bc5e686cd84d5"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "objective_cases": 150,
+  "estimated_inference_seconds": 3507.754816991791,
+  "method": "Piecewise linear interpolation of measured warm runtime by each exact prompt token count.",
+  "limitations": "Estimate for this GPU and single-request method; excludes load, compilation, scoring, and other overhead. Not an actual full-CoT evaluation."
+}

@@ -1,0 +1,37 @@
+{
+  "status": "submitted",
+  "intent": "749fb9dc-70e2-4cea-b0b3-9d24e109e834",
+  "created_utc": "2026-11-23T05:37:10.565932+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=decision-variants-20261123-qwen-smoke-cpu6",
+    "--comment=decision-variants:749fb9dc-70e2-4cea-b0b3-9d24e109e834",
+    "--partition=gpu_h200",
+    "--gpus=h200:1",
+    "--cpus-per-task=6",
+    "--mem=96G",
+    "--account=cpsc4880",
+    "--nodes=1",
+    "--ntasks=1",
+    "--no-requeue",
+    "--time=02:00:00",
+    "--dependency=afterok:34326291",
+    "--kill-on-invalid-dep=yes",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/decision-variants-qwen-smoke-cpu6-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b/run.sbatch",
+    "qwen",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/decision-variants-d98ee84c398bee9b/config.json",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73",
+    "smoke"
+  ],
+  "source_manifest_sha256": "d98ee84c398bee9b90f66132b15a8c5fd53476d97534a0d5a1f9569cbde0a616",
+  "prior_receipts": {
+    "decision-variants-20261123-prepare.submission.json": "34326291"
+  },
+  "queue_before": "34326291|decision-variants-20261123-prepare|RUNNING|decision-variants:d3dc1e8f-6191-420f-b613-e5ff5f977635\n",
+  "accounting_before": "34326291|decision-variants-20261123-prepare|RUNNING|\n",
+  "job_id": "34327025",
+  "submitted_utc": "2026-11-23T05:37:10.581537+00:00",
+  "stderr": ""
+}

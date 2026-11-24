@@ -1,0 +1,60 @@
+[
+  {
+    "stage": "qwen-smoke",
+    "gpu": "H200",
+    "depends_on": [
+      "prepare"
+    ],
+    "time_limit": "02:00:00"
+  },
+  {
+    "stage": "glide-smoke",
+    "gpu": "RTX PRO 6000 Blackwell",
+    "depends_on": [
+      "qwen-smoke"
+    ],
+    "time_limit": "02:00:00",
+    "steps": [
+      "glide-chunks --smoke",
+      "glide-full --smoke",
+      "glide-summaries --smoke"
+    ]
+  },
+  {
+    "stage": "qwen-production",
+    "gpu": "H200",
+    "depends_on": [
+      "qwen-smoke"
+    ],
+    "time_limit": "12:00:00"
+  },
+  {
+    "stage": "glide-production",
+    "gpu": "RTX PRO 6000 Blackwell",
+    "depends_on": [
+      "glide-smoke"
+    ],
+    "time_limit": "06:00:00",
+    "steps": [
+      "glide-chunks",
+      "glide-full"
+    ]
+  },
+  {
+    "stage": "glide-summaries-production",
+    "gpu": "RTX PRO 6000 Blackwell",
+    "depends_on": [
+      "glide-smoke",
+      "qwen-production terminal"
+    ],
+    "time_limit": "03:00:00"
+  },
+  {
+    "stage": "score",
+    "gpu": null,
+    "depends_on": [
+      "all production jobs terminal"
+    ],
+    "time_limit": "01:00:00"
+  }
+]

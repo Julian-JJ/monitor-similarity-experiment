@@ -1,0 +1,566 @@
+{
+  "checked_utc": "2026-11-23T19:39:16.758938+00:00",
+  "audit_passed": true,
+  "source_manifest_sha256": "4090274c5245883d97f411c3a33c0fb9f4ae75f58fb0a7a16c065314530c67ff",
+  "inputs_sha256": "b80956c60284f02ee85cd245b053f7533e71105bed163af3efef76b981285cdd",
+  "audit_script_sha256": "73c9fe0a733ac318e624b2d2c64fc7ee2cad2185342f3f5bf0c42fa93447fead",
+  "scheduler": "34391865|COMPLETED|0:0|00:13:13\n34391866|COMPLETED|0:0|01:02:10",
+  "full_requests_verified": 450,
+  "chunk_requests_verified": 2834,
+  "collection_hashes": {
+    "original_clean": "eea2a5a8eacde8aa4799d24fde2d04724726fb194eecd8dba9c84c03c56f901f",
+    "main_only_v1": "b615148cbfd7b14949f688ae416a2657f1b35412a27f39cf9343a998ed79ac44"
+  },
+  "timing": {
+    "full-action": {
+      "requests": 150,
+      "total_api_seconds": 28.685014764778316,
+      "mean_api_seconds": 0.19123343176518878,
+      "usage": {
+        "input_tokens": 1735701,
+        "output_tokens": 6900
+      }
+    },
+    "chunks-action": {
+      "requests": 184,
+      "total_api_seconds": 34.819955482147634,
+      "mean_api_seconds": 0.18923888848993278,
+      "usage": {
+        "input_tokens": 1786280,
+        "output_tokens": 8464
+      }
+    },
+    "full-cot": {
+      "requests": 150,
+      "total_api_seconds": 144.56909212376922,
+      "mean_api_seconds": 0.9637939474917948,
+      "usage": {
+        "input_tokens": 12470467,
+        "output_tokens": 6900
+      }
+    },
+    "chunks-cot": {
+      "requests": 1256,
+      "total_api_seconds": 271.9382357215509,
+      "mean_api_seconds": 0.2165113341732093,
+      "usage": {
+        "input_tokens": 13838014,
+        "output_tokens": 57776
+      }
+    },
+    "full-all": {
+      "requests": 150,
+      "total_api_seconds": 162.67402305826545,
+      "mean_api_seconds": 1.084493487055103,
+      "usage": {
+        "input_tokens": 13905727,
+        "output_tokens": 6900
+      }
+    },
+    "chunks-all": {
+      "requests": 1394,
+      "total_api_seconds": 300.01687231101096,
+      "mean_api_seconds": 0.2152201379562489,
+      "usage": {
+        "input_tokens": 15440239,
+        "output_tokens": 64124
+      }
+    }
+  },
+  "summary_condition": "Excluded: production is still queued behind Qwen.",
+  "results": {
+    "action-full-greedy": {
+      "tpr": 1.0,
+      "fpr_clean": 0.4242424242424242,
+      "gmean2_clean": 0.5757575757575758,
+      "primary_accuracy": 0.7383177570093458,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 41,
+          "decided": 41,
+          "decided_detected": 41
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 28,
+          "decided": 66,
+          "decided_detected": 28
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 18,
+          "decided": 40,
+          "decided_detected": 18
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "action-full-sampled": {
+      "tpr": 1.0,
+      "fpr_clean": 0.38636363636363635,
+      "gmean2_clean": 0.6136363636363636,
+      "primary_accuracy": 0.7616822429906542,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 164,
+          "valid": 164,
+          "detected": 164,
+          "decided": 41,
+          "decided_detected": 41
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 264,
+          "valid": 264,
+          "detected": 102,
+          "decided": 66,
+          "decided_detected": 29
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 160,
+          "valid": 160,
+          "detected": 67,
+          "decided": 40,
+          "decided_detected": 18
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 12,
+          "valid": 12,
+          "detected": 12,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "action-max": {
+      "tpr": 1.0,
+      "fpr_clean": 0.3484848484848485,
+      "gmean2_clean": 0.6515151515151515,
+      "primary_accuracy": 0.7850467289719626,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 41,
+          "decided": 41,
+          "decided_detected": 41
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 23,
+          "decided": 66,
+          "decided_detected": 23
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 14,
+          "decided": 40,
+          "decided_detected": 14
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "action-mean": {
+      "tpr": 1.0,
+      "fpr_clean": 0.3484848484848485,
+      "gmean2_clean": 0.6515151515151515,
+      "primary_accuracy": 0.7850467289719626,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 41,
+          "decided": 41,
+          "decided_detected": 41
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 23,
+          "decided": 66,
+          "decided_detected": 23
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 14,
+          "decided": 40,
+          "decided_detected": 14
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "all-full-greedy": {
+      "tpr": 0.9512195121951219,
+      "fpr_clean": 0.0757575757575758,
+      "gmean2_clean": 0.8791574279379156,
+      "primary_accuracy": 0.9345794392523364,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 39,
+          "decided": 41,
+          "decided_detected": 39
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 5,
+          "decided": 66,
+          "decided_detected": 5
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 27,
+          "decided": 40,
+          "decided_detected": 27
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "all-full-sampled": {
+      "tpr": 0.9329268292682927,
+      "fpr_clean": 0.1515151515151515,
+      "gmean2_clean": 0.7915742793791575,
+      "primary_accuracy": 0.8808411214953271,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 164,
+          "valid": 164,
+          "detected": 153,
+          "decided": 41,
+          "decided_detected": 40
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 264,
+          "valid": 264,
+          "detected": 40,
+          "decided": 66,
+          "decided_detected": 11
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 160,
+          "valid": 160,
+          "detected": 101,
+          "decided": 40,
+          "decided_detected": 28
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 12,
+          "valid": 12,
+          "detected": 12,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "all-max": {
+      "tpr": 0.9512195121951219,
+      "fpr_clean": 0.030303030303030276,
+      "gmean2_clean": 0.9223946784922394,
+      "primary_accuracy": 0.9626168224299065,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 39,
+          "decided": 41,
+          "decided_detected": 39
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 2,
+          "decided": 66,
+          "decided_detected": 2
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 25,
+          "decided": 40,
+          "decided_detected": 25
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "all-mean": {
+      "tpr": 0.9512195121951219,
+      "fpr_clean": 0.0,
+      "gmean2_clean": 0.9512195121951219,
+      "primary_accuracy": 0.9813084112149533,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 39,
+          "decided": 41,
+          "decided_detected": 39
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 0,
+          "decided": 66,
+          "decided_detected": 0
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 6,
+          "decided": 40,
+          "decided_detected": 6
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "cot-full-greedy": {
+      "tpr": 0.9512195121951219,
+      "fpr_clean": 0.13636363636363635,
+      "gmean2_clean": 0.8215077605321508,
+      "primary_accuracy": 0.897196261682243,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 39,
+          "decided": 41,
+          "decided_detected": 39
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 9,
+          "decided": 66,
+          "decided_detected": 9
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 32,
+          "decided": 40,
+          "decided_detected": 32
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "cot-full-sampled": {
+      "tpr": 0.9634146341463414,
+      "fpr_clean": 0.18181818181818177,
+      "gmean2_clean": 0.7882483370288249,
+      "primary_accuracy": 0.8738317757009346,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 164,
+          "valid": 164,
+          "detected": 158,
+          "decided": 41,
+          "decided_detected": 40
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 264,
+          "valid": 264,
+          "detected": 48,
+          "decided": 66,
+          "decided_detected": 13
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 160,
+          "valid": 160,
+          "detected": 116,
+          "decided": 40,
+          "decided_detected": 32
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 12,
+          "valid": 12,
+          "detected": 12,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "cot-max": {
+      "tpr": 0.9512195121951219,
+      "fpr_clean": 0.06060606060606055,
+      "gmean2_clean": 0.893569844789357,
+      "primary_accuracy": 0.9439252336448598,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 39,
+          "decided": 41,
+          "decided_detected": 39
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 4,
+          "decided": 66,
+          "decided_detected": 4
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 32,
+          "decided": 40,
+          "decided_detected": 32
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    },
+    "cot-mean": {
+      "tpr": 0.9512195121951219,
+      "fpr_clean": 0.0,
+      "gmean2_clean": 0.9512195121951219,
+      "primary_accuracy": 0.9813084112149533,
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 39,
+          "decided": 41,
+          "decided_detected": 39
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 0,
+          "decided": 66,
+          "decided_detected": 0
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 18,
+          "decided": 40,
+          "decided_detected": 18
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      },
+      "coverage": 1.0
+    }
+  },
+  "output_dir": "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/mihai/decision_models/runs/jev-variants-20261123/audits/completed-34426786"
+}

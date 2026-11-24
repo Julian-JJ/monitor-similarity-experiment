@@ -1,0 +1,12 @@
+{
+  "sources": [
+    "demo_output.json",
+    "demo_glide.py",
+    "installation.json"
+  ],
+  "source_sha256": {
+    "demo_output.json": "1284fd45d85caa31b828358ce4a050ca45425671b10f2c17b271339efd87f02c",
+    "demo_glide.py": "dd0e10c1de3bbbf5846b12d7f8566c7e3551f9ef75e29808be08dc0222559598",
+    "installation.json": "e190c8b49ce79a0c49ba17266e1b1fa3e61831726b37de61ae64a6b06bdb751e"
+  }
+}

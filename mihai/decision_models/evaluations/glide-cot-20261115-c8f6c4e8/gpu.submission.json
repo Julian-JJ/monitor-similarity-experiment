@@ -1,0 +1,28 @@
+{
+  "status": "submitted",
+  "intent": "91e24da2-b7af-46b2-9e9d-9636dc396b75",
+  "created_utc": "2026-11-16T00:16:17.967644+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--job-name=glide-cot",
+    "--partition=gpu_devel,gpu_rtx6000",
+    "--constraint=gpu:rtx_pro_6000_blackwell",
+    "--gpus=1",
+    "--mem=96G",
+    "--time=02:00:00",
+    "--dependency=afterok:33509894",
+    "--comment=glide-cot:91e24da2-b7af-46b2-9e9d-9636dc396b75",
+    "--output=/nfs/roberts/project/cpsc4880/cpsc4880_mae73/logs/glide-cot-%j.log",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/evaluate.sbatch",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/run_evaluation.py",
+    "run",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73/releases/glide-cot-20261115-c8f6c4e8/mihai/decision_models/evaluation.json",
+    "/nfs/roberts/project/cpsc4880/cpsc4880_mae73"
+  ],
+  "source_manifest_sha256": "ba1f5cda9f4fc507f54b4c399ed873a5fbddd6a43b0db041d83fc5a9ca508fc9",
+  "preflight_job_id": "33509894",
+  "job_id": "33509938",
+  "submitted_utc": "2026-11-16T00:16:17.993103+00:00",
+  "stderr": ""
+}
