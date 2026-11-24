@@ -8,9 +8,30 @@ monitor_nvcc_version() {
     printf '%s\n' "${BASH_REMATCH[1]}"
 }
 
+# Without a toolkit that matches the serving environment's Torch, vLLM cannot
+# compile FlashInfer kernels at runtime. Bouchet's newest toolkit is CUDA/12.9.1,
+# so a cu130 environment can never find one. Serving continues with vLLM's
+# PyTorch-native top-p/top-k sampler, which is what the Qwen3 environment already
+# uses because FlashInfer is not installed there.
+monitor_cuda_without_jit() {
+    export VLLM_USE_FLASHINFER_SAMPLER=0
+    export CUDA_HOME='' CUDA_PATH='' CUDACXX=''
+    MONITOR_CUDA_JIT=no
+    MONITOR_CUDA_MODULE='none (FlashInfer JIT disabled)'
+    MONITOR_NVCC_VERSION=''
+    MONITOR_NINJA_PATH=''
+    MONITOR_NINJA_VERSION=''
+    printf 'No CUDA %s toolkit available; disabled FlashInfer JIT (VLLM_USE_FLASHINFER_SAMPLER=0), so vLLM samples with PyTorch-native kernels. Install or point CUDA_HOME at a CUDA %s toolkit to keep FlashInfer kernels.\n' \
+        "$MONITOR_TORCH_CUDA" "$MONITOR_TORCH_CUDA" >&2
+}
+
 configure_monitor_cuda() {
     local nvcc= current= module_name= module_init resolved_nvcc serving_bin
     local module_initializers=(/etc/profile.d/lmod.sh /etc/profile.d/modules.sh)
+    MONITOR_CUDA_JIT=yes
+    MONITOR_NVCC_VERSION=''
+    MONITOR_NINJA_PATH=''
+    MONITOR_NINJA_VERSION=''
     serving_bin=$(dirname -- "$(command -v -- "$SERVING_PY")") || return 1
     # Using an absolute venv Python does not activate its command-line tools.
     export PATH="$serving_bin:$PATH"
@@ -41,6 +62,10 @@ configure_monitor_cuda() {
         fi
         module_name="${CUDA_MODULE:-CUDA/$MONITOR_TORCH_CUDA}"
         if ! command -v module >/dev/null || ! module load "$module_name"; then
+            if [[ -z "${CUDA_MODULE:-}" ]]; then
+                monitor_cuda_without_jit
+                return 0
+            fi
             echo "Cannot load $module_name for torch CUDA $MONITOR_TORCH_CUDA. Run 'module spider CUDA' on Bouchet; set CUDA_MODULE to a matching module or CUDA_HOME to its toolkit directory." >&2
             return 1
         fi
@@ -50,6 +75,10 @@ configure_monitor_cuda() {
         [[ -z "$nvcc" ]] || current=$(monitor_nvcc_version "$nvcc" || true)
     fi
     if [[ -z "$nvcc" || "$current" != "$MONITOR_TORCH_CUDA" ]]; then
+        if [[ -z "${CUDA_MODULE:-}" ]]; then
+            monitor_cuda_without_jit
+            return 0
+        fi
         echo "Need nvcc $MONITOR_TORCH_CUDA for the serving environment; found ${current:-no usable nvcc} at ${nvcc:-no path}. Check 'module spider CUDA' and CUDA_MODULE." >&2
         return 1
     fi

@@ -14,9 +14,9 @@ archives/
 *.log
 *.safetensors
 *.gguf
-/rollouts_original_clean/
+/rollouts_original_clean
 /test_rollouts_2/
-/rollouts_main_only_clean/
+/rollouts_main_only_clean
 /runs/
 /presence/
 .sync-commit.json

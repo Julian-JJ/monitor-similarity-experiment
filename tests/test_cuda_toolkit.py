@@ -112,19 +112,46 @@ class CudaToolkitTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(Path(env["TEST_MODULE_LOG"]).read_text(), "load CUDA/12.9.1\n")
 
-    def test_unavailable_module_fails_with_cluster_instructions(self):
+    def run_helper_with_sampling(self, env):
+        command = COMMAND + 'printf "%s\\n" "${VLLM_USE_FLASHINFER_SAMPLER:-unset}" "$MONITOR_CUDA_JIT" "$MONITOR_CUDA_MODULE"\n'
+        return subprocess.run(["bash", "-c", command, "bash", str(HELPER)], env=env, text=True, capture_output=True)
+
+    def test_unavailable_module_falls_back_to_native_sampling(self):
         with TempDir() as directory:
             env = {**self.environment(directory), "TEST_LOAD_FAIL": "1"}
-            result = self.run_helper(env)
-            self.assertNotEqual(result.returncode, 0)
-            self.assertIn("Cannot load CUDA/12.9", result.stderr)
-            self.assertIn("module spider CUDA", result.stderr)
-            self.assertEqual(result.stdout, "")
+            tools = directory / "tools"
+            tools.mkdir()
+            for command in ("bash", "dirname", "readlink"):
+                (tools / command).symlink_to(shutil.which(command))
+            env["PATH"] = str(tools)   # Nothing else can provide nvcc.
+            result = self.run_helper_with_sampling(env)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("disabled FlashInfer JIT", result.stderr)
+            self.assertEqual(result.stdout.splitlines()[-3:], ["0", "no", "none (FlashInfer JIT disabled)"])
 
-    def test_wrong_compiler_after_module_load_is_rejected(self):
+    def test_wrong_compiler_without_a_requested_module_falls_back(self):
         with TempDir() as directory:
             env = self.environment(directory)
             env["TEST_CUDA_ROOT"] = str(directory / "old cuda")
+            result = self.run_helper_with_sampling(env)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.splitlines()[-3:], ["0", "no", "none (FlashInfer JIT disabled)"])
+
+    def test_unavailable_requested_module_fails_with_cluster_instructions(self):
+        with TempDir() as directory:
+            env = {**self.environment(directory), "TEST_LOAD_FAIL": "1",
+                   "CUDA_MODULE": "CUDA/13.0", "TEST_EXPECT_MODULE": "CUDA/13.0"}
+            result = self.run_helper(env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Cannot load CUDA/13.0", result.stderr)
+            self.assertIn("module spider CUDA", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_requested_module_with_wrong_compiler_still_fails(self):
+        with TempDir() as directory:
+            env = self.environment(directory)
+            env["TEST_CUDA_ROOT"] = str(directory / "old cuda")
+            env["CUDA_MODULE"] = env["TEST_EXPECT_MODULE"] = "CUDA/12.9"
             result = self.run_helper(env)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("Need nvcc 12.9", result.stderr)

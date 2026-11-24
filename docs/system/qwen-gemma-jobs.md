@@ -203,6 +203,17 @@ not satisfy a build requiring CUDA 13.0. The diagnostic below prints the
 configured serving Python's actual `torch.version.cuda`; toolkit selection is
 based on that value, regardless of the installation recipe's index URLs.
 
+Bouchet has no CUDA 13 toolkit (`module spider CUDA` lists 12.0.0, 12.1.1, 12.6.0,
+12.8.0 and 12.9.1 as its newest), so the installed Gemma environment
+(`torch 2.14.0+cu130`) can never find a matching compiler. Rather than stop, the
+job now serves without JIT-compiled FlashInfer kernels: it exports
+`VLLM_USE_FLASHINFER_SAMPLER=0`, which makes vLLM use its PyTorch-native top-p and
+top-k sampler, and records `cuda_module=none (FlashInfer JIT disabled)` with an
+empty `cuda_home` in the serving manifest. That is the same sampler the Qwen3
+environment already uses, where FlashInfer is not installed at all, so the
+monitors are compared with matching sampling implementations. The distribution
+being sampled is unchanged; only the kernel that draws it differs.
+
 After pulling this change, retry just the four Gemmas concurrently:
 
 ```bash
@@ -210,12 +221,15 @@ bash junlin/run.sh gemma --parallel
 ```
 
 No package reinstall or result deletion is needed for this discovery fix. A
-matching toolkit must exist on the cluster. If module loading fails, the job
-stops before loading weights and recommends `module spider CUDA` to inspect the
-available versions. `CUDA_MODULE` can select a particular module; it is restored
-from `.env.cluster` when saved with `bash junlin/setup.sh`. Matching toolkits in
-custom locations can instead be supplied through `CUDA_HOME`. This addresses
-the missing compiler error; GPU inference still needs to succeed on the cluster.
+toolkit is not required any more, so no package reinstall or result deletion is
+needed. A toolkit is still used whenever one matches, and asking for one
+explicitly keeps the strict behaviour: with `CUDA_MODULE` set, a module that
+cannot be loaded or a compiler of the wrong version still stops the job before
+weights are loaded, naming `module spider CUDA` as the check to run. Set
+`CUDA_MODULE` (restored from `.env.cluster` when saved with `bash junlin/setup.sh`)
+or `CUDA_HOME` to a CUDA 13 toolkit of your own to keep FlashInfer kernels.
+`junlin/smoke_gemma.sbatch` checks one Gemma end to end on one H200 in about ten
+minutes; it writes to `$ME/runs/smoke/` and is not a baseline result.
 
 If the original `/usr/local/cuda` traceback recurs and the job has no
 `torch_cuda=` line, inspect the newest submission with:
