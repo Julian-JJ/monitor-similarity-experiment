@@ -325,57 +325,71 @@ The 68 completed requests passed the pilot audit (job 34391510, 1:52). The longe
 
 ## All results on the same cases
 
-For the table below, each input view uses the **intersection of cases with valid answers for every included method**, including greedy Qwen and both summary methods. This prevents different missing-case sets from deciding the highlighted winner. The smaller subsets can still favor easier cases; consult the full-coverage tables above.
+For the three tables below, each input view uses the **intersection of cases with valid answers for every included method**, including greedy Qwen and both summary methods. This prevents different missing-case sets from deciding the highlighted winner. The smaller subsets can still favor easier cases; consult the full-coverage tables above.
 
-- **Actions:** 148 total cases; 41 positives + 64 clean = 105 primary cases; 40 cross-objective negatives and 3 assigned-objective failures.
-- **CoT:** 135 total cases; 37 positives + 63 clean = 100 primary cases; 32 cross-objective negatives and 3 assigned-objective failures.
-- **Combined:** 137 total cases; 38 positives + 59 clean = 97 primary cases; 37 cross-objective negatives and 3 assigned-objective failures.
+Sampled rows contribute four judgments per included case; other rows contribute one. 🟩 marks the best observed value in each column within that input view, including ties, based on unrounded values. Higher is better for accuracy, TPR and G-mean²; lower is better for clean FPR and cross FPR. It is not a significance claim. The supporting demos, length pilot and summary-generation counts are excluded from the accuracy ranking.
 
-Sampled rows contribute four judgments per included case; other rows contribute one. **Bold marks the best observed value within each input view, including ties**, based on unrounded values. Higher is better for accuracy, TPR and G-mean²; lower is better for clean FPR and cross FPR. It is not a significance claim. The supporting demos, length pilot and summary-generation counts are excluded from the accuracy ranking.
+### Actions
 
-| Input | Experiment | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |
-|---|---|---:|---:|---:|---:|---:|
-| Actions | [Qwen3-14B — sampled baseline](experiments/qwen/qwen14b_sampled/README.md) | 86.7% | 97.0% | 19.9% | 0.776 | 29.4% |
-| Actions | [Qwen3-32B — sampled baseline](experiments/qwen/qwen32b_sampled/README.md) | 82.9% | **100.0%** | 28.1% | 0.719 | 33.8% |
-| Actions | [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 83.8% | 97.6% | 25.0% | 0.732 | 32.5% |
-| Actions | [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 84.8% | 95.1% | 21.9% | 0.743 | 20.0% |
-| Actions | [GLiDE-9B — full context, sampled answers](experiments/glide/full_context_sampled/README.md) | 84.8% | 94.5% | 21.5% | 0.742 | 23.1% |
-| Actions | [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | **90.5%** | 92.7% | **10.9%** | **0.825** | **12.5%** |
-| Actions | [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | **90.5%** | 92.7% | **10.9%** | **0.825** | **12.5%** |
-| Actions | [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | **90.5%** | 92.7% | **10.9%** | **0.825** | **12.5%** |
-| Actions | [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 89.5% | 90.2% | **10.9%** | 0.804 | **12.5%** |
-| Actions | [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 75.2% | **100.0%** | 40.6% | 0.594 | 45.0% |
-| Actions | [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 77.1% | **100.0%** | 37.5% | 0.625 | 41.9% |
-| Actions | [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 79.0% | **100.0%** | 34.4% | 0.656 | 35.0% |
-| Actions | [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 79.0% | **100.0%** | 34.4% | 0.656 | 35.0% |
-| Actions | [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | 79.0% | **100.0%** | 34.4% | 0.656 | 35.0% |
-| Actions | [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 84.8% | 95.1% | 21.9% | 0.743 | 22.5% |
-| CoT | [Qwen3-14B — sampled baseline](experiments/qwen/qwen14b_sampled/README.md) | 88.5% | 96.6% | 16.3% | 0.809 | 19.5% |
-| CoT | [Qwen3-32B — sampled baseline](experiments/qwen/qwen32b_sampled/README.md) | 86.0% | 97.3% | 20.6% | 0.772 | 22.7% |
-| CoT | [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 88.0% | 97.3% | 17.5% | 0.803 | 21.9% |
-| CoT | [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 92.0% | 78.4% | **0.0%** | 0.784 | 34.4% |
-| CoT | [GLiDE-9B — full context, sampled answers](experiments/glide/full_context_sampled/README.md) | 85.5% | 64.2% | 2.0% | 0.629 | 21.9% |
-| CoT | [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | 84.0% | 56.8% | **0.0%** | 0.568 | 3.1% |
-| CoT | [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | **98.0%** | 94.6% | **0.0%** | **0.946** | 18.8% |
-| CoT | [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | **98.0%** | 94.6% | **0.0%** | **0.946** | **0.0%** |
-| CoT | [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 86.0% | 94.6% | 19.0% | 0.766 | 3.1% |
-| CoT | [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 89.0% | 94.6% | 14.3% | 0.811 | 84.4% |
-| CoT | [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 86.8% | 95.9% | 18.7% | 0.781 | 75.8% |
-| CoT | [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 96.0% | 94.6% | 3.2% | 0.916 | 56.3% |
-| CoT | [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 94.0% | 94.6% | 6.3% | 0.886 | 84.4% |
-| CoT | [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | **98.0%** | 94.6% | **0.0%** | **0.946** | 40.6% |
-| CoT | [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 72.0% | **100.0%** | 44.4% | 0.556 | 43.8% |
-| Combined | [Qwen3-14B — sampled baseline](experiments/qwen/qwen14b_sampled/README.md) | 86.9% | 97.4% | 19.9% | 0.780 | 31.1% |
-| Combined | [Qwen3-32B — sampled baseline](experiments/qwen/qwen32b_sampled/README.md) | 83.5% | 94.1% | 23.3% | 0.722 | 18.9% |
-| Combined | [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 85.6% | 94.7% | 20.3% | 0.755 | 13.5% |
-| Combined | [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 90.7% | 86.8% | 6.8% | 0.810 | 54.1% |
-| Combined | [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | 88.7% | 71.1% | **0.0%** | 0.711 | 21.6% |
-| Combined | [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | 95.9% | 92.1% | 1.7% | 0.905 | 24.3% |
-| Combined | [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | 96.9% | 92.1% | **0.0%** | 0.921 | **0.0%** |
-| Combined | [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 92.8% | 97.4% | 10.2% | 0.875 | 10.8% |
-| Combined | [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 93.8% | 94.7% | 6.8% | 0.883 | 67.6% |
-| Combined | [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 88.1% | 92.8% | 14.8% | 0.790 | 64.9% |
-| Combined | [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 94.8% | 94.7% | 5.1% | 0.899 | 56.8% |
-| Combined | [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 95.9% | 94.7% | 3.4% | 0.915 | 67.6% |
-| Combined | [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | **97.9%** | 94.7% | **0.0%** | **0.947** | 16.2% |
-| Combined | [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 78.4% | **100.0%** | 35.6% | 0.644 | 32.4% |
+148 total cases: 41 positives + 64 clean = 105 primary cases; 40 cross-objective negatives and 3 assigned-objective failures.
+
+| Experiment | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |
+|---|---:|---:|---:|---:|---:|
+| [Qwen3-14B — sampled baseline](experiments/qwen/qwen14b_sampled/README.md) | 86.7% | 97.0% | 19.9% | 0.776 | 29.4% |
+| [Qwen3-32B — sampled baseline](experiments/qwen/qwen32b_sampled/README.md) | 82.9% | 🟩 100.0% | 28.1% | 0.719 | 33.8% |
+| [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 83.8% | 97.6% | 25.0% | 0.732 | 32.5% |
+| [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 84.8% | 95.1% | 21.9% | 0.743 | 20.0% |
+| [GLiDE-9B — full context, sampled answers](experiments/glide/full_context_sampled/README.md) | 84.8% | 94.5% | 21.5% | 0.742 | 23.1% |
+| [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | 🟩 90.5% | 92.7% | 🟩 10.9% | 🟩 0.825 | 🟩 12.5% |
+| [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | 🟩 90.5% | 92.7% | 🟩 10.9% | 🟩 0.825 | 🟩 12.5% |
+| [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | 🟩 90.5% | 92.7% | 🟩 10.9% | 🟩 0.825 | 🟩 12.5% |
+| [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 89.5% | 90.2% | 🟩 10.9% | 0.804 | 🟩 12.5% |
+| [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 75.2% | 🟩 100.0% | 40.6% | 0.594 | 45.0% |
+| [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 77.1% | 🟩 100.0% | 37.5% | 0.625 | 41.9% |
+| [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 79.0% | 🟩 100.0% | 34.4% | 0.656 | 35.0% |
+| [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 79.0% | 🟩 100.0% | 34.4% | 0.656 | 35.0% |
+| [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | 79.0% | 🟩 100.0% | 34.4% | 0.656 | 35.0% |
+| [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 84.8% | 95.1% | 21.9% | 0.743 | 22.5% |
+
+### CoT
+
+135 total cases: 37 positives + 63 clean = 100 primary cases; 32 cross-objective negatives and 3 assigned-objective failures.
+
+| Experiment | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |
+|---|---:|---:|---:|---:|---:|
+| [Qwen3-14B — sampled baseline](experiments/qwen/qwen14b_sampled/README.md) | 88.5% | 96.6% | 16.3% | 0.809 | 19.5% |
+| [Qwen3-32B — sampled baseline](experiments/qwen/qwen32b_sampled/README.md) | 86.0% | 97.3% | 20.6% | 0.772 | 22.7% |
+| [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 88.0% | 97.3% | 17.5% | 0.803 | 21.9% |
+| [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 92.0% | 78.4% | 🟩 0.0% | 0.784 | 34.4% |
+| [GLiDE-9B — full context, sampled answers](experiments/glide/full_context_sampled/README.md) | 85.5% | 64.2% | 2.0% | 0.629 | 21.9% |
+| [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | 84.0% | 56.8% | 🟩 0.0% | 0.568 | 3.1% |
+| [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | 🟩 98.0% | 94.6% | 🟩 0.0% | 🟩 0.946 | 18.8% |
+| [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | 🟩 98.0% | 94.6% | 🟩 0.0% | 🟩 0.946 | 🟩 0.0% |
+| [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 86.0% | 94.6% | 19.0% | 0.766 | 3.1% |
+| [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 89.0% | 94.6% | 14.3% | 0.811 | 84.4% |
+| [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 86.8% | 95.9% | 18.7% | 0.781 | 75.8% |
+| [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 96.0% | 94.6% | 3.2% | 0.916 | 56.3% |
+| [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 94.0% | 94.6% | 6.3% | 0.886 | 84.4% |
+| [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | 🟩 98.0% | 94.6% | 🟩 0.0% | 🟩 0.946 | 40.6% |
+| [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 72.0% | 🟩 100.0% | 44.4% | 0.556 | 43.8% |
+
+### Combined
+
+137 total cases: 38 positives + 59 clean = 97 primary cases; 37 cross-objective negatives and 3 assigned-objective failures.
+
+| Experiment | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |
+|---|---:|---:|---:|---:|---:|
+| [Qwen3-14B — sampled baseline](experiments/qwen/qwen14b_sampled/README.md) | 86.9% | 97.4% | 19.9% | 0.780 | 31.1% |
+| [Qwen3-32B — sampled baseline](experiments/qwen/qwen32b_sampled/README.md) | 83.5% | 94.1% | 23.3% | 0.722 | 18.9% |
+| [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 85.6% | 94.7% | 20.3% | 0.755 | 13.5% |
+| [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 90.7% | 86.8% | 6.8% | 0.810 | 54.1% |
+| [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | 88.7% | 71.1% | 🟩 0.0% | 0.711 | 21.6% |
+| [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | 95.9% | 92.1% | 1.7% | 0.905 | 24.3% |
+| [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | 96.9% | 92.1% | 🟩 0.0% | 0.921 | 🟩 0.0% |
+| [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 92.8% | 97.4% | 10.2% | 0.875 | 10.8% |
+| [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 93.8% | 94.7% | 6.8% | 0.883 | 67.6% |
+| [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 88.1% | 92.8% | 14.8% | 0.790 | 64.9% |
+| [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 94.8% | 94.7% | 5.1% | 0.899 | 56.8% |
+| [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 95.9% | 94.7% | 3.4% | 0.915 | 67.6% |
+| [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | 🟩 97.9% | 94.7% | 🟩 0.0% | 🟩 0.947 | 16.2% |
+| [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 78.4% | 🟩 100.0% | 35.6% | 0.644 | 32.4% |

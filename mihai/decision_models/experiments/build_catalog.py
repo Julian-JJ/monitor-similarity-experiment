@@ -414,18 +414,19 @@ readme += ['## Code, records and limitations', '',
     '- These are system comparisons: prompts/interfaces, hierarchy, retries, sampling and hardware can differ. A change in scores cannot be attributed solely to model architecture or greedy decoding. Runtime measurements use different hardware and execution arrangements.',
     '- Only three environments are represented. Grader labels primarily measure achievement whereas the prompt asks about pursuit. Results do not establish generalization or statistically significant winners.', '',
     '## All results on the same cases', '',
-    'For the table below, each input view uses the **intersection of cases with valid answers for every included method**, including greedy Qwen and both summary methods. '
+    'For the three tables below, each input view uses the **intersection of cases with valid answers for every included method**, including greedy Qwen and both summary methods. '
     'This prevents different missing-case sets from deciding the highlighted winner. The smaller subsets can still favor easier cases; consult the full-coverage tables above.', '']
+readme += ['Sampled rows contribute four judgments per included case; other rows contribute one. '
+    '🟩 marks the best observed value in each column within that input view, including ties, based on unrounded values. '
+    'Higher is better for accuracy, TPR and G-mean²; lower is better for clean FPR and cross FPR. '
+    'It is not a significance claim. The supporting demos, length pilot and summary-generation counts are excluded from the accuracy ranking.', '']
 for scope in SCOPES:
     meta = catalog['common_cases'][scope]
     roles = meta['roles']
-    readme.append(f"- **{SCOPES[scope]}:** {meta['cases']} total cases; {roles['positive']} positives + {roles['clean_negative']} clean = {roles['positive']+roles['clean_negative']} primary cases; {roles['cross_negative']} cross-objective negatives and {roles['own_failure']} assigned-objective failures.")
-readme += ['', 'Sampled rows contribute four judgments per included case; other rows contribute one. **Bold marks the best observed value within each input view, including ties**, based on unrounded values. '
-    'Higher is better for accuracy, TPR and G-mean²; lower is better for clean FPR and cross FPR. '
-    'It is not a significance claim. The supporting demos, length pilot and summary-generation counts are excluded from the accuracy ranking.', '',
-    '| Input | Experiment | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |',
-    '|---|---|---:|---:|---:|---:|---:|']
-for scope in SCOPES:
+    readme += ['### ' + SCOPES[scope], '',
+        f"{meta['cases']} total cases: {roles['positive']} positives + {roles['clean_negative']} clean = {roles['positive']+roles['clean_negative']} primary cases; {roles['cross_negative']} cross-objective negatives and {roles['own_failure']} assigned-objective failures.", '',
+        '| Experiment | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |',
+        '|---|---:|---:|---:|---:|---:|']
     selected = [exp for exp in experiments if scope in exp['views']]
     best = {k: (min if k in ['fpr','cross_fpr'] else max)(e['views'][scope]['common_cases'][k] for e in selected)
             for k in ['accuracy','tpr','fpr','gmean2','cross_fpr']}
@@ -435,11 +436,12 @@ for scope in SCOPES:
         for key in best:
             value = format_metric(r[key], key)
             if math.isclose(r[key], best[key], abs_tol=1e-12):
-                value = '**' + value + '**'
+                value = '🟩 ' + value
             cells.append(value)
         title = link(HERE/exp['model']/exp['slug']/'README.md',exp['title'],ROOT)
-        readme.append(f"| {SCOPES[scope]} | {title} | " + ' | '.join(cells) + ' |')
-(ROOT/'README.md').write_text('\n'.join(readme) + '\n')
+        readme.append(f"| {title} | " + ' | '.join(cells) + ' |')
+    readme.append('')
+(ROOT/'README.md').write_text('\n'.join(readme).rstrip() + '\n')
 print(json.dumps({'scored_experiments':len(experiments),'supporting_experiments':len(support),
     'method_view_rows':sum(len(e['views']) for e in experiments),
     'common_cases':{s:{k:v for k,v in m.items() if k!='keys'} for s,m in catalog['common_cases'].items()}}))
