@@ -10,6 +10,23 @@ The Qwen3-32B greedy run has also been audited: 440/450 valid judgments.
 Raw transcripts and reasoning remain on the cluster; the linked local reports
 contain metrics and provenance.
 
+## Full-context decision threshold: P(A) ≥ 0.5, November 24
+
+Reused and verified all 900 saved Jev/GLiDE full-context responses; no new inference or API calls. The only change is the decision rule: raw P(A) ≥ 0.5 instead of four-way argmax. Original results remain separate.
+
+| Model | Input | Accuracy | TPR | Clean FPR | G-mean² | Cross FPR | Changed from argmax |
+|---|---|---:|---:|---:|---:|---:|---:|
+| GLiDE-9B | Actions | 90.7% | 92.7% | 10.6% | 0.829 | 12.5% | 13/150 |
+| GLiDE-9B | CoT | 82.2% | 53.7% | 0.0% | 0.537 | 2.5% | 21/150 |
+| GLiDE-9B | Combined | 89.7% | 73.2% | 0.0% | 0.732 | 20.0% | 22/150 |
+| Jev 1.14 | Actions | 78.5% | 100.0% | 34.8% | 0.652 | 35.0% | 9/150 |
+| Jev 1.14 | CoT | 96.3% | 95.1% | 3.0% | 0.922 | 57.5% | 16/150 |
+| Jev 1.14 | Combined | 95.3% | 95.1% | 4.5% | 0.908 | 52.5% | 8/150 |
+
+Each row has 150 valid cases. Accuracy/G-mean² use 41 positives and 66 clean negatives; cross-objective FPR uses 40 separate cases. Changed decisions count all 150 cases. Jev retains all its previous true detections and reduces clean false alarms. GLiDE Actions improves, but its CoT and Combined threshold loses true detections. Thus the threshold mismatch materially affected the earlier comparison.
+
+[Full report and comparison with chunks at the same threshold](decision_models/full_context_threshold/README.md). The all-experiment catalog includes both scoring rules, with common-case comparisons separately from these full-coverage results.
+
 ## Qwen3-32B greedy: verified results, November 24
 
 The greedy baseline uses temperature **0**, top-p **1**, thinking enabled,

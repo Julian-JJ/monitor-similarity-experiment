@@ -1,0 +1,46 @@
+{
+  "model": "glide",
+  "slug": "full_context_threshold",
+  "title": "GLiDE-9B \u2014 full context, P(A) \u2265 0.5",
+  "purpose": "Compare full-input detection with chunk aggregation using the same binary probability threshold.",
+  "method": "Reuse the exact full-context responses from the highest-answer experiment. Flag only when the original raw P(A) is at least 0.5, including equality. Apply no sampling, temperature rescaling or top-p filtering. This compares A with the combined probability of B, C and D.",
+  "notes": [
+    "All 450 full-context responses were verified against their saved requests and original argmax records. No new model or API calls.",
+    "Prompts, input rendering, model versions and labels are identical to the full-context highest-answer experiment.",
+    "Changed A alarms to negative decisions: 13 Actions, 21 CoT and 22 Combined, across all 150 cases per view.",
+    "The original argmax results remain a separate experiment. Threshold results are point estimates; no new confidence intervals were computed.",
+    "Full-context and chunk methods now share the 0.5 decision threshold; chunking still changes the input and includes a partial-transcript notice.",
+    "This is offline rescoring, so original inference runtime is unchanged."
+  ],
+  "sources": {
+    "action": {
+      "records": "full_context_threshold/scores/glide-action-records.json",
+      "metrics": "full_context_threshold/scores/glide-action-metrics.json"
+    },
+    "cot": {
+      "records": "full_context_threshold/scores/glide-cot-records.json",
+      "metrics": "full_context_threshold/scores/glide-cot-metrics.json"
+    },
+    "all": {
+      "records": "full_context_threshold/scores/glide-all-records.json",
+      "metrics": "full_context_threshold/scores/glide-all-metrics.json"
+    }
+  },
+  "audits": [
+    "full_context_threshold/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/glide-actions-20261115-60611f0f/",
+    "$PROJECT/mihai/decision_models/runs/glide-cot-20261115-c8f6c4e8/",
+    "$PROJECT/mihai/decision_models/runs/decision-variants-20261123/glide-full/"
+  ],
+  "source_sha256": {
+    "full_context_threshold/audit.json": "1ccd2d79d8b46eda610eac68cb09aa6885c1bd772a43af230b2e91f1a44d0f94",
+    "full_context_threshold/scores/glide-action-metrics.json": "af9159c7b0662207dc9bea14ca2b452561560102def2f70d4d0e8a5d5fbbd519",
+    "full_context_threshold/scores/glide-action-records.json": "7eb892fdf9d08601ed3eac4acd230309218294823650d1964f92e111a84bfd72",
+    "full_context_threshold/scores/glide-all-metrics.json": "955ea396640fdd5e6ec87887de649d7dbffb97f5946918e12ebc17fc98d91d2e",
+    "full_context_threshold/scores/glide-all-records.json": "a6937836aef0c04c2e2691b7d825bf43bb05cbc2f88ac262c6e2289327b39180",
+    "full_context_threshold/scores/glide-cot-metrics.json": "7511eb716cd2887eef641d883e208fb891521610e866c37e9aa6f7591960a3b5",
+    "full_context_threshold/scores/glide-cot-records.json": "2c94e9894cc7ab4ff30dbebdcac8c68dcc50864b22ae4af24352c03a5fe7f2b3"
+  }
+}

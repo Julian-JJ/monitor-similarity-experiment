@@ -21,7 +21,7 @@ Accuracy and G-mean² use positives and clean controls; cross-objective false al
 - All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined.
 - Maximum and average reuse the same calls; averaging is not weighted by chunk length.
 - This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case.
-- Chunking and the final decision rule both differ from full-input highest-answer inference.
+- Chunking and the final decision rule both differ from full-input highest-answer inference. The full-context P(A) ≥ 0.5 experiment controls for the threshold rule.
 - Shared chunk job duration: 2:02:25, also including the new full Combined evaluation.
 
 ## Results on the common comparison cases

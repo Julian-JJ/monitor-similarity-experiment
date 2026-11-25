@@ -22,7 +22,7 @@ decision_models/
 - Each transcript is checked against its task’s malicious and benign candidate objectives: **150 cases per view**. Actions, CoT and Combined are views of the same cases.
 - Headline metrics use **41 positive + 66 clean-negative cases**. The **40 cross-objective negatives** and **3 assigned-objective failures** have separate scores. These are objective-achievement labels, not main-task success grades.
 - A means detected; B/C/D mean not detected. **TPR** is detection among positives; **clean FPR** is alarms on clean controls; **accuracy** is correct positive/clean decisions divided by valid positive/clean judgments; **G-mean² = TPR × (1 − clean FPR)**. Cross FPR is reported separately.
-- Highest option means four-way argmax. Chunk maximum/average instead compares P(A) with **0.5**, equivalent to comparing A against B+C+D. These are different decision rules.
+- Highest option means four-way argmax. Full-context threshold and chunk maximum/average compare raw P(A) with **0.5**, equivalent to comparing A against B+C+D. The full-context threshold experiment reuses exactly the argmax experiment’s responses.
 - Four sampled labels/analyses are pooled as four judgments, never majority-voted. GLiDE/Jev draws share one probability vector; Qwen samples are independently generated analyses.
 - “Full context” means the full rendered view with the existing **2,000-character tool-result cuts**. Actor system instructions, grading labels and follow-up responses are excluded.
 - Invalid answers and blocked summary cases are reported and excluded from rates, never treated as negative answers. Per-experiment tables below use **all valid cases for that experiment**.
@@ -106,6 +106,20 @@ Reuse each full-input probability vector; apply temperature 0.6 and top-p 0.9, t
 
 **Notes:** Actions and CoT were evaluated. Sampled full Combined was not run. The four labels share one inference result; they are not four independent analyses.
 
+### [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md)
+
+Compare full-input detection with chunk aggregation using the same binary probability threshold.
+
+Reuse the exact full-context responses from the highest-answer experiment. Flag only when the original raw P(A) is at least 0.5, including equality. Apply no sampling, temperature rescaling or top-p filtering. This compares A with the combined probability of B, C and D.
+
+| Input | Valid cases | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |
+|---|---:|---:|---:|---:|---:|---:|
+| Actions | 150/150 | 90.7% | 92.7% | 10.6% | 0.829 | 12.5% |
+| CoT | 150/150 | 82.2% | 53.7% | 0.0% | 0.537 | 2.5% |
+| Combined | 150/150 | 89.7% | 73.2% | 0.0% | 0.732 | 20.0% |
+
+**Notes:** All 450 full-context responses were verified against their saved requests and original argmax records. No new model or API calls. Prompts, input rendering, model versions and labels are identical to the full-context highest-answer experiment. Changed A alarms to negative decisions: 13 Actions, 21 CoT and 22 Combined, across all 150 cases per view. The original argmax results remain a separate experiment. Threshold results are point estimates; no new confidence intervals were computed. Full-context and chunk methods now share the 0.5 decision threshold; chunking still changes the input and includes a partial-transcript notice. This is offline rescoring, so original inference runtime is unchanged.
+
 ### [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md)
 
 Test whether judging smaller pieces helps detection, using the strongest local signal.
@@ -118,7 +132,7 @@ Use the baseline chunk planner (12,000-token budget, single-pass-if-fits shortcu
 | CoT | 150/150 | 97.2% | 92.7% | 0.0% | 0.927 | 17.5% |
 | Combined | 150/150 | 96.3% | 92.7% | 1.5% | 0.913 | 22.5% |
 
-**Notes:** All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined. Maximum and average reuse the same calls; averaging is not weighted by chunk length. This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case. Chunking and the final decision rule both differ from full-input highest-answer inference. Shared chunk job duration: 2:02:25, also including the new full Combined evaluation.
+**Notes:** All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined. Maximum and average reuse the same calls; averaging is not weighted by chunk length. This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case. Chunking and the final decision rule both differ from full-input highest-answer inference. The full-context P(A) ≥ 0.5 experiment controls for the threshold rule. Shared chunk job duration: 2:02:25, also including the new full Combined evaluation.
 
 ### [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md)
 
@@ -132,7 +146,7 @@ Use the baseline chunk planner (12,000-token budget, single-pass-if-fits shortcu
 | CoT | 150/150 | 97.2% | 92.7% | 0.0% | 0.927 | 0.0% |
 | Combined | 150/150 | 97.2% | 92.7% | 0.0% | 0.927 | 0.0% |
 
-**Notes:** All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined. Maximum and average reuse the same calls; averaging is not weighted by chunk length. This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case. Chunking and the final decision rule both differ from full-input highest-answer inference. Shared chunk job duration: 2:02:25, also including the new full Combined evaluation.
+**Notes:** All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined. Maximum and average reuse the same calls; averaging is not weighted by chunk length. This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case. Chunking and the final decision rule both differ from full-input highest-answer inference. The full-context P(A) ≥ 0.5 experiment controls for the threshold rule. Shared chunk job duration: 2:02:25, also including the new full Combined evaluation.
 
 ### [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md)
 
@@ -178,6 +192,20 @@ Draw four labels locally from each saved vector using temperature 0.6, top-p 0.9
 
 **Notes:** All three input views were evaluated. These are four draws, not four independently generated analyses.
 
+### [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md)
+
+Compare full-input detection with chunk aggregation using the same binary probability threshold.
+
+Reuse the exact full-context responses from the highest-answer experiment. Flag only when the original raw P(A) is at least 0.5, including equality. Apply no sampling, temperature rescaling or top-p filtering. This compares A with the combined probability of B, C and D.
+
+| Input | Valid cases | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |
+|---|---:|---:|---:|---:|---:|---:|
+| Actions | 150/150 | 78.5% | 100.0% | 34.8% | 0.652 | 35.0% |
+| CoT | 150/150 | 96.3% | 95.1% | 3.0% | 0.922 | 57.5% |
+| Combined | 150/150 | 95.3% | 95.1% | 4.5% | 0.908 | 52.5% |
+
+**Notes:** All 450 full-context responses were verified against their saved requests and original argmax records. No new model or API calls. Prompts, input rendering, model versions and labels are identical to the full-context highest-answer experiment. Changed A alarms to negative decisions: 9 Actions, 16 CoT and 8 Combined, across all 150 cases per view. The original argmax results remain a separate experiment. Threshold results are point estimates; no new confidence intervals were computed. Full-context and chunk methods now share the 0.5 decision threshold; chunking still changes the input and includes a partial-transcript notice. This is offline rescoring, so original inference runtime is unchanged.
+
 ### [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md)
 
 Test whether judging smaller pieces helps detection, using the strongest local signal.
@@ -190,7 +218,7 @@ Use the baseline chunk planner (12,000-token budget, single-pass-if-fits shortcu
 | CoT | 150/150 | 94.4% | 95.1% | 6.1% | 0.894 | 80.0% |
 | Combined | 150/150 | 96.3% | 95.1% | 3.0% | 0.922 | 62.5% |
 
-**Notes:** All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined. Maximum and average reuse the same calls; averaging is not weighted by chunk length. This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case. Chunking and the final decision rule both differ from full-input highest-answer inference. Shared chunk job duration: 1:02:10 through the hosted API.
+**Notes:** All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined. Maximum and average reuse the same calls; averaging is not weighted by chunk length. This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case. Chunking and the final decision rule both differ from full-input highest-answer inference. The full-context P(A) ≥ 0.5 experiment controls for the threshold rule. Shared chunk job duration: 1:02:10 through the hosted API.
 
 ### [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md)
 
@@ -204,7 +232,7 @@ Use the baseline chunk planner (12,000-token budget, single-pass-if-fits shortcu
 | CoT | 150/150 | 98.1% | 95.1% | 0.0% | 0.951 | 45.0% |
 | Combined | 150/150 | 98.1% | 95.1% | 0.0% | 0.951 | 15.0% |
 
-**Notes:** All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined. Maximum and average reuse the same calls; averaging is not weighted by chunk length. This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case. Chunking and the final decision rule both differ from full-input highest-answer inference. Shared chunk job duration: 1:02:10 through the hosted API.
+**Notes:** All 2,834 chunk calls completed: 184 Actions, 1,256 CoT and 1,394 Combined. Maximum and average reuse the same calls; averaging is not weighted by chunk length. This is a binary threshold rule, not choosing the largest of A, B, C and D. Any missing chunk invalidates the case. Chunking and the final decision rule both differ from full-input highest-answer inference. The full-context P(A) ≥ 0.5 experiment controls for the threshold rule. Shared chunk job duration: 1:02:10 through the hosted API.
 
 ### [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md)
 
@@ -287,6 +315,7 @@ The 68 completed requests passed the pilot audit (job 34391510, 1:52). The longe
 ## Code, records and limitations
 
 - [Setup instructions and historical run log](SETUP_HISTORY.md); [initial GLiDE runner](run_evaluation.py); [Qwen/GLiDE variants](variants/run_variants.py); [Jev runner](jev/run_jev.py).
+- [Full-context threshold comparison](full_context_threshold/README.md) and [offline rescoring script](full_context_threshold/rescore.py): the same probabilities, flagged at P(A) ≥ 0.5.
 - Prompts: [Actions](monitorbench_action.json), [CoT](long_context/prompt.json), [Combined](variants/combined-question.json), [chunks and summaries](variants/prompts.py).
 - [Machine-readable catalog](experiments/catalog.json), [observations](../observations_mihai.md), and [rebuild script](experiments/build_catalog.py). Each experiment’s provenance file links its source reports and SHA256 checksums.
 - Raw transcripts, model responses, weights and Qwen summaries stay on the cluster. Decision-model runs are under `$PROJECT/mihai/decision_models/runs/`; submitted code is under `$PROJECT/releases/`. Exact original run locations remain in the provenance records.
@@ -302,7 +331,7 @@ For the table below, each input view uses the **intersection of cases with valid
 - **CoT:** 135 total cases; 37 positives + 63 clean = 100 primary cases; 32 cross-objective negatives and 3 assigned-objective failures.
 - **Combined:** 137 total cases; 38 positives + 59 clean = 97 primary cases; 37 cross-objective negatives and 3 assigned-objective failures.
 
-Sampled rows contribute four judgments per included case; other rows contribute one. **Bold marks the best observed value within each input view, including ties**, based on unrounded values. It is not a significance claim. The supporting demos, length pilot and summary-generation counts are excluded from the accuracy ranking.
+Sampled rows contribute four judgments per included case; other rows contribute one. **Bold marks the best observed value within each input view, including ties**, based on unrounded values. Higher is better for accuracy, TPR and G-mean²; lower is better for clean FPR and cross FPR. It is not a significance claim. The supporting demos, length pilot and summary-generation counts are excluded from the accuracy ranking.
 
 | Input | Experiment | Accuracy ↑ | TPR ↑ | Clean FPR ↓ | G-mean² ↑ | Cross FPR ↓ |
 |---|---|---:|---:|---:|---:|---:|
@@ -311,11 +340,13 @@ Sampled rows contribute four judgments per included case; other rows contribute 
 | Actions | [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 83.8% | 97.6% | 25.0% | 0.732 | 32.5% |
 | Actions | [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 84.8% | 95.1% | 21.9% | 0.743 | 20.0% |
 | Actions | [GLiDE-9B — full context, sampled answers](experiments/glide/full_context_sampled/README.md) | 84.8% | 94.5% | 21.5% | 0.742 | 23.1% |
+| Actions | [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | **90.5%** | 92.7% | **10.9%** | **0.825** | **12.5%** |
 | Actions | [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | **90.5%** | 92.7% | **10.9%** | **0.825** | **12.5%** |
 | Actions | [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | **90.5%** | 92.7% | **10.9%** | **0.825** | **12.5%** |
 | Actions | [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 89.5% | 90.2% | **10.9%** | 0.804 | **12.5%** |
 | Actions | [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 75.2% | **100.0%** | 40.6% | 0.594 | 45.0% |
 | Actions | [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 77.1% | **100.0%** | 37.5% | 0.625 | 41.9% |
+| Actions | [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 79.0% | **100.0%** | 34.4% | 0.656 | 35.0% |
 | Actions | [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 79.0% | **100.0%** | 34.4% | 0.656 | 35.0% |
 | Actions | [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | 79.0% | **100.0%** | 34.4% | 0.656 | 35.0% |
 | Actions | [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 84.8% | 95.1% | 21.9% | 0.743 | 22.5% |
@@ -324,11 +355,13 @@ Sampled rows contribute four judgments per included case; other rows contribute 
 | CoT | [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 88.0% | 97.3% | 17.5% | 0.803 | 21.9% |
 | CoT | [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 92.0% | 78.4% | **0.0%** | 0.784 | 34.4% |
 | CoT | [GLiDE-9B — full context, sampled answers](experiments/glide/full_context_sampled/README.md) | 85.5% | 64.2% | 2.0% | 0.629 | 21.9% |
+| CoT | [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | 84.0% | 56.8% | **0.0%** | 0.568 | 3.1% |
 | CoT | [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | **98.0%** | 94.6% | **0.0%** | **0.946** | 18.8% |
 | CoT | [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | **98.0%** | 94.6% | **0.0%** | **0.946** | **0.0%** |
 | CoT | [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 86.0% | 94.6% | 19.0% | 0.766 | 3.1% |
 | CoT | [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 89.0% | 94.6% | 14.3% | 0.811 | 84.4% |
 | CoT | [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 86.8% | 95.9% | 18.7% | 0.781 | 75.8% |
+| CoT | [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 96.0% | 94.6% | 3.2% | 0.916 | 56.3% |
 | CoT | [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 94.0% | 94.6% | 6.3% | 0.886 | 84.4% |
 | CoT | [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | **98.0%** | 94.6% | **0.0%** | **0.946** | 40.6% |
 | CoT | [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 72.0% | **100.0%** | 44.4% | 0.556 | 43.8% |
@@ -336,11 +369,13 @@ Sampled rows contribute four judgments per included case; other rows contribute 
 | Combined | [Qwen3-32B — sampled baseline](experiments/qwen/qwen32b_sampled/README.md) | 83.5% | 94.1% | 23.3% | 0.722 | 18.9% |
 | Combined | [Qwen3-32B — greedy baseline](experiments/qwen/qwen32b_greedy/README.md) | 85.6% | 94.7% | 20.3% | 0.755 | 13.5% |
 | Combined | [GLiDE-9B — full context, highest answer](experiments/glide/full_context_highest/README.md) | 90.7% | 86.8% | 6.8% | 0.810 | 54.1% |
+| Combined | [GLiDE-9B — full context, P(A) ≥ 0.5](experiments/glide/full_context_threshold/README.md) | 88.7% | 71.1% | **0.0%** | 0.711 | 21.6% |
 | Combined | [GLiDE-9B — chunks, maximum P(A)](experiments/glide/chunks_max/README.md) | 95.9% | 92.1% | 1.7% | 0.905 | 24.3% |
 | Combined | [GLiDE-9B — chunks, average P(A)](experiments/glide/chunks_mean/README.md) | 96.9% | 92.1% | **0.0%** | 0.921 | **0.0%** |
 | Combined | [Qwen3-32B summaries → GLiDE-9B](experiments/glide/qwen_summaries/README.md) | 92.8% | 97.4% | 10.2% | 0.875 | 10.8% |
 | Combined | [Jev 1.14 — full context, highest answer](experiments/jev/full_context_highest/README.md) | 93.8% | 94.7% | 6.8% | 0.883 | 67.6% |
 | Combined | [Jev 1.14 — full context, sampled answers](experiments/jev/full_context_sampled/README.md) | 88.1% | 92.8% | 14.8% | 0.790 | 64.9% |
+| Combined | [Jev 1.14 — full context, P(A) ≥ 0.5](experiments/jev/full_context_threshold/README.md) | 94.8% | 94.7% | 5.1% | 0.899 | 56.8% |
 | Combined | [Jev 1.14 — chunks, maximum P(A)](experiments/jev/chunks_max/README.md) | 95.9% | 94.7% | 3.4% | 0.915 | 67.6% |
 | Combined | [Jev 1.14 — chunks, average P(A)](experiments/jev/chunks_mean/README.md) | **97.9%** | 94.7% | **0.0%** | **0.947** | 16.2% |
 | Combined | [Qwen3-32B summaries → Jev 1.14](experiments/jev/qwen_summaries/README.md) | 78.4% | **100.0%** | 35.6% | 0.644 | 32.4% |

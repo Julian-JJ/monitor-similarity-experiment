@@ -1,0 +1,262 @@
+{
+  "point_estimates": {
+    "malicious": {
+      "metrics": {
+        "tpr": [
+          1.0,
+          null
+        ],
+        "monitorbench_score": [
+          1.0,
+          null
+        ],
+        "tnr_clean": [
+          0.48484848484848486,
+          null
+        ],
+        "tnr_cross": [
+          0.6,
+          null
+        ],
+        "tnr_own": [
+          null,
+          "no valid verdicts on own-objective failures"
+        ],
+        "gmean2_clean": [
+          0.48484848484848486,
+          null
+        ],
+        "gmean2_cross": [
+          0.6,
+          null
+        ],
+        "tpr_majority": [
+          1.0,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.48484848484848486,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.48484848484848486,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 22,
+          "requested": 22,
+          "valid": 22,
+          "detected": 22,
+          "decided": 22,
+          "decided_detected": 22
+        },
+        "clean_negative": {
+          "pairs": 33,
+          "requested": 33,
+          "valid": 33,
+          "detected": 17,
+          "decided": 33,
+          "decided_detected": 17
+        },
+        "cross_negative": {
+          "pairs": 20,
+          "requested": 20,
+          "valid": 20,
+          "detected": 8,
+          "decided": 20,
+          "decided_detected": 8
+        },
+        "own_failure": {
+          "pairs": 0,
+          "requested": 0,
+          "valid": 0,
+          "detected": 0,
+          "decided": 0,
+          "decided_detected": 0
+        }
+      }
+    },
+    "benign": {
+      "metrics": {
+        "tpr": [
+          1.0,
+          null
+        ],
+        "monitorbench_score": [
+          1.0,
+          null
+        ],
+        "tnr_clean": [
+          0.8181818181818182,
+          null
+        ],
+        "tnr_cross": [
+          0.7,
+          null
+        ],
+        "tnr_own": [
+          0.0,
+          null
+        ],
+        "gmean2_clean": [
+          0.8181818181818182,
+          null
+        ],
+        "gmean2_cross": [
+          0.7,
+          null
+        ],
+        "tpr_majority": [
+          1.0,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.8181818181818182,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.8181818181818182,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 19,
+          "requested": 19,
+          "valid": 19,
+          "detected": 19,
+          "decided": 19,
+          "decided_detected": 19
+        },
+        "clean_negative": {
+          "pairs": 33,
+          "requested": 33,
+          "valid": 33,
+          "detected": 6,
+          "decided": 33,
+          "decided_detected": 6
+        },
+        "cross_negative": {
+          "pairs": 20,
+          "requested": 20,
+          "valid": 20,
+          "detected": 6,
+          "decided": 20,
+          "decided_detected": 6
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      }
+    },
+    "pooled": {
+      "metrics": {
+        "tpr": [
+          1.0,
+          null
+        ],
+        "monitorbench_score": [
+          1.0,
+          null
+        ],
+        "tnr_clean": [
+          0.6515151515151515,
+          null
+        ],
+        "tnr_cross": [
+          0.65,
+          null
+        ],
+        "tnr_own": [
+          0.0,
+          null
+        ],
+        "gmean2_clean": [
+          0.6515151515151515,
+          null
+        ],
+        "gmean2_cross": [
+          0.65,
+          null
+        ],
+        "tpr_majority": [
+          1.0,
+          null
+        ],
+        "tnr_clean_majority": [
+          0.6515151515151515,
+          null
+        ],
+        "gmean2_clean_majority": [
+          0.6515151515151515,
+          null
+        ],
+        "coverage": [
+          1.0,
+          null
+        ],
+        "invalid_rate": [
+          0.0,
+          null
+        ]
+      },
+      "counts": {
+        "positive": {
+          "pairs": 41,
+          "requested": 41,
+          "valid": 41,
+          "detected": 41,
+          "decided": 41,
+          "decided_detected": 41
+        },
+        "clean_negative": {
+          "pairs": 66,
+          "requested": 66,
+          "valid": 66,
+          "detected": 23,
+          "decided": 66,
+          "decided_detected": 23
+        },
+        "cross_negative": {
+          "pairs": 40,
+          "requested": 40,
+          "valid": 40,
+          "detected": 14,
+          "decided": 40,
+          "decided_detected": 14
+        },
+        "own_failure": {
+          "pairs": 3,
+          "requested": 3,
+          "valid": 3,
+          "detected": 3,
+          "decided": 3,
+          "decided_detected": 3
+        }
+      }
+    }
+  }
+}

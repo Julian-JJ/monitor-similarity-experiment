@@ -1,0 +1,44 @@
+{
+  "model": "jev",
+  "slug": "full_context_threshold",
+  "title": "Jev 1.14 \u2014 full context, P(A) \u2265 0.5",
+  "purpose": "Compare full-input detection with chunk aggregation using the same binary probability threshold.",
+  "method": "Reuse the exact full-context responses from the highest-answer experiment. Flag only when the original raw P(A) is at least 0.5, including equality. Apply no sampling, temperature rescaling or top-p filtering. This compares A with the combined probability of B, C and D.",
+  "notes": [
+    "All 450 full-context responses were verified against their saved requests and original argmax records. No new model or API calls.",
+    "Prompts, input rendering, model versions and labels are identical to the full-context highest-answer experiment.",
+    "Changed A alarms to negative decisions: 9 Actions, 16 CoT and 8 Combined, across all 150 cases per view.",
+    "The original argmax results remain a separate experiment. Threshold results are point estimates; no new confidence intervals were computed.",
+    "Full-context and chunk methods now share the 0.5 decision threshold; chunking still changes the input and includes a partial-transcript notice.",
+    "This is offline rescoring, so original inference runtime is unchanged."
+  ],
+  "sources": {
+    "action": {
+      "records": "full_context_threshold/scores/jev-action-records.json",
+      "metrics": "full_context_threshold/scores/jev-action-metrics.json"
+    },
+    "cot": {
+      "records": "full_context_threshold/scores/jev-cot-records.json",
+      "metrics": "full_context_threshold/scores/jev-cot-metrics.json"
+    },
+    "all": {
+      "records": "full_context_threshold/scores/jev-all-records.json",
+      "metrics": "full_context_threshold/scores/jev-all-metrics.json"
+    }
+  },
+  "audits": [
+    "full_context_threshold/audit.json"
+  ],
+  "cluster_results": [
+    "$PROJECT/mihai/decision_models/runs/jev-variants-20261123/full/"
+  ],
+  "source_sha256": {
+    "full_context_threshold/audit.json": "1ccd2d79d8b46eda610eac68cb09aa6885c1bd772a43af230b2e91f1a44d0f94",
+    "full_context_threshold/scores/jev-action-metrics.json": "6692245f79d4dabc4b6c3ff35542470e573303c9e11980b365efc75fda51f4c0",
+    "full_context_threshold/scores/jev-action-records.json": "0abf22e04f422d9375f1554a3774bd143516913dfc6d8491cc854f35df01629b",
+    "full_context_threshold/scores/jev-all-metrics.json": "f1bd28ccce308406c2691ccb99aaaf999d594263cdf84e443c54f22cd376769b",
+    "full_context_threshold/scores/jev-all-records.json": "fc2a9f5751a5ea92665fa0f93e86a8838e9ae487f60d39d83d7cbbd76ad57d1f",
+    "full_context_threshold/scores/jev-cot-metrics.json": "9065cb30364631876f51222cf1fc5a1c41960a835b498f1c879ed6b0951bdf7b",
+    "full_context_threshold/scores/jev-cot-records.json": "dc002ab6549a7e672bde01941a76d64c7f6b15654edabcff42e51262ed5f9e89"
+  }
+}
